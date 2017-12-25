@@ -1,0 +1,4 @@
+Packages/*.nb
+Packages/*/*.nb
+Packages/*/*/*/*.nb
+.DS_Store
