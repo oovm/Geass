@@ -31,7 +31,32 @@ Tschirnhaus$Version="V1.0";
 Tschirnhaus$LastUpdate="2016-11-11";
 (* ::Subsubsection:: *)
 (*功能块 1*)
-ExampleFunction[1]="我就是个示例函数,什么功能都没有";
+Psi[q_,x_,n_Integer]:=Psi[q,x,n]=-((n*Coefficient[q,x,5-n]+Sum[Psi[q,x,n-j]*Coefficient[q,x,5-j],{j,n-1}])/Coefficient[q,x,5]);
+PrincipalTransformEqn[(p_)==0,x_,y_]:=Module[
+	{alpha,beta,xi},
+	{alpha,beta}={alpha,beta}/.Last[
+		Solve[{5*(xi^2+alpha*xi+beta)==0, Expand[5*(xi^2+alpha*xi+beta)^2]==0}/.xi^(n_.)->(1/5)*Psi[p,x,n],{alpha,beta}
+		]
+	];
+	{Evaluate[#1^2+alpha*#1+beta]&,
+		y^5-Sum[(y^(5-j)*Collect[(xi^2+alpha*xi+beta)^j+4*beta^j,xi])/j/.xi^(n_.)->Psi[p,x,n],{j,3,5}]==0
+	}
+]/;MatchQ[CoefficientList[p,x],{_,_,_,_,_?(#1=!=0&),_}];
+BringJerrardTransformEqn[(p_)==0,y_,z_]:=Module[
+	{alpha,beta,gamma,delta,epsilon,kappa,lambda,mu,nu,psi,xi,zeta,a,b,c,g,h},
+	psi[t_]:=Expand[5*t]/.xi^(n_.)->(1/5)*Psi[p,y,n];
+	{a,b,c}=(Psi[p,y,#1]&)/@{3,4,5};
+	g=5*a*xi^3-5*b*xi^2-a^2;h=5*a*xi^4-5*c*xi^2-a*b;
+	{lambda,mu,nu}=psi/@{g^2,2*g*h,h^2};
+	kappa=-(mu/(2*lambda))+Sqrt[mu^2/(4*lambda^2)-nu/lambda];
+	delta=Solve[psi[(zeta*xi+kappa*g+h)^3]==0,zeta][[1,1,2]];
+	alpha=5*a;beta=5*a*kappa;gamma=-5*b*kappa-5*c;
+	epsilon=(-a^2)*kappa-a*b;
+	{Evaluate[alpha*#1^4+beta*#1^3+gamma*#1^2+delta*#1+epsilon]&,
+		z^5-Sum[(z^(5-j)*Collect[psi[(delta*xi+kappa*g+h)^j],xi])/j,{j,4,5}]==0
+	}
+]/;MatchQ[CoefficientList[p,y],{_,_,_,0,0,_}];
+CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4)==0};
 
 
 
