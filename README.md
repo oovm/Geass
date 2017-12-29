@@ -1,10 +1,10 @@
 # Geis — Code::Geass
 
 [![Mathematica](https://img.shields.io/badge/Mathematica-%3E%3D10.0-brightgreen.svg)](https://www.wolfram.com/mathematica/)
-[![Release Vision](https://img.shields.io/badge/release-v0.1.0-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
+[![Release Vision](https://img.shields.io/badge/release-v0.3.0-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/GalAster/Geis.svg)](https://github.com/GalAster/Geis.git)
 
-![Background](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/MainPage.jpg)
+![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.jpg)
 
 ## ![项目简介](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-blocks.png) Introduce
 
@@ -38,10 +38,10 @@ Geis 是 Geass 的原型, 意为
 - 演示代码
 
 ```Mathematica
-Needs["Deus`"]
-In[1]:= MagicShow[Magic[3,3],3]
+Needs["Geis`"]
+In[1]:=
 In[2]:=
-In[3]:= NonogramGenerate["https://github.com/GalAster/Deus",Method->"QR"]
+In[3]:=
 In[4]:=
 ```
 ## ![计划项目](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/battleship.png) Todo List
