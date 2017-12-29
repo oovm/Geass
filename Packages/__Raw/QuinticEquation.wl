@@ -20,13 +20,8 @@
 BeginPackage["QuinticEquation`"];
 MetacyclicGroup::usage = "亚循环群";
 GaloisGroup::usage = "";
-QuinticRootToRadicals::usage = "";
-SolveQuinticEqn::usage = "";
 QuinticSolve::usage = "";
-SolvableGroupQ::usage="SolvableGroupQ[poly, x] yields True if poly, a quintic in
-the variable x, is solvable in radicals, and yields False
-otherwise.";
-
+SolvableGroupQ::usage="判定是否是可解群,很小一部分情况会判定错误.";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -42,7 +37,7 @@ QuinticEquation$LastUpdate="2017-12-29";
 Format[MetacyclicGroup[n_], TraditionalForm] :=	TraditionalForm["MetacyclicGroup[" <> ToString@n <> "]"];
 (*MetacyclicGroup[n_]:="MetacyclicGroup["<>ToString@n<>"]";*)
 QuinticSolve::notQE="`1` 不是五次多项式或者含有符号变量!";
-QuinticSolve::noRad="该式无法用根式求解! 请检查其伽罗瓦群.";
+QuinticSolve::noRad="该式无法用根式求解! 请先计算其伽罗瓦群.";
 QuinticSolve::noSol="`1` 无法用现有方法求解! 或者其伽罗瓦群不是可解群.";
 QuinticEquationQ[poly_,var_]:=Block[
 	{coes=CoefficientList[poly,var]},
@@ -54,6 +49,7 @@ QuinticSolve[poly_,var_]:=Block[
 		Message[QuinticSolve::notQE,TraditionalForm@poly];
 		Return[Null]
 	];
+
 	solR=Solve[poly==0,var];
 	If[solR[[1,1,2,0]]=!=Root,Return[solR]];
 	sol=SolveQuinticEqn[poly==0,var];
@@ -68,8 +64,6 @@ QuinticSolve[poly_,var_]:=Block[
 	];
 	List/@Thread[var->sol]
 ];
-
-
 (* ::Subsubsection:: *)
 (*GaloisGroup*)
 GaloisGroup::"red" = "The quintic is reducible.";
