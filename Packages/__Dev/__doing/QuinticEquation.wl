@@ -1,6 +1,6 @@
 (* ::Package:: *)
 (* ::Title:: *)
-(*QuinticEquation(样板包)*)
+(*QuinticEquation(五次方程求解器)*)
 (* ::Subchapter:: *)
 (*程序包介绍*)
 (* ::Text:: *)
@@ -8,8 +8,8 @@
 (*Created by Mathematica Plugin for IntelliJ IDEA*)
 (*Establish from GalAster's template*)
 (**)
-(*Author:我是作者*)
-(*Creation Date:我是创建日期*)
+(*Author:酱紫君*)
+(*Creation Date:2017-12-25*)
 (*Copyright:CC4.0 BY+NA+NC*)
 (**)
 (*该软件包遵从CC协议:署名、非商业性使用、相同方式共享*)
@@ -18,12 +18,15 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["QuinticEquation`"];
+MetacyclicGroup::usage = "亚循环群";
 GaloisGroup::usage = "";
-SolveQuintic::usage = "";
+QuinticRootToRadicals::usage = "";
+SolveQuinticEqn::usage = "";
+QuinticSolve::usage = "";
 SolvableGroupQ::usage="SolvableGroupQ[poly, x] yields True if poly, a quintic in
 the variable x, is solvable in radicals, and yields False
 otherwise.";
-QuinticByRadicalsQ::usage = "";
+
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -32,8 +35,41 @@ QuinticEquation::usage = "程序包的说明,这里抄一遍";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
-QuinticEquation$Version="V1.0";
-QuinticEquation$LastUpdate="2016-11-11";
+QuinticEquation$Version="V1.1";
+QuinticEquation$LastUpdate="2017-12-29";
+(* ::Subsubsection:: *)
+(*QuinticSolve*)
+Format[MetacyclicGroup[n_], TraditionalForm] :=	TraditionalForm["MetacyclicGroup[" <> ToString@n <> "]"];
+(*MetacyclicGroup[n_]:="MetacyclicGroup["<>ToString@n<>"]";*)
+QuinticSolve::notQE="`1` 不是五次多项式或者含有符号变量!";
+QuinticSolve::noRad="该式无法用根式求解! 请检查其伽罗瓦群.";
+QuinticSolve::noSol="`1` 无法用现有方法求解! 或者其伽罗瓦群不是可解群.";
+QuinticEquationQ[poly_,var_]:=Block[
+	{coes=CoefficientList[poly,var]},
+	And@@(NumericQ/@coes)&&Length@coes==6&&Exponent[poly,var]==5
+];
+QuinticSolve[poly_,var_]:=Block[
+	{x,sol,solR},
+	If[!QuinticEquationQ[poly,var],
+		Message[QuinticSolve::notQE,TraditionalForm@poly];
+		Return[Null]
+	];
+	solR=Solve[poly==0,var];
+	If[solR[[1,1,2,0]]=!=Root,Return[solR]];
+	sol=SolveQuinticEqn[poly==0,var];
+	If[sol===$Failed||sol[[1,1,2,0]]===Root,
+		Echo["快速根式变换失败, 尝试使用扩展算法.","Method: "],
+		Return[sol]
+	];
+	sol=Simplify[QuinticRootToRadicals/@(solR[[All, 1, 2]])];
+	If[sol[[1,0]]==Root,
+		Message[QuinticSolve::noSol,TraditionalForm@poly];
+		Return[solR]
+	];
+	List/@Thread[var->sol]
+];
+
+
 (* ::Subsubsection:: *)
 (*GaloisGroup*)
 GaloisGroup::"red" = "The quintic is reducible.";
@@ -142,14 +178,8 @@ resolvent[s_, r_, q_, p_, x_] :=x^6 + 8 r x^5 + (2 p q^2 - 6 p^2 r + 40 r^2 -
 	125 p q^4 s^2 - 99 p^5 r s^2 - 725 p^2 q^2 r s^2 +
 	1200 p^3 r^2 s^2 + 3250 q^2 r^2 s^2 - 2000 p r^3 s^2 -
 	1250 p q r s^3 + 3125 p^2 s^4 - 9375 r s^4);
-
 (* ::Subsubsection:: *)
-(*功能块 1*)
-SolveQuinticEqn::usage="RadicalQuinticSolve[lhs == rhs, x] attempts to solve the
-reduced quintic lhs == rhs in the variable x in terms of
-radicals.";
-SolveQuinticEqn::rad="This quintic is unsolvable in radicals.";
-
+(*SolveQuinticEqn*)
 SolveQuinticEqn[a_==b_,x_]:=Module[
 	{temp},
 	temp=QuinticByRadicalsQ[a-b,x];
@@ -157,8 +187,8 @@ SolveQuinticEqn[a_==b_,x_]:=Module[
 		If[temp[[2]]===$Failed,
 			Return[Solve[a==b,x]],If[(#===Integer||#===Rational)&[Head[temp[[2]]]],
 			tosolve[a-b,x,temp[[2]]],
-			Message[SolveQuintic::rad];
-			Return[$Failed]]],Message[SolveQuintic::rad];
+			Message[QuinticSolve::noRad];
+			Return[$Failed]]],Message[QuinticSolve::noRad];
 	Return[$Failed]
 	]
 ];
@@ -224,19 +254,23 @@ T3[a_,b_,r_]:=(-18880 a^5+781250b^4-34240a^4 r-21260a^3 r^2-5980a^2 r^3-1255 a r
 T4[a_,b_,r_]:=(68800 a^5+25000a^4 r+11500a^3 r^2+3250a^2 r^3+375 a r^4+100 r^5)/(512 a^5+6250 b^4);
 V[a_,b_,r_]:=(-1036800 a^5+48828125 b^4-2280000a^4 r-1291500a^3 r^2-399500a^2 r^3-76625a r^4-16100r^5)/(256a^5+3125b^4);
 (* ::Subsubsection:: *)
-(*功能块 1*)
+(*QuinticRootToRadicals*)
 QuinticRootToRadicals[root_Root] := Block[
 	{a, b, c, d, e, f, h, p, q, r, s, t, u, v, w, x, z, g, F, A, B, G, H, L, M, P, Q, R, S},
 	If[!TrueQ[Element[root, Algebraics]], Return[root]];
 	With[{m = MinimalPolynomial[root, z]},
 		If[!PolynomialQ[m, z] || Exponent[m, z] != 5,Return[root]];
 		{f, e, d, c, b, a} = CoefficientList[m, z]];
-		p = (5 a c - 2 b^2)/(5 a^2);
-		q = (25 a^2 d - 15 a b c + 4 b^3)/(25 a^3);
-		r = (125 a^3 e - 50 a^2 b d + 15 a b^2 c - 3 b^4)/(125 a^4);
-		s = (3125 a^4 f - 625 a^3 b e + 125 a^2 b^2 d - 25 a b^3 c + 4 b^5)/(3125 a^5);
-		G = Select[Solve[{(p^2 + 12 r + 4 t) Discriminant[z^5 + p z^3 + q z^2 + r z + s, z]
-			== (2 t^3 + 8 t^2 r + (2 p q^2 - 6 p^2 r + 24 r^2 - 50 q s) t - 2 q^4 +
+	p = (5 a c - 2 b^2)/(5 a^2);
+	q = (25 a^2 d - 15 a b c + 4 b^3)/(25 a^3);
+	r = (125 a^3 e - 50 a^2 b d + 15 a b^2 c - 3 b^4)/(125 a^4);
+	s = (3125 a^4 f - 625 a^3 b e + 125 a^2 b^2 d - 25 a b^3 c +
+		4 b^5)/(3125 a^5);
+	G = Select[
+		Solve[{(p^2 + 12 r + 4 t) Discriminant[
+			z^5 + p z^3 + q z^2 + r z + s,
+			z] == (2 t^3 +
+			8 t^2 r + (2 p q^2 - 6 p^2 r + 24 r^2 - 50 q s) t - 2 q^4 +
 			13 p q^2 r - 16 (p^2 - 4 r) r^2 - 5 q (3 p^2 + 40 r) s +
 			125 p s^2)^2,
 			4 r^2 + 2 q (p q + 5 s + 2 u) + 5 x ==
@@ -280,76 +314,66 @@ QuinticRootToRadicals[root_Root] := Block[
 						q^3 (4095 r s + 752 s t + 43 r u) - 10 q^4 v + 176 r^3 v +
 						5 q s (635 s (5 s + u) - 312 r v) - 124 q r^2 w +
 						1375 s^2 x - q^2 (612 r^3 + 220 r^2 t + 110 s w - 27 r x)),
-			Element[t, Rationals]}, {t, u, v, w, x}], FreeQ[ConditionalExpression], 1];
+			Element[t, Rationals]}, {t, u, v, w, x}],
+		FreeQ[ConditionalExpression], 1];
 	If[G == {}, Return[root], G /. Rule -> Set];
-		g = -3 p^2 (-v + q^2) + 20 v r - 50 u s + 125 s^2 +
-			3 q^2 (-7 r + t) + p^3 (4 r + 3 t) +
-			p (16 r^2 - q (u - 40 s) + 12 r t);
-		h = 366 v q^3 - 402 q^5 - 748 u q^2 r + 440 w r^2 - 448 q r^3 -
-			12 p^5 s - 275 w q s + 2100 v r s - 1925 q^2 r s - 4875 u s^2 -
-			1875 s^3 + x (-65 p^2 q - 550 q r + 875 p s) + 524 q r^2 t -
-			1040 q^2 s t + p^4 q (158 r + 85 t) +
-			p^3 (85 v q - 85 q^3 + 4 u r - 1462 r s - 418 s t) +
-			p (41 w q^2 - 298 v q r - 56 u r^2 + 5 q s (419 u + 35 s) +
-				10 r s (290 r + 159 t) + q^3 (896 r + 419 t)) -
-			p^2 (58 w r + 520 v s + q (73 u q - 142 r^2 + 159 q s + 440 r t));
-		F = Sqrt[
-			5 (40 x p - 120 w q + p^2 (-24 v + 40 q^2) + 100 v r +
-				332 q^2 r - 300 u s + 125 s^2 + p^3 (-80 r - 24 t) + 24 q^2 t +
-				p (88 u q + 160 r^2 - 480 q s + 100 r t))];
-		A = Sqrt[5/2 (g + h/F)];
-		B = 1/(A F)
-		5 (42 q^5 + 12 p^5 s + 3 p^4 q (14 r + 5 t) +
-			q^2 (550 r s + 515 s t - 182 r u) - 6 q^3 v +
-			p^3 (-15 q^3 + 492 r s + 213 s t - 4 r u + 15 q v) -
-			50 s (25 s^2 - 60 s u + 22 r v) - 40 r^2 w + 650 q s w +
-			p^2 (-3 q^2 (52 s + 9 u) + 195 s v - 22 r w +
-				q (358 r^2 + 50 r t - 35 x)) -
-			8 q r (29 r^2 + 23 r t + 25 x) +
-			p (q^3 (-246 r + t) + 5 q s (565 s - 54 u) -
-				4 r (350 r s + 235 s t - 24 r u) + 68 q r v + 19 q^2 w -
-				250 s x));
-		H = -1750 w q + p^2 (-600 v + 500 q^2) + 2500 v r - 7500 u s +
-			3125 s^2 + q^2 (-700 r - 1150 t) + p^3 (-2000 r - 600 t) +
-			p (1000 x + 1700 u q + 4000 r^2 - 6375 q s + 2500 r t);
-		L = -25 x p - 9 v p^2 - 25 w q - 7 u p q - 7 p^2 q^2 - 60 v r +
-			50 p^3 r + 128 q^2 r - 308 p r^2 + 525 u s - 145 p q s -
-			1000 s^2 - p^3 t + 11 q^2 t - 96 p r t;
-		M = -125 x p + 67 v p^2 + 75 w q - 109 u p q - 79 p^2 q^2 -
-			420 v r + 210 p^3 r + 496 q^2 r - 676 p r^2 + 1175 u s -
-			415 p q s - 750 s^2 + 63 p^3 t + 27 q^2 t - 412 p r t; {A, B,
-			F} = Select[{{A, B, F}, {-A, -B, F}, {B, -A, -F}, {-B, A, -F}},
-			Apply[25 (2 u - p q - 5 s) + (L #1 + M #2)/g + H/#3 != 0 &],
-			1][[1]];
-		P = 1/5 (5/4 (25 (2 u - p q - 5 s) + (L A + M B)/g + H/F))^(1/5);
-		Q = -((4 p^2 q + 2 (36 q r + 7 q t - 5 w) + p (-45 s + 4 u + F))/(
-			10 P F));
-		R = 1/(500 P^2) (-25 q + (
-			25 (-40 r^2 - 35 q s + 2 p^2 (10 r + t) - 22 q u +
-				2 p (q^2 + v) - 10 x))/F +
-			1/g 2 (-105 q s A - 140 q s B + 4 r t (3 A + 4 B) +
-				2 p q^2 (7 A + 11 B) + r^2 (76 A + 68 B) -
-				2 p^2 (29 r A + 3 A t + 17 r B + 9 t B) + 23 q A u +
-				14 q B u - 2 p (2 A + 11 B) v + 35 A x + 5 B x));
-		S = 1/(500 P^3) (1/
-			g (-80 r s A + 30 s A t + 60 r s B + 40 s t B +
-			14 q^3 (A + 3 B) - 16 r g + 3 t g +
-			2 p^2 (26 s A + 18 s B + g) + 8 r A u + 44 r B u -
-			2 q (p (26 r A + 3 A t + 33 r B + 14 t B) + (A + 18 B) v) +
-			p (-8 A w + 6 B w)) + (
-			5 (8 p^3 q - 2 p q (13 r + t) + p^2 (-20 s + 8 u) +
-				5 (14 q^3 + 10 r s - 5 s t - 10 r u - 2 q v)))/F);
-		Select[{P + Q + R + S,
-			(-1)^(4/5) P - (-1)^(1/5) Q + (-1)^(2/5) R - (-1)^(3/5)S,
-			-(-1)^(3/5) P + (-1)^(2/5) Q + (-1)^(4/5) R - (-1)^(1/5)S,
-			+(-1)^(2/5) P - (-1)^(3/5) Q - (-1)^(1/5) R + (-1)^(4/5)S,
-			-(-1)^(1/5) P + (-1)^(4/5) Q - (-1)^(3/5) R + (-1)^(2/5)S
-		} - b/(5 a), !TrueQ[# != root] &, 1][[1]]
+	g = -3 p^2 (-v + q^2) + 20 v r - 50 u s + 125 s^2 + 3 q^2 (-7 r + t) +
+		p^3 (4 r + 3 t) + p (16 r^2 - q (u - 40 s) + 12 r t);
+	h = 366 v q^3 - 402 q^5 - 748 u q^2 r + 440 w r^2 - 448 q r^3 -
+		12 p^5 s - 275 w q s + 2100 v r s - 1925 q^2 r s - 4875 u s^2 -
+		1875 s^3 + x (-65 p^2 q - 550 q r + 875 p s) + 524 q r^2 t -
+		1040 q^2 s t + p^4 q (158 r + 85 t) +
+		p^3 (85 v q - 85 q^3 + 4 u r - 1462 r s - 418 s t) +
+		p (41 w q^2 - 298 v q r - 56 u r^2 + 5 q s (419 u + 35 s) +
+			10 r s (290 r + 159 t) + q^3 (896 r + 419 t)) -
+		p^2 (58 w r + 520 v s + q (73 u q - 142 r^2 + 159 q s + 440 r t));
+	F = Sqrt[5 (40 x p - 120 w q + p^2 (-24 v + 40 q^2) + 100 v r +
+		332 q^2 r - 300 u s + 125 s^2 + p^3 (-80 r - 24 t) + 24 q^2 t +
+		p (88 u q + 160 r^2 - 480 q s + 100 r t))];
+	A = Sqrt[5/2 (g + h/F)];
+	B = 1/(A F) 5 (42 q^5 + 12 p^5 s + 3 p^4 q (14 r + 5 t) +
+		q^2 (550 r s + 515 s t - 182 r u) - 6 q^3 v +
+		p^3 (-15 q^3 + 492 r s + 213 s t - 4 r u + 15 q v) -
+		50 s (25 s^2 - 60 s u + 22 r v) - 40 r^2 w + 650 q s w +
+		p^2 (-3 q^2 (52 s + 9 u) + 195 s v - 22 r w +
+			q (358 r^2 + 50 r t - 35 x)) -
+		8 q r (29 r^2 + 23 r t + 25 x) +
+		p (q^3 (-246 r + t) + 5 q s (565 s - 54 u) -
+			4 r (350 r s + 235 s t - 24 r u) + 68 q r v + 19 q^2 w -
+			250 s x));
+	H = -1750 w q + p^2 (-600 v + 500 q^2) + 2500 v r - 7500 u s +
+		3125 s^2 + q^2 (-700 r - 1150 t) + p^3 (-2000 r - 600 t) +
+		p (1000 x + 1700 u q + 4000 r^2 - 6375 q s + 2500 r t);
+	L = -25 x p - 9 v p^2 - 25 w q - 7 u p q - 7 p^2 q^2 - 60 v r +
+		50 p^3 r + 128 q^2 r - 308 p r^2 + 525 u s - 145 p q s - 1000 s^2 -
+		p^3 t + 11 q^2 t - 96 p r t;
+	M = -125 x p + 67 v p^2 + 75 w q - 109 u p q - 79 p^2 q^2 - 420 v r +
+		210 p^3 r + 496 q^2 r - 676 p r^2 + 1175 u s - 415 p q s -
+		750 s^2 + 63 p^3 t + 27 q^2 t - 412 p r t; {A, B, F} =
+		Select[{{A, B, F}, {-A, -B, F}, {B, -A, -F}, {-B, A, -F}},Apply[25 (2 u - p q - 5 s) + (L #1 + M #2)/g + H/#3 != 0 &], 1][[1]];
+	P = 1/5 (5/4 (25 (2 u - p q - 5 s) + (L A + M B)/g + H/F))^(1/5);
+	Q = -((4 p^2 q + 2 (36 q r + 7 q t - 5 w) +	p (-45 s + 4 u + F))/(10 P F));
+	R = 1/(500 P^2) (-25 q + (25 (-40 r^2 - 35 q s + 2 p^2 (10 r + t) -
+		22 q u + 2 p (q^2 + v) - 10 x))/F +
+		1/g 2 (-105 q s A - 140 q s B + 4 r t (3 A + 4 B) +
+			2 p q^2 (7 A + 11 B) + r^2 (76 A + 68 B) -
+			2 p^2 (29 r A + 3 A t + 17 r B + 9 t B) + 23 q A u +
+			14 q B u - 2 p (2 A + 11 B) v + 35 A x + 5 B x));
+	S = 1/(500 P^3) (1/
+		g (-80 r s A + 30 s A t + 60 r s B + 40 s t B +
+		14 q^3 (A + 3 B) - 16 r g + 3 t g +
+		2 p^2 (26 s A + 18 s B + g) + 8 r A u + 44 r B u -
+		2 q (p (26 r A + 3 A t + 33 r B + 14 t B) + (A + 18 B) v) +
+		p (-8 A w + 6 B w)) + (5 (8 p^3 q - 2 p q (13 r + t) +
+		p^2 (-20 s + 8 u) +
+		5 (14 q^3 + 10 r s - 5 s t - 10 r u - 2 q v)))/F);
+	Select[{P + Q + R + S,
+		(-1)^(4/5) P - (-1)^(1/5) Q + (-1)^(2/5) R - (-1)^(3/5)S,
+		-(-1)^(3/5) P + (-1)^(2/5) Q + (-1)^(4/5) R - (-1)^(1/5)S,
+		+(-1)^(2/5) P - (-1)^(3/5) Q - (-1)^(1/5) R + (-1)^(4/5)S,
+		-(-1)^(1/5) P + (-1)^(4/5) Q - (-1)^(3/5) R + (-1)^(2/5)S
+	} - b/(5 a), !TrueQ[# != root] &, 1][[1]]
 ];
-
-
-(* ::Subsubsection:: *)
-(*功能块 1*)
 
 
 (* ::Subsection::Closed:: *)
