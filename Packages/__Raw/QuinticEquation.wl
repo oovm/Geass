@@ -19,9 +19,9 @@
 (*函数说明*)
 BeginPackage["QuinticEquation`"];
 MetacyclicGroup::usage = "亚循环群";
-GaloisGroup::usage = "";
-QuinticSolve::usage = "";
-SolvableGroupQ::usage="判定是否是可解群,很小一部分情况会判定错误.";
+GaloisGroup::usage = "计算五次方程的伽罗瓦群";
+QuinticSolve::usage = "根式求解五次方程";
+SolvableGroupQ::usage="判定是否是可解群,有可能会判定错误.";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -49,7 +49,6 @@ QuinticSolve[poly_,var_]:=Block[
 		Message[QuinticSolve::notQE,TraditionalForm@poly];
 		Return[Null]
 	];
-
 	solR=Solve[poly==0,var];
 	If[solR[[1,1,2,0]]=!=Root,Return[solR]];
 	sol=SolveQuinticEqn[poly==0,var];
@@ -372,6 +371,9 @@ QuinticRootToRadicals[root_Root] := Block[
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
-End[] ;
-
+End[];
+SetAttributes[
+	{MetacyclicGroup,GaloisGroup,QuinticSolve,SolvableGroupQ}
+	{Protected,ReadProtected}
+];
 EndPackage[];

@@ -8,7 +8,7 @@
 (*Created by Mathematica Plugin for IntelliJ IDEA*)
 (*Establish from GalAster's template*)
 (**)
-(*Author:我是作者*)
+(*Author: 酱紫君*)
 (*Creation Date:我是创建日期*)
 (*Copyright:CC4.0 BY+NA+NC*)
 (**)
@@ -18,7 +18,12 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["Tschirnhaus`"];
-ExampleFunction::usage = "这里应该填这个函数的说明,如果要换行用\"\\r\"\r就像这样";
+PrincipalTransformEqn::usage = "";
+BringJerrardTransformEqn::usage = "";
+CanonicalTransformEqn::usage = "";
+PrincipalTransform::usage = "";
+BringJerrardTransform::usage = "";
+CanonicalTransform::usage = "";
 QuinticSolveHermite::usage = "";
 (* ::Section:: *)
 (*程序包正体*)
@@ -31,7 +36,7 @@ Begin["`Private`"];
 Tschirnhaus$Version="V1.0";
 Tschirnhaus$LastUpdate="2017-12-29";
 (* ::Subsubsection:: *)
-(*TransformsEqn 1*)
+(*TransformsEqn*)
 Psi[q_,x_,n_Integer]:=Psi[q,x,n]=-((n*Coefficient[q,x,5-n]+Sum[Psi[q,x,n-j]*Coefficient[q,x,5-j],{j,n-1}])/Coefficient[q,x,5]);
 PrincipalTransformEqn[(p_)==0,x_,y_]:=Module[
 	{alpha,beta,xi},
@@ -60,9 +65,33 @@ BringJerrardTransformEqn[(p_)==0,y_,z_]:=Module[
 CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4)==0};
 (* ::Subsubsection:: *)
 (*功能块 2*)
+PrincipalTransform[p_?PolynomialQ,x_,y_]:=Block[
+	{mQ,trans,eqn},
+	mQ=!MatchQ[CoefficientList[p,x],{_,_,_,_,_?(#=!=0&),_}];
+	If[mQ,Return@Message[TschirnhausTransform::notPT,p]];
+	{trans,eqn}=Quiet@PrincipalTransformEqn[p==0,x,y]//Chop;
+	Echo[TraditionalForm[x==trans[y]],"Traceback:"];
+	First@eqn
+];
+BringJerrardTransform[p_?PolynomialQ,x_,y_]:=Block[
+	{mQ,trans,eqn},
+	mQ=!MatchQ[CoefficientList[p,x],{_,_,_,0,0,_}];
+	If[mQ,Return@Message[TschirnhausTransform::notBJ,p]];
+	{trans,eqn}=Quiet@BringJerrardTransformEqn[p==0,x,y]//Chop;
+	Echo[TraditionalForm[x==trans[y]],"Traceback:"];
+	First@eqn
+];
+CanonicalTransform[p_?PolynomialQ,x_,y_]:=Block[
+	{mQ,trans,eqn},
+	mQ=!MatchQ[CoefficientList[p,x],{_,_,0,0,0,_}];
+	If[mQ,Return@Message[TschirnhausTransform::notCT,p]];
+	{trans,eqn}=Quiet@CanonicalTransformEqn[p==0,x,y]//Chop;
+	Echo[TraditionalForm[x==trans[y]],"Traceback:"];
+	First@eqn
+];
 (* ::Subsubsection:: *)
 (*HermiteQuinticSolve*)
-HermiteQuinticSolve[rho_,t_]:=Module[
+HermiteSolve[rho_,t_]:=Module[
 	{k,b,q},
 	k=Tan[(1/4)*ArcSin[16/(25*Sqrt[5]*rho^2)]]//Simplify;
 	b=((k^2)^(1/8)*If[Re[rho]==0,-Sign[Im[rho]],Sign[Re[rho]]])/(2*5^(3/4)*Sqrt[k]*Sqrt[1-k^2]);
@@ -89,13 +118,16 @@ HermiteQuinticSolve[rho_,t_]:=Module[
 			-I*InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))
 	}
 ];
-
-
-
 (* ::Subsubsection:: *)
-(*功能块 2*)
-(* ::Subsubsection:: *)
-(*功能块 2*)
+(*MeijerGSolve*)
+MeijerGSolve[n_Integer /; n > 1, t_] := Append[
+	Table[Exp[-((2*Pi*I*j)/(n - 1))] -(t*Sqrt[n/(n - 1)^3]*Inactive[MeijerG][{Append[Range[n - 1]/n,
+			(n - 2)/(n - 1)], {}}, {Range[0, n - 2]/(n - 1),
+			{-(1/(n - 1))}}, -((n^(n/(n - 1))*t*Exp[(2*Pi*I*j)/(n - 1)])/(n - 1)),
+		1/(n - 1)])/(2*Pi)^(n - 3/2),{j, 0, n - 2}],
+		(Sqrt[n/(n - 1)^3]*t*Inactive[MeijerG][{Range[0, n - 1]/n, {}}, {{0}, Range[-1, n - 3]/(n - 1)},
+			(-n^n)*(t/(n - 1))^(n - 1)])/Sqrt[2*Pi]
+];
 (* ::Subsubsection:: *)
 (*功能块 2*)
 (* ::Subsubsection:: *)
