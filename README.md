@@ -8,7 +8,7 @@
 
 ## ![项目简介](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-blocks.png) Introduce
 
-
+Geis 是 Geass 的原型, 意为
 
 ## ![安装方式](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-map.png) Install
 
@@ -27,14 +27,6 @@
 - 使用``BTools` ``的部署功能
 
 ## ![意见建议](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-box.png) Show Time!
-
-### 三维幻方
-
-<div align=center>
-<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Magic3D.gif" alt="3D幻方"/>
-</div>
-
-### 汉诺塔动画
 
 ### 数织二维码
 
@@ -58,20 +50,6 @@ In[4]:=
   - [x] 三柱汉诺塔任意解
   - [x] 多柱汉诺塔一般解
   - [ ] 多柱汉诺塔任意解
-- [x] 幻方
-  - [x] 任意维幻方
-  - [ ] 特种幻方
-  - [ ] 幻方判定
-- [x] 数织
-  - [x] 二维码数织
-  - [ ] 非方阵数织
-  - [ ] 多色数织
-- [ ] DigitalMinato
-  - [ ] 算法优化
-- [ ] 猜拳
-- [ ] n 皇后
-- [ ] 约瑟夫游戏
-
 
 ## ![更新日志](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/hourglass.png) Change Log
 

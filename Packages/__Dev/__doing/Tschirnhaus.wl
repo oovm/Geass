@@ -19,6 +19,7 @@
 (*函数说明*)
 BeginPackage["Tschirnhaus`"];
 ExampleFunction::usage = "这里应该填这个函数的说明,如果要换行用\"\\r\"\r就像这样";
+QuinticSolveHermite::usage = "";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -28,9 +29,9 @@ Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
 Tschirnhaus$Version="V1.0";
-Tschirnhaus$LastUpdate="2016-11-11";
+Tschirnhaus$LastUpdate="2017-12-29";
 (* ::Subsubsection:: *)
-(*功能块 1*)
+(*TransformsEqn 1*)
 Psi[q_,x_,n_Integer]:=Psi[q,x,n]=-((n*Coefficient[q,x,5-n]+Sum[Psi[q,x,n-j]*Coefficient[q,x,5-j],{j,n-1}])/Coefficient[q,x,5]);
 PrincipalTransformEqn[(p_)==0,x_,y_]:=Module[
 	{alpha,beta,xi},
@@ -57,12 +58,48 @@ BringJerrardTransformEqn[(p_)==0,y_,z_]:=Module[
 	}
 ]/;MatchQ[CoefficientList[p,y],{_,_,_,0,0,_}];
 CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4)==0};
+(* ::Subsubsection:: *)
+(*功能块 2*)
+(* ::Subsubsection:: *)
+(*HermiteQuinticSolve*)
+HermiteQuinticSolve[rho_,t_]:=Module[
+	{k,b,q},
+	k=Tan[(1/4)*ArcSin[16/(25*Sqrt[5]*rho^2)]]//Simplify;
+	b=((k^2)^(1/8)*If[Re[rho]==0,-Sign[Im[rho]],Sign[Re[rho]]])/(2*5^(3/4)*Sqrt[k]*Sqrt[1-k^2]);
+	q=EllipticNomeQ[k^2];({t->#1}&)/@{
+		b*((-1)^(3/4)*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)
+			+I*InverseEllipticNomeQ[E^((1/5)*(2*I)*Pi)*q^(1/5)]^(1/8))*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(4*I)*Pi)]^(1/8)
+			+InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))*((q^(5/8)*InverseEllipticNomeQ[q^5]^(1/8))/(q^5)^(1/8)
+			+InverseEllipticNomeQ[q^(1/5)]^(1/8))),
+		b*(E^((1/4)*(3*I)*Pi)*InverseEllipticNomeQ[E^((1/5)*(2*I)*Pi)*q^(1/5)]^(1/8)
+			-InverseEllipticNomeQ[q^(1/5)]^(1/8))*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)/E^((1/4)*(3*I)*Pi)
+			+I*InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))*(I*InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(4*I)*Pi)]^(1/8)
+			+(q^(5/8)*InverseEllipticNomeQ[q^5]^(1/8))/(q^5)^(1/8)),
+		b*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)/E^((1/4)*(3*I)*Pi)
+			-I*InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(4*I)*Pi)]^(1/8))*(-InverseEllipticNomeQ[q^(1/5)]^(1/8)
+			-I*InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))*((q^(5/8)*InverseEllipticNomeQ[q^5]^(1/8))/(q^5)^(1/8)
+			+E^((1/4)*(3*I)*Pi)*InverseEllipticNomeQ[E^((1/5)*(2*I)*Pi)*q^(1/5)]^(1/8)),
+		b*(InverseEllipticNomeQ[q^(1/5)]^(1/8)
+			-I*InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(4*I)*Pi)]^(1/8))*((-E^((1/4)*(3*I)*Pi))*InverseEllipticNomeQ[E^((1/5)*(2*I)*Pi)*q^(1/5)]^(1/8)
+			-I*InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)/E^((1/4)*(3*I)*Pi)
+			+(q^(5/8)*InverseEllipticNomeQ[q^5]^(1/8))/(q^5)^(1/8)),
+		b*(InverseEllipticNomeQ[q^(1/5)]^(1/8)
+			-InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)/E^((1/4)*(3*I)*Pi))*(I*InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(4*I)*Pi)]^(1/8)
+			-InverseEllipticNomeQ[E^((1/5)*(2*I)*Pi)*q^(1/5)]^(1/8)*E^((1/4)*(3*I)*Pi))*((InverseEllipticNomeQ[q^5]^(1/8)*q^(5/8))/(q^5)^(1/8)
+			-I*InverseEllipticNomeQ[E^((1/5)*(4*I)*Pi)*q^(1/5)]^(1/8))
+	}
+];
 
 
 
 (* ::Subsubsection:: *)
 (*功能块 2*)
-ExampleFunction[2]="我就是个示例函数,什么功能都没有";
+(* ::Subsubsection:: *)
+(*功能块 2*)
+(* ::Subsubsection:: *)
+(*功能块 2*)
+(* ::Subsubsection:: *)
+(*功能块 2*)
 
 
 (* ::Subsection::Closed:: *)
