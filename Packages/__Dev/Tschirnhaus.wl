@@ -9,7 +9,7 @@
 (*Establish from GalAster's template*)
 (**)
 (*Author: 酱紫君*)
-(*Creation Date:我是创建日期*)
+(*Creation Date:2012-12-28*)
 (*Copyright:CC4.0 BY+NA+NC*)
 (**)
 (*该软件包遵从CC协议:署名、非商业性使用、相同方式共享*)
@@ -35,6 +35,11 @@ Begin["`Private`"];
 (*主体代码*)
 Tschirnhaus$Version="V1.0";
 Tschirnhaus$LastUpdate="2017-12-29";
+(* ::Subsubsection:: *)
+(*功能块 2*)
+
+
+
 (* ::Subsubsection:: *)
 (*TransformsEqn*)
 Psi[q_,x_,n_Integer]:=Psi[q,x,n]=-((n*Coefficient[q,x,5-n]+Sum[Psi[q,x,n-j]*Coefficient[q,x,5-j],{j,n-1}])/Coefficient[q,x,5]);
@@ -64,7 +69,7 @@ BringJerrardTransformEqn[(p_)==0,y_,z_]:=Module[
 ]/;MatchQ[CoefficientList[p,y],{_,_,_,0,0,_}];
 CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4)==0};
 (* ::Subsubsection:: *)
-(*功能块 2*)
+(*Transforms*)
 PrincipalTransform[p_?PolynomialQ,x_,y_]:=Block[
 	{mQ,trans,eqn},
 	mQ=!MatchQ[CoefficientList[p,x],{_,_,_,_,_?(#=!=0&),_}];
@@ -90,7 +95,7 @@ CanonicalTransform[p_?PolynomialQ,x_,y_]:=Block[
 	First@eqn
 ];
 (* ::Subsubsection:: *)
-(*HermiteQuinticSolve*)
+(*HermiteSolve*)
 HermiteSolve[rho_,t_]:=Module[
 	{k,b,q},
 	k=Tan[(1/4)*ArcSin[16/(25*Sqrt[5]*rho^2)]]//Simplify;
@@ -130,8 +135,7 @@ MeijerGSolve[n_Integer /; n > 1, t_] := Append[
 ];
 (* ::Subsubsection:: *)
 (*功能块 2*)
-(* ::Subsubsection:: *)
-(*功能块 2*)
+
 
 
 (* ::Subsection::Closed:: *)
