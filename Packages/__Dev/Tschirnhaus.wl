@@ -72,7 +72,7 @@ CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4
 TschirnhausTransform::notPT="`1` 不满足契恩豪斯主变换的使用条件!";
 TschirnhausTransform::notBJ="`1`不满足布林-杰拉德变换的使用条件!";
 TschirnhausTransform::notCT="`1`不满足规范变换的使用条件!";
-PrincipalTransform[p_?PolynomialQ,x_,y_]:=Block[
+PrincipalTransform5[p_?PolynomialQ,x_,y_]:=Block[
 	{mQ,trans,eqn},
 	mQ=!MatchQ[CoefficientList[p,x],{_,_,_,_,_?(#=!=0&),_}];
 	If[mQ,Return@Message[TschirnhausTransform::notPT,p]];
@@ -88,7 +88,7 @@ BringJerrardTransform[p_?PolynomialQ,x_,y_]:=Block[
 	Echo[TraditionalForm[y==trans[x]],"Traceback:"];
 	Quiet@Simplify[First@eqn,Reals,TimeConstraint -> 0.1]
 ];
-CanonicalTransform[p_?PolynomialQ,x_,y_]:=Block[
+CanonicalTransform5[p_?PolynomialQ,x_,y_]:=Block[
 	{mQ,trans,eqn},
 	mQ=!MatchQ[CoefficientList[p,x],{_,_,0,0,0,_}];
 	If[mQ,Return@Message[TschirnhausTransform::notCT,p]];
