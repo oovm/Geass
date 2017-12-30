@@ -4,7 +4,7 @@
 [![Release Vision](https://img.shields.io/badge/release-v0.3.0-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/GalAster/Geis.svg)](https://github.com/GalAster/Geis.git)
 
-![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.jpg)
+![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.png)
 
 ## ![项目简介](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-blocks.png) Introduce
 
@@ -38,7 +38,7 @@ Geis 是 Geass 的原型, 意为
 - 演示代码
 
 ```Mathematica
-Needs["Geis`"]
+Needs["Geis`"];
 In[1]:=
 In[2]:=
 In[3]:=

@@ -3,16 +3,24 @@
     <words>
       <w>algebraics</w>
       <w>autocompletions</w>
+      <w>coef</w>
       <w>coes</w>
+      <w>crit</w>
+      <w>elim</w>
       <w>factorable</w>
+      <w>geass</w>
       <w>geis</w>
+      <w>hypergeometric</w>
       <w>jerrard</w>
       <w>meijer</w>
       <w>metacyclic</w>
       <w>newp</w>
       <w>randp</w>
       <w>realr</w>
+      <w>reals</w>
       <w>simp</w>
+      <w>tetrate</w>
+      <w>tetration</w>
       <w>traceback</w>
       <w>tschirnhaus</w>
     </words>
