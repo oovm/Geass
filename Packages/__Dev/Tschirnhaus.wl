@@ -99,7 +99,7 @@ CanonicalTransform5[p_?PolynomialQ,x_,y_]:=Block[
 (* ::Subsubsection:: *)
 (*Tschirnhaus*)
 TschirnhausTransform::done="`1` 已经是布林-杰拉德正规式!";
-
+TschirnhausTransform::noTrans = "暂时没有可以使用的契恩豪斯变换.";
 Tschirnhaus2[poly_,var_]:=Block[
 	{x=var,all1,all2,t},
 	If[MatchQ[CoefficientList[poly,var],{_,-1,1}],Message[TschirnhausTransform::done,poly];

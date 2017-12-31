@@ -4,23 +4,30 @@
       <w>algebraics</w>
       <w>autocompletions</w>
       <w>coef</w>
+      <w>coefs</w>
       <w>coes</w>
       <w>crit</w>
       <w>elim</w>
       <w>factorable</w>
+      <w>fnew</w>
       <w>geass</w>
       <w>geis</w>
       <w>hypergeometric</w>
+      <w>integralroot</w>
+      <w>introot</w>
+      <w>isfactorable</w>
       <w>jerrard</w>
       <w>meijer</w>
       <w>metacyclic</w>
       <w>newp</w>
+      <w>newroots</w>
       <w>randp</w>
       <w>realr</w>
       <w>reals</w>
       <w>simp</w>
       <w>tetrate</w>
       <w>tetration</w>
+      <w>tosolve</w>
       <w>traceback</w>
       <w>tschirnhaus</w>
     </words>

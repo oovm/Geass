@@ -33,7 +33,7 @@ Begin["`Private`"];
 Tetration$Version="V1.0";
 Tetration$LastUpdate="2017-12-29";
 (* ::Subsubsection:: *)
-(*功能块 1*)
+(*Tetrate*)
 Log4Prepare[n_,x_]:=Log4Prepare[n,x]=Block[
 	{mat,$MachinePrecision=32},
 	mat=Table[k^j/k!-If[j==k,Log[x]^-k,0],{j,0,n-1},{k,1,n}];
@@ -60,6 +60,8 @@ Log4Evaluate[v_List,z_?NumericQ]:=Block[
 		z>1,	Block[{i=-1},SlogCrit[NestWhile[Log[v[[1]],#]&,z,(i++;#>1)&]]+i]
 	]
 ];
+(* ::Subsubsection:: *)
+(*TetraLog/TetraRoot*)
 Options[TetraLog]={MaxIterations->10};
 TetraLog[x_,y_,OptionsPattern[]]:=Block[
 	{ans},
@@ -87,7 +89,7 @@ TetraRoot[a_,y_,OptionsPattern[]]:=Block[
 	If[First@ans<0.01,Message[General::ovfl];$Failed,Last@ans]
 ];
 (* ::Subsubsection:: *)
-(*功能块 2*)
+(*TetraD*)
 TetraND[f_,x_,c_]:=TetraND[f,x,c,1];
 TetraND[f_,x_,c_,k_]:=TetraND[f,x,c,k,0.0001];
 TetraND[f_,x_,c_,0,h_]:=(f/.x->c);

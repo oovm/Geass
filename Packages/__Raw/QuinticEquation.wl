@@ -343,7 +343,8 @@ QuinticRootToRadicals[root_Root] := Block[
 	M = -125 x p + 67 v p^2 + 75 w q - 109 u p q - 79 p^2 q^2 - 420 v r +
 		210 p^3 r + 496 q^2 r - 676 p r^2 + 1175 u s - 415 p q s -
 		750 s^2 + 63 p^3 t + 27 q^2 t - 412 p r t; {A, B, F} =
-		Select[{{A, B, F}, {-A, -B, F}, {B, -A, -F}, {-B, A, -F}},Apply[25 (2 u - p q - 5 s) + (L #1 + M #2)/g + H/#3 != 0 &], 1][[1]];
+		Select[{{A, B, F}, {-A, -B, F}, {B, -A, -F}, {-B, A, -F}},
+			Apply[25 (2 u - p q - 5 s) + (L #1 + M #2)/g + H/#3 != 0 &], 1][[1]];
 	P = 1/5 (5/4 (25 (2 u - p q - 5 s) + (L A + M B)/g + H/F))^(1/5);
 	Q = -((4 p^2 q + 2 (36 q r + 7 q t - 5 w) +	p (-45 s + 4 u + F))/(10 P F));
 	R = 1/(500 P^2) (-25 q + (25 (-40 r^2 - 35 q s + 2 p^2 (10 r + t) -
@@ -367,13 +368,11 @@ QuinticRootToRadicals[root_Root] := Block[
 		-(-1)^(1/5) P + (-1)^(4/5) Q - (-1)^(3/5) R + (-1)^(2/5)S
 	} - b/(5 a), !TrueQ[# != root] &, 1][[1]]
 ];
-
-
 (* ::Subsection::Closed:: *)
 (*附加设置*)
 End[];
 SetAttributes[
-	{MetacyclicGroup,GaloisGroup,QuinticSolve,SolvableGroupQ}
+	{MetacyclicGroup,GaloisGroup,QuinticSolve,SolvableGroupQ},
 	{Protected,ReadProtected}
 ];
 EndPackage[];
