@@ -29,7 +29,7 @@
 ### 解五次方程
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/Hermitsolve.png" alt="解五次方程"/>
+<img src="https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/HermiteSolve.png" alt="解五次方程"/>
 </div>
 
 

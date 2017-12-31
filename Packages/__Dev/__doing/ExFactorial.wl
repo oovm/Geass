@@ -28,7 +28,7 @@ Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
 ExFactorials$Version="V1.0";
-ExFactorials$LastUpdate="2016-11-11";
+ExFactorials$LastUpdate="2018-01-01";
 (* ::Subsubsection:: *)
 (*功能块 1*)
 ExampleFunction[1]="我就是个示例函数,什么功能都没有";
