@@ -130,7 +130,7 @@ Tschirnhaus4[poly_,var_]:=Block[
 (*HermiteSolve*)
 HermiteSolve[rho_,t_]:=Module[
 	{k,b,q},
-	k=Tan[(1/4)*ArcSin[16/(25*Sqrt[5]*rho^2)]]//Simplify;
+	k=Tan[(1/4)*ArcSin[16/(25*Sqrt[5]*rho^2)]]//FullSimplify;
 	b=((k^2)^(1/8)*If[Re[rho]==0,-Sign[Im[rho]],Sign[Re[rho]]])/(2*5^(3/4)*Sqrt[k]*Sqrt[1-k^2]);
 	q=EllipticNomeQ[k^2];({t->#1}&)/@{
 		b*((-1)^(3/4)*(InverseEllipticNomeQ[q^(1/5)/E^((1/5)*(2*I)*Pi)]^(1/8)

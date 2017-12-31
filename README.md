@@ -6,11 +6,9 @@
 
 ![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.png)
 
-## ![项目简介](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-blocks.png) Introduce
+## ![项目简介](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/01_Introduce.png) Introduce
 
-Geis 是 Geass 的原型, 意为
-
-## ![安装方式](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-map.png) Install
+## ![安装方式](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/02_Install.png) Install
 
 #### 手动安装
 
@@ -26,12 +24,12 @@ Geis 是 Geass 的原型, 意为
 
 - 使用``BTools` ``的部署功能
 
-## ![意见建议](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-game-box.png) Show Time!
+## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/03_ShowTime.png) Show Time!
 
-### 数织二维码
+### 解五次方程
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Nonograms.png" alt="数织二维码" width = "400"/>
+<img src="https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/Hermitsolve.png" alt="解五次方程"/>
 </div>
 
 
@@ -39,28 +37,30 @@ Geis 是 Geass 的原型, 意为
 
 ```Mathematica
 Needs["Geis`"];
-In[1]:=
+In[1]:= TschirnhausSolve[t^5-t+(11 2^(3/4))/(15 Sqrt[5])==0,Method->EllipticNomeQ];
 In[2]:=
-In[3]:=
-In[4]:=
 ```
-## ![计划项目](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/battleship.png) Todo List
+## ![计划项目](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/04_TodoList.png) Todo List
 
-- [x] 汉诺塔
-  - [x] 三柱汉诺塔任意解
-  - [x] 多柱汉诺塔一般解
-  - [ ] 多柱汉诺塔任意解
+- [ ] 契恩豪斯变换
+  - [ ] 契恩豪斯主变换
+  - [x] 布林-杰拉德变换
+  - [ ] 契恩豪斯规范变换
+- [x] 五次方程
+  - [x] 五次方程椭圆函数解
+  - [x] 五次方程梅耶尔函数解
+  - [ ] 五次方程根式解
+- [ ] 超幂运算
+- [ ] 
 
-## ![更新日志](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/hourglass.png) Change Log
+## ![更新日志](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/05_ChangeLog.png) Change Log
 
 | 版本号 |最近更新|
 |:-----:| --- 
-| 0.4.0 | 加入并持续更新24点中!
-| 0.3.2 | 加入数织包
-| 0.2.1 | 移植幻方包
-| Older | [查看完整记录](https://github.com/GalAster/Deus/blob/master/Resources/Change%20Log%20Full.md)
+| 0.3.0 | ???????
+| Older | [查看完整记录](https://github.com/GalAster/Geis/blob/master/Resources/Change%20Log%20Full.md)
 
-## ![意见建议](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-games-with-roles.png) Ideas
+## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/06_Ideas.png) Ideas
 
 ### 联系方式
 
@@ -70,8 +70,20 @@ In[4]:=
 |[<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Logo_Zhihu.png" alt="知乎链接" width = "100" align=center />](https://www.zhihu.com/people/GalAster)|[<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Logo_QQ.png" alt="QQ链接" width = "100" align=center />](https://jq.qq.com/?_wv=1027&k=5BqFya1)
 
 
-## ![许可协议](https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/board-gaming.png) License
+## ![许可协议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/07_License.png) License
 
-该软件包遵从CC 4.0协议: <img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/ico/CC40_BY+NC+SA.png" alt="CC协议" align=center />
+该软件包遵从CC 4.0协议: **BY-NC-SA**.
 
-**BY-NC-SA** (非商业性使用、相同方式共享）
+Pic:
+
+A:
+
+Ico:
+
+
+
+<img src="http://opentf.github.io/GuokrBadge/cc/gs/cc_byncsa.flat.guokr.svg" alt="数织二维码" width = "400"/>
+
+
+
+
