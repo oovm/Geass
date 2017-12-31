@@ -1,6 +1,6 @@
 (* ::Package:: *)
 (* ::Title:: *)
-(*QuinticEquation(五次方程求解器)*)
+(*KempnerSums(肯普纳求和)*)
 (* ::Subchapter:: *)
 (*程序包介绍*)
 (* ::Text:: *)
@@ -11,7 +11,7 @@
 (* ::Text:: *)
 (*Author: Robert Baillie and Thomas Schmelzer*)
 (*Translator: GalAster*)
-(*Creation Date: 2008-7-24*)
+(*Update Date: 2008-7-24*)
 (*Copyright: CC Non-Commercial*)
 (* ::Program:: *)
 (*1.禁止用作商业用途*)
@@ -21,9 +21,7 @@
 
 (* ::Section:: *)
 (*Summary*)
-
-
-(* ::Text:: *)
+(* ::Subsection:: *)
 (*   This package computes sums of "Kempner" series.*)
 (**)
 (*   The harmonic series 1/1 + 1/2 + 1/3 + ... + 1/n + ... diverges.  This means*)
@@ -69,8 +67,6 @@
 (*      pages 525-540 (June/July 2008).*)
 (*      The latest version of this Mathematica code may be downloaded from*)
 (*        http://library.wolfram.com/infocenter/MathSource/7166/*)
-
-
 (* ::Subsection::Closed:: *)
 (*Test*)
 

@@ -21,7 +21,7 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["ExFactorial`"];
-MultiFactorial::usage = "";
+MultiFactorial::usage = "MultiFactorial[x,k] x 的 k阶阶乘.";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
