@@ -24,11 +24,11 @@ CanonicalTransformEqn::usage = "";
 PrincipalTransform::usage = "";
 BringJerrardTransform::usage = "";
 CanonicalTransform::usage = "";
-QuinticSolveHermite::usage = "";
-HypergeometricSolve::usage = "";
+TschirnhausSolve::usage = "";
 Tschirnhaus2::usage = "";
 Tschirnhaus3::usage = "";
 Tschirnhaus4::usage = "";
+RootSimplify::usage = "";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -72,7 +72,7 @@ CanonicalTransformEqn[z_^5+e_. z_+f_==0,z_,t_]:={#/(-e)^(1/4)&,t^5-t+f/(-e)^(5/4
 TschirnhausTransform::notPT="`1` 不满足契恩豪斯主变换的使用条件!";
 TschirnhausTransform::notBJ="`1`不满足布林-杰拉德变换的使用条件!";
 TschirnhausTransform::notCT="`1`不满足规范变换的使用条件!";
-PrincipalTransform5[p_?PolynomialQ,x_,y_]:=Block[
+PrincipalTransform[p_?PolynomialQ,x_,y_]:=Block[
 	{mQ,trans,eqn},
 	mQ=!MatchQ[CoefficientList[p,x],{_,_,_,_,_?(#=!=0&),_}];
 	If[mQ,Return@Message[TschirnhausTransform::notPT,p]];
@@ -88,7 +88,7 @@ BringJerrardTransform[p_?PolynomialQ,x_,y_]:=Block[
 	Echo[TraditionalForm[y==trans[x]],"Traceback:"];
 	Quiet@Simplify[First@eqn,Reals,TimeConstraint -> 0.1]
 ];
-CanonicalTransform5[p_?PolynomialQ,x_,y_]:=Block[
+CanonicalTransform[p_?PolynomialQ,x_,y_]:=Block[
 	{mQ,trans,eqn},
 	mQ=!MatchQ[CoefficientList[p,x],{_,_,0,0,0,_}];
 	If[mQ,Return@Message[TschirnhausTransform::notCT,p]];
@@ -168,53 +168,112 @@ MeijerGSolve[n_Integer /; n > 1, t_] := Append[
 		(-n^n)*(t/(n - 1))^(n - 1)])/Sqrt[2*Pi]
 ];
 (* ::Subsubsection:: *)
-(*Hypergeometric*)
-HypergeometricSolve[2,1]=1/2-1/2 HypergeometricPFQ[{-(1/2)},{},-4 t];
-HypergeometricSolve[2,2]=1/2+1/2 HypergeometricPFQ[{-(1/2)},{},-4 t];
-HypergeometricSolve[3,1]=Hypergeometric2F1[1/6,-(1/6),1/2,(27 t^2)/4]
-	+1/2 t Hypergeometric2F1[2/3,1/3,3/2,(27 t^2)/4];
-HypergeometricSolve[3,2]=-Hypergeometric2F1[1/6,-(1/6),1/2,(27 t^2)/4]
-	+1/2 t Hypergeometric2F1[2/3,1/3,3/2,(27 t^2)/4];
-HypergeometricSolve[3,3]=-(t Hypergeometric2F1[2/3,1/3,3/2,(27 t^2)/4]);
-HypergeometricSolve[4,1]=-(t HypergeometricPFQ[{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]);
-HypergeometricSolve[4,2]=HypergeometricPFQ[{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)]
-	+1/3 t HypergeometricPFQ[{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
-	-2/9 t^2 HypergeometricPFQ[{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
-HypergeometricSolve[4,3]=(-1)^(2/3) HypergeometricPFQ[{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)]
-	+1/3 t HypergeometricPFQ[{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
-	+2/9 (-1)^(1/3) t^2 HypergeometricPFQ[{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
-HypergeometricSolve[4,4]=-((-1)^(1/3) HypergeometricPFQ[{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)])
-	+1/3 t HypergeometricPFQ[{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
-	-2/9 (-1)^(2/3) t^2 HypergeometricPFQ[{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
-HypergeometricSolve[5,1]=t HypergeometricPFQ[{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)];
-HypergeometricSolve[5,2]=-((4 (-1)^(1/4) Gamma[3/4] HypergeometricPFQ[{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)])
-	-1/4 t HypergeometricPFQ[{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
-	+(25 (-1)^(3/4) t^2 Gamma[5/4] HypergeometricPFQ[{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
-	+1/32 (5 I) t^3 HypergeometricPFQ[{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
-HypergeometricSolve[5,3]=-((4 (-1)^(3/4) Gamma[3/4] HypergeometricPFQ[{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)])
-	-1/4 t HypergeometricPFQ[{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
-	+(25 (-1)^(1/4) t^2 Gamma[5/4] HypergeometricPFQ[{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
-	-1/32 (5 I) t^3 HypergeometricPFQ[{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
-HypergeometricSolve[5,4]=(4 (-1)^(1/4) Gamma[3/4] HypergeometricPFQ[{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)]
-	-1/4 t HypergeometricPFQ[{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
-	-(25 (-1)^(3/4) t^2 Gamma[5/4] HypergeometricPFQ[{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
-	+1/32 (5 I) t^3 HypergeometricPFQ[{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
-HypergeometricSolve[5,5]=(4 (-1)^(3/4) Gamma[3/4] HypergeometricPFQ[{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)]
-	-1/4 t HypergeometricPFQ[{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
-	-(25 (-1)^(1/4) t^2 Gamma[5/4] HypergeometricPFQ[{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
-	-1/32 (5 I) t^3 HypergeometricPFQ[{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
+(*Hypergeometric/SeriesSolve*)
+HypergeometricSolve[2,1]=1/2-1/2 Inactive[HypergeometricPFQ][{-(1/2)},{},-4 t];
+HypergeometricSolve[2,2]=1/2+1/2 Inactive[HypergeometricPFQ][{-(1/2)},{},-4 t];
+HypergeometricSolve[3,1]=Inactive[Hypergeometric2F1][1/6,-(1/6),1/2,(27 t^2)/4]
+	+1/2 t Inactive[Hypergeometric2F1][2/3,1/3,3/2,(27 t^2)/4];
+HypergeometricSolve[3,2]=-Inactive[Hypergeometric2F1][1/6,-(1/6),1/2,(27 t^2)/4]
+	+1/2 t Inactive[Hypergeometric2F1][2/3,1/3,3/2,(27 t^2)/4];
+HypergeometricSolve[3,3]=-(t Inactive[Hypergeometric2F1][2/3,1/3,3/2,(27 t^2)/4]);
+HypergeometricSolve[4,1]=-(t Inactive[HypergeometricPFQ][{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]);
+HypergeometricSolve[4,2]=Inactive[HypergeometricPFQ][{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)]
+	+1/3 t Inactive[HypergeometricPFQ][{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
+	-2/9 t^2 Inactive[HypergeometricPFQ][{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
+HypergeometricSolve[4,3]=(-1)^(2/3) Inactive[HypergeometricPFQ][{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)]
+	+1/3 t Inactive[HypergeometricPFQ][{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
+	+2/9 (-1)^(1/3) t^2 Inactive[HypergeometricPFQ][{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
+HypergeometricSolve[4,4]=-((-1)^(1/3) Inactive[HypergeometricPFQ][{-(1/12),1/6,5/12},{1/3,2/3},-((256 t^3)/27)])
+	+1/3 t Inactive[HypergeometricPFQ][{1/4,1/2,3/4},{2/3,4/3},-((256 t^3)/27)]
+	-2/9 (-1)^(2/3) t^2 Inactive[HypergeometricPFQ][{7/12,5/6,13/12},{4/3,5/3},-((256 t^3)/27)];
+HypergeometricSolve[5,1]=t Inactive[HypergeometricPFQ][{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)];
+HypergeometricSolve[5,2]=-((4 (-1)^(1/4) Gamma[3/4] Inactive[HypergeometricPFQ][{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)])
+	-1/4 t Inactive[HypergeometricPFQ][{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
+	+(25 (-1)^(3/4) t^2 Gamma[5/4] Inactive[HypergeometricPFQ][{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
+	+1/32 (5 I) t^3 Inactive[HypergeometricPFQ][{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
+HypergeometricSolve[5,3]=-((4 (-1)^(3/4) Gamma[3/4] Inactive[HypergeometricPFQ][{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)])
+	-1/4 t Inactive[HypergeometricPFQ][{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
+	+(25 (-1)^(1/4) t^2 Gamma[5/4] Inactive[HypergeometricPFQ][{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
+	-1/32 (5 I) t^3 Inactive[HypergeometricPFQ][{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
+HypergeometricSolve[5,4]=(4 (-1)^(1/4) Gamma[3/4] Inactive[HypergeometricPFQ][{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)]
+	-1/4 t Inactive[HypergeometricPFQ][{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
+	-(25 (-1)^(3/4) t^2 Gamma[5/4] Inactive[HypergeometricPFQ][{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
+	+1/32 (5 I) t^3 Inactive[HypergeometricPFQ][{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
+HypergeometricSolve[5,5]=(4 (-1)^(3/4) Gamma[3/4] Inactive[HypergeometricPFQ][{-(1/20),3/20,7/20,11/20},{1/4,1/2,3/4},-((3125 t^4)/256)])/Gamma[-(1/4)]
+	-1/4 t Inactive[HypergeometricPFQ][{1/5,2/5,3/5,4/5},{1/2,3/4,5/4},-((3125 t^4)/256)]
+	-(25 (-1)^(1/4) t^2 Gamma[5/4] Inactive[HypergeometricPFQ][{9/20,13/20,17/20,21/20},{3/4,5/4,3/2},-((3125 t^4)/256)])/(128 Gamma[9/4])
+	-1/32 (5 I) t^3 Inactive[HypergeometricPFQ][{7/10,9/10,11/10,13/10},{5/4,3/2,7/4},-((3125 t^4)/256)];
 HypergeometricPostProcess[f_]:=Collect[f,_HypergeometricPFQ]/.{a_ F_HypergeometricPFQ:>With[{r=Rationalize[Chop[N[a]]]},r F/;Precision[r]===\[Infinity]]};
 HypergeometricSolve[n_Integer,k_Integer]:=Module[
 	{coef,i},
-	coef=Refine[FunctionExpand[SeriesCoefficient[Root[#1^n-#1-t&,1],{t,0,k}]],k>=0];
+	coef=Refine[FunctionExpand[SeriesCoefficient[Root[#^n-#-t&,k],{t,0,p}]],p>=0];
 	HypergeometricPostProcess[Sum[coef t^i,{i,0,\[Infinity]}]]
+]/.HypergeometricPFQ:>Inactive[HypergeometricPFQ];
+SeriesSolve[p_Integer,q_Integer]:=Block[{expr},
+	expr=Refine[SeriesCoefficient[Root[#^p-#-t&,q],{t,0,n}],n>=0] t^n;
+	Inactive[Sum][If[p>=5,expr,FunctionExpand@expr],{n,0,\[Infinity]}]
 ];
-
+(* ::Subsubsection:: *)
+(*TschirnhausSolve*)
+TschirnhausSolve::noSol="暂时没有该方程可供使用的公式";
+TschirnhausSolveNormal[{t_,x_,n_},Method->EllipticNomeQ]:=If[
+	n!=5,Message[TschirnhausSolve::noSol];Return[$Failed],
+	HermiteSolve[t,x]
+];
+TschirnhausSolveNormal[{t_,x_,n_},Method->MeijerG]:=List/@Thread[x->MeijerGSolve[n,t]];
+TschirnhausSolveNormal[{m_,x_,n_},Method->HypergeometricPFQ]:=If[
+	m>=n>5,Message[TschirnhausSolve::noSol];Return[$Failed],
+	HypergeometricSolve[n,m]/.{t->x}
+];
+TschirnhausSolveNormal[{m_,x_,n_},Method->Series]:=If[
+	m>=n,Message[TschirnhausSolve::noSol];Return[$Failed],
+	SeriesSolve[n,m]/.{t->x}
+];
+Options[TschirnhausSolveSingle]={Method->HypergeometricPFQ,Power->5,Root->1};
+Options[TschirnhausSolve]={Method->HypergeometricPFQ,Root->1};
+TschirnhausSolveSingle[t_,x_,OptionsPattern[]]:=Block[
+	{p,r},
+	p=OptionValue[Power];
+	r=OptionValue[Root];
+	Switch[OptionValue[Method],
+		HypergeometricPFQ,
+		x->TschirnhausSolveNormal[{r,t,p},Method->HypergeometricPFQ],
+		MeijerG,
+		TschirnhausSolveNormal[{t,x,p},Method->MeijerG],
+		Series,
+		TschirnhausSolveNormal[{r,x,p},Method->Series]/.n->x,
+		EllipticNomeQ,
+		TschirnhausSolveNormal[{t,x,p},Method->EllipticNomeQ]
+	]
+];
+TschirnhausSolve::err="`1` 不是规范形式, 请检查你的输入!";
+TschirnhausSolve[a_Symbol,x_,ops:OptionsPattern[]]:=TschirnhausSolveSingle[a,x,ops]
+TschirnhausSolve[a_?NumericQ,x_,ops:OptionsPattern[]]:=TschirnhausSolveSingle[a,x,ops]
+TschirnhausSolve[a_==b_,x_,ops:OptionsPattern[]]:=TschirnhausSolve[a-b,x,ops]
+TschirnhausSolve[poly_,x_,ops:OptionsPattern[]]:=Block[
+	{t,r,p,coes,mQ},
+	t=Coefficient[poly,x, 0];
+	r=OptionValue[Root];
+	p=Exponent[poly,x];
+	coes=CoefficientList[poly,x];
+	(*
+	mQ=And@@Join[Thread[coes[[3;;p]]==0],{coes[[1]]\[NotEqual]0},{coes[[2]]\[Equal]-1},{t\[Equal]1}];
+	If[!mQ,Message[TschirnhausSolve::err,poly];Return[$Failed]];
+	*)
+	TschirnhausSolveSingle[t,x,ops,Power->p,Root->r]
+]/;PolynomialQ[poly,x];
+(* ::Subsubsection:: *)
+(*Others*)
+noRoot=10000 Count[#,Root[__],All]+LeafCount[#]&;
+RootSimplify[expr_]:=FullSimplify[expr//FunctionExpand,ComplexityFunction->noRoot];
 (* ::Subsection::Closed:: *)
 (*附加设置*)
 End[];
 SetAttributes[
-	{ },
+	{
+		PrincipalTransform,BringJerrardTransform,CanonicalTransform,
+		TschirnhausSolve,RootSimplify
+	},
 	{Protected,ReadProtected}
 ];
 EndPackage[];
