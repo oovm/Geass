@@ -17,21 +17,33 @@
 (*这里应该填这个函数的介绍*)
 (* ::Section:: *)
 (*函数说明*)
-BeginPackage["Example`"];
+BeginPackage["SpecialPrime`"];
 ExampleFunction::usage = "这里应该填这个函数的说明,如果要换行用\"\\r\"\r就像这样";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
 (*主设置*)
-ExNumber::usage = "程序包的说明,这里抄一遍";
+ExPrime::usage = "程序包的说明,这里抄一遍";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
-Example$Version="V1.0";
-Example$LastUpdate="2016-11-11";
+ExPrime$Version="V1.0";
+ExPrime$LastUpdate="2016-11-11";
 (* ::Subsubsection:: *)
 (*功能块 1*)
-ExampleFunction[1]="我就是个示例函数,什么功能都没有";
+DayPrimes[st_]:=DayPrimes[st,st];
+DayPrimes[st_,ft_]:=Block[
+	{d,days},
+	d=DateRange[DateObject[{ToExpression@st, 1,1}],DateObject[{ToExpression@ft,12,31}]];
+	days=DateString[#,{"Year","Month","Day"}]&/@d;
+	Select[ToExpression/@days,PrimeQ]
+];
+SecPrimes[day_]:=SecPrimes[day]=Block[{h,m,s,sec},
+	h=StringJoin[ToString/@#]&/@Table[IntegerDigits[i,10,2],{i,0,23}];
+	m=s=StringJoin[ToString/@#]&/@Table[IntegerDigits[i,10,2],{i,0,59}];
+	sec=ToString[day]<>#&/@StringJoin@@@Tuples[{h,m,s}];
+	Select[ToExpression/@sec,PrimeQ]
+];
 
 
 
@@ -43,8 +55,5 @@ ExampleFunction[2]="我就是个示例函数,什么功能都没有";
 (* ::Subsection::Closed:: *)
 (*附加设置*)
 End[] ;
-SetAttributes[
-	{ },
-	{Protected,ReadProtected}
-];
+
 EndPackage[];
