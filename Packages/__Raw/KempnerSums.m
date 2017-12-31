@@ -1,26 +1,25 @@
 (* ::Package:: *)
-
-(* ::Subtitle:: *)
+(* ::Title:: *)
+(*QuinticEquation(五次方程求解器)*)
+(* ::Subchapter:: *)
+(*程序包介绍*)
+(* ::Text:: *)
+(*Mathematica Package*)
+(*Created by Mathematica Plugin for IntelliJ IDEA*)
+(*Establish from GalAster's template(v1.1)*)
+(**)
+(* ::Text:: *)
+(*Author: Robert Baillie and Thomas Schmelzer*)
+(*Translator: GalAster*)
+(*Creation Date: 2008-7-24*)
+(*Copyright: CC Non-Commercial*)
+(* ::Program:: *)
+(*1.禁止用作商业用途*)
+(* ::Text:: *)
 (*A package to compute sums of Kempner series*)
 
 
-(* ::Subsection::Closed:: *)
-(*Version information*)
-
-
-(* ::Text:: *)
-(*Mathematica Version: 4.0 + *)
-(**)
-(*Package Version: 2.2 -- 7/24/2008 *)
-(**)
-(*Authors: Robert Baillie and Thomas Schmelzer *)
-(**)
-(*Translator: GalAster - \:9171\:7d2b\:541b *)
-(**)
-(*Copyright: Non-Commercial *)
-
-
-(* ::Subsection::Closed:: *)
+(* ::Section:: *)
 (*Summary*)
 
 
@@ -74,9 +73,6 @@
 
 (* ::Subsection::Closed:: *)
 (*Test*)
-
-
-BeginPackage[ "KempnerSums`" ];
 
 (* :Examples:
    The main function in this package is KempnerSum.
@@ -254,9 +250,10 @@ BeginPackage[ "KempnerSums`" ];
 *)
 
 
+
 (* ::Subsection:: *)
 (*Main Package*)
-
+BeginPackage[ "KempnerSums`" ];
 
 (* usage messages for this context, and for the exported functions *)
 KempnerSums::usage = "KempnerSums.m是一个用来计算 缺位调和级数(Kempner series)的程序包.\r\n
@@ -326,9 +323,9 @@ kSumTimeAndMemory::usage = "kSumTimeAndMemory[nDigits] 估算 KempnerSum[9, nDig
 kSumSetDefaultDecimals::usage = "kSumSetDefaultDecimals[n] 控制默认的精度,没有设置过的话这个值是15.";
 kSumShowDefaultDecimals::usage = "kSumShowDefaultDecimals 返回当前的默认精度.";
 
-
-Begin["`Private`"];
+(* ::Subsection::Closed:: *)
 (* begin the private context (implementation) *)
+Begin["`Private`"];
 
 
 Off[ General::spell1 ];
@@ -1304,12 +1301,15 @@ Block[
 kSumShowDefaultDecimals := nDefaultDecimals;
 
 
-
-End[ ]         (* end the private context *)
-
-(* protect the exported symbols *)
-Protect[KempnerSum, kSumFormatted, kPartialSum, kSumGetT, kSumGetA, kSumShowA];
-Protect[kSumTimeAndMemory, kSumSetDefaultDecimals, kSumShowDefaultDecimals];
-Protect[kPartialSumThreshold];
-
-EndPackage[ ]  (* end the package context *)
+(* ::Subsection:: *)
+(*附加设置*)
+End[];
+SetAttributes[
+	{
+		KempnerSum, kSumFormatted, kPartialSum, kSumGetT, kSumGetA, kSumShowA,
+		kSumTimeAndMemory, kSumSetDefaultDecimals, kSumShowDefaultDecimals,
+		kPartialSumThreshold
+	},
+	{Protected,ReadProtected}
+];
+EndPackage[];

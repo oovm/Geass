@@ -3,6 +3,8 @@
     <words>
       <w>algebraics</w>
       <w>autocompletions</w>
+      <w>backquotes</w>
+      <w>cicle</w>
       <w>coef</w>
       <w>coefs</w>
       <w>coes</w>
@@ -17,15 +19,19 @@
       <w>integralroot</w>
       <w>introot</w>
       <w>isfactorable</w>
+      <w>jacobian</w>
       <w>jerrard</w>
+      <w>kempner</w>
       <w>meijer</w>
       <w>metacyclic</w>
       <w>mozilla</w>
+      <w>mult</w>
       <w>newp</w>
       <w>newroots</w>
       <w>randp</w>
       <w>realr</w>
       <w>reals</w>
+      <w>schmelzer</w>
       <w>simp</w>
       <w>tetrate</w>
       <w>tetration</w>
