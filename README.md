@@ -72,18 +72,8 @@ In[2]:=
 
 ## ![许可协议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/07_License.png) License
 
-该软件包遵从CC 4.0协议: **BY-NC-SA**.
+The application is under **Mozilla Public License v2**.
 
-Pic:
+©Copyright picture, icons and packages.
 
-A:
-
-Ico:
-
-
-
-<img src="http://opentf.github.io/GuokrBadge/cc/gs/cc_byncsa.flat.guokr.svg" alt="数织二维码" width = "400"/>
-
-
-
-
+For all the ©Copyright see: License Log Full.

@@ -10,10 +10,13 @@
 (**)
 (*Author: 酱紫君*)
 (*Creation Date:2017-10-18*)
-(*Copyright:CC4.0 BY+NA+NC*)
-(**)
-(*该软件包遵从CC协议:署名、非商业性使用、相同方式共享*)
-(**)
+(*Copyright: Mozilla Public License Version 2.0*)
+(* ::Program:: *)
+(*1.软件产品再发布时包含一份原始许可声明和版权声明。*)
+(*2.提供快速的专利授权。*)
+(*3.不得使用其原始商标。*)
+(*4.如果修改了源代码，包含一份代码修改说明。*)
+(* ::Text:: *)
 (*这里应该填这个函数的介绍*)
 (* ::Section:: *)
 (*函数说明*)
@@ -136,7 +139,7 @@ TetraNDFormat[asc_?AssociationQ][n_?NumericQ] := Lookup[asc,Function][n];
 (*附加设置*)
 End[] ;
 SetAttributes[
-	{ },
+	{Tetrate,TetraLog,TetraRoot,TetraD},
 	{Protected,ReadProtected}
 ];
 EndPackage[];

@@ -18,7 +18,7 @@ Author: **Robert Baillie and Thomas Schmelzer**
 
 Date: 2008-7-24
 
-Vision: v2.3
+Version: v2.3
 
 Source: 
 
@@ -36,15 +36,27 @@ Author: **Robert Baillie**
 
 Date: August 16, 2008
 
-Vision: v1.3
+Version: v1.3
 
 Source: 
 
--
+- F. Irwin, "A Curious Convergent Series"
 
--
+- R. Baillie, "Summing The Curious Series of Kempner and Irwin"
 
--
+- http://arxiv.org/abs/0806.4410
+
+## Tetration
+
+License: Not Found
+
+Author: **Andrew Robbins**
+
+Version: ???
+
+Source: 
+
+- http://allergrootste.com/big/Source/articles/TetrationSuperlog_Robbins.pdf
 
 ## RiemannSurfacePlot
 
