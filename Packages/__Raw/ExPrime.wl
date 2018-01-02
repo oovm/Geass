@@ -21,7 +21,10 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["ExPrime`"];
-ExampleFunction::usage = "这里应该填这个函数的说明,如果要换行用\"\\r\"\r就像这样";
+DayPrimes::usage = "
+	DayPrimes[year],给出当年的日期质数.\n
+	DayPrimes[year1,year2],从year1到year2所有的日期质数";
+SecPrimes::usage = "SecPrimes[day],给出当天所有的质数秒";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)

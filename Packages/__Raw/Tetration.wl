@@ -25,6 +25,7 @@ Tetrate::usage = "";
 TetraLog::usage = "";
 TetraRoot::usage = "";
 TetraD::usage = "";
+HalfExp::usage = "";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -33,11 +34,14 @@ Tetration::usage = "程序包的说明,这里抄一遍";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
-Tetration$Version="V1.0";
-Tetration$LastUpdate="2017-12-29";
+Tetration$Version="V1.1";
+(*1.0->1.1
+新增半指数函数
+*)
+Tetration$LastUpdate="2018-01-02";
 (* ::Subsubsection:: *)
 (*Tetrate*)
-Log4Prepare[n_,x_]:=Log4Prepare[n,x]=Block[
+Log4Prepare[n_,x_?NumericQ]:=Log4Prepare[n,x]=Block[
 	{mat,$MachinePrecision=32},
 	mat=Table[k^j/k!-If[j==k,Log[x]^-k,0],{j,0,n-1},{k,1,n}];
 	{x,LinearSolve[N[mat,$MachinePrecision],UnitVector[n,1]]}
@@ -52,8 +56,8 @@ TetrationEvaluate[v_List,y_?NumericQ]:=Block[
 	]
 ];
 Options[Tetrate]={MaxIterations->10};
-Tetrate[x_,y_,OptionsPattern[]]:=TetrationEvaluate[Log4Prepare[OptionValue[MaxIterations],x],y];
-Tetrate[z_,Infinity]:= ProductLog[-Log[z]]/-Log[z];
+Tetrate[x_?NumericQ,y_?NumericQ,OptionsPattern[]]:=TetrationEvaluate[Log4Prepare[OptionValue[MaxIterations],x],y];
+Tetrate[z_?NumericQ,Infinity,OptionsPattern[]]:= ProductLog[-Log[z]]/-Log[z];
 Log4Evaluate[v_List,z_?NumericQ]:=Block[
 	{SlogCrit},
 	SlogCrit[zc_]:=-1+Sum[v[[2,k]]*zc^k/k!,{k,1,Length[v[[2]]]}];
@@ -66,11 +70,7 @@ Log4Evaluate[v_List,z_?NumericQ]:=Block[
 (* ::Subsubsection:: *)
 (*TetraLog/TetraRoot*)
 Options[TetraLog]={MaxIterations->10};
-TetraLog[x_,y_,OptionsPattern[]]:=Block[
-	{ans},
-	ans=Log4Evaluate[Log4Prepare[OptionValue[MaxIterations],x],y];
-	If[Chop@FractionalPart[ans]==0,Round[ans],ans]
-];
+TetraLog[x_?NumericQ,y_?NumericQ,OptionsPattern[]]:=Log4Evaluate[Log4Prepare[OptionValue[MaxIterations],x],y];
 Bisection[f_, int_, tol_, niter_] := Block[
 	{m = tol + 1, prev, ym, yl = f[Last@int]},
 	NestWhile[(
@@ -85,7 +85,7 @@ Bisection[f_, int_, tol_, niter_] := Block[
 	int,ym != 0 && Abs[m - prev] > tol &, 2, niter]
 ];
 Options[TetraRoot]={MaxIterations->10};
-TetraRoot[a_,y_,OptionsPattern[]]:=Block[
+TetraRoot[a_?NumericQ,y_?NumericQ,OptionsPattern[]]:=Block[
 	{ff,ans},
 	ff=Tetrate[a,#]-y&;
 	ans=Quiet@Bisection[ff,{0.001,10},10^-OptionValue[MaxIterations],250];
@@ -110,7 +110,7 @@ TetraNDFormat/:MakeBoxes[obj:TetraNDFormat[ass_], form:StandardForm|TraditionalF
 		{BoxForm`SummaryItem[{"Function: ", ass["Function"]}],SpanFromLeft}, 
 		{BoxForm`SummaryItem[{"Order: ", ass["Order"]}],BoxForm`SummaryItem[{"error: ", ass["error"]}]}}; 
 	below = {}; 
-	BoxForm`ArrangeSummaryBox[TetraND, obj,ass["icon"], above, below, form, 
+	BoxForm`ArrangeSummaryBox["TetraDFormat", obj,ass["icon"], above, below, form,
 	"Interpretable" -> Automatic]
 ];
 SetAttributes[TetraD,HoldFirst];
@@ -121,7 +121,7 @@ TetraD[expr_,{t_,n_},OptionsPattern[]]:=Block[
 	err=N[10^-Sqrt@OptionValue[MaxIterations]];
 	fun=Evaluate@TetraND[expr,t,#,n,err]&;
 	TetraNDFormat[Association[
-		"Function" ->Hold@expr, 
+		"Function" ->HoldForm@expr,
 		"Order" ->n,
 		"error" ->err,
 		"icon"->TetraNDImage@expr,
@@ -131,15 +131,22 @@ TetraD[expr_,{t_,n_},OptionsPattern[]]:=Block[
 TetraNDFormat[asc_?AssociationQ][prop_] := Lookup[asc, prop];
 TetraNDFormat[asc_?AssociationQ][n_?NumericQ] := Lookup[asc,Function][n];
 (* ::Subsubsection:: *)
-(*功能块 2*)
-
-
-
+(*HalfExp*)
+Options[HalfExp] = {MaxIterations->10, Number->2};
+HalfExp[x_?NumericQ,y_?NumericQ,OptionsPattern[]]:=Block[
+	{env=Log4Prepare[OptionValue[MaxIterations],x]},
+	TetrationEvaluate[env,TetraLog[x,y]+1/OptionValue[Number]]
+];
+HalfExp[z_?NumericQ,ops:OptionsPattern[]]:=HalfExp[E,z,ops];
+(* ::Subsubsection:: *)
+(*tasks*)
+(*Todo:{}^x x 的反函数SR*)
+(*Todo:{}^Inf x 的反函数SSR*)
 (* ::Subsection::Closed:: *)
 (*附加设置*)
 End[] ;
 SetAttributes[
-	{Tetrate,TetraLog,TetraRoot,TetraD},
+	{Tetrate,TetraLog,TetraRoot,TetraD,HalfExp},
 	{Protected,ReadProtected}
 ];
 EndPackage[];
