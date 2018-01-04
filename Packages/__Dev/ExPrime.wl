@@ -56,7 +56,9 @@ SecPrimes[day_]:=SecPrimes[day]=Block[
 
 (* ::Subsubsection:: *)
 (*功能块 2*)
-ExampleFunction[2]="我就是个示例函数,什么功能都没有";
+MultPrime[n_]:=Union@@Table[p*TakeWhile[Prime[Range[PrimePi[n]]],p*#1<n&],{p,TakeWhile[l,#1<Sqrt[n]&]}];
+PlusPrime[n_]:=Union@@Table[p+TakeWhile[Prime[Range[PrimePi[n]]],p*#1<n&],{p,TakeWhile[l,#1<Sqrt[n]&]}];
+ManyPrime[n_,s_]:=Select[Range[n],PrimeOmega[#1]==s&];
 
 
 (* ::Subsection::Closed:: *)

@@ -21,7 +21,18 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["ExFactorial`"];
-MultiFactorial::usage = "MultiFactorial[x,k] x 的 k阶阶乘.";
+MultiFactorial::usage = "MultiFactorial[x,k] x 的 k阶 阶乘.";
+HyperFactorial::usage = "超阶乘函数 HyperFactorial[n].";
+SuperFactorial::usage = "叠阶乘函数 SuperFactorial[n].";
+SubFactorial::usage = "n个元素的错排数为SubFactorial[n].";
+(*AlternatingFactorial*)
+RisingFactorial::usage = "上阶乘函数 RisingFactorial[n].";
+FallingFactorial::usage = "下阶乘函数 FallingFactorial[n].";
+EulerFactorial::usage = "EulerFactorial[n] 欧拉阶乘函数.";
+HadamardFactorial::usage = "HadamardFactorial[n] 阿达玛阶乘函数.";
+LuschnyFactorial::usage = "LuschnyFactorial[n] 阶乘.";
+Primorial::usage = "Primorial[n] 第n个素数阶乘.";
+ExpFactorial::usage = "ExpFactorial[n] 第n个指数阶乘.";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -32,7 +43,7 @@ Begin["`Private`"];
 (*主体代码*)
 ExFactorial$Version="V1.0";
 ExFactorial$LastUpdate="2018-01-01";
-Unprotect[Sum];
+Unprotect[Sum,FunctionExpand];
 (* ::Subsubsection:: *)
 (*MultiFactorial*)
 MultiFactorialInt[n_,k_]:=With[{q=Quotient[n+k-1,k]},k^q q! Binomial[n/k,q]];
@@ -57,14 +68,54 @@ MultiFactorial[x_,k_,OptionsPattern[]]:=Block[{},
 ];
 Sum[1/MultiFactorial[n_,k_],{n_,0,Infinity}]:=ReciprocalFactorialSumConstant[k];
 (* ::Subsubsection:: *)
-(*功能块 2*)
-ExampleFunction[2]="我就是个示例函数,什么功能都没有";
+(*Hyper/Super/Sub Factorial*)
 
+(* ::Subsubsection:: *)
+(*Hyper/Super/Sub*)
+Unprotect[FunctionExpand,AlternatingFactorial];
+SetAttributes[
+	{
+		HyperFactorial,SuperFactorial,
+		SubFactorial,
+		EulerFactorial,HadamardFactorial,LuschnyFactorial,
+		ExpFactorial,Primorial
+	},
+	{NumericFunction,Listable}
+];
+HyperFactorial[n_?NumericQ]:=Hyperfactorial[n];
+SuperFactorial[n_?NumericQ]:=BarnesG[n+2];
+FunctionExpand[HyperFactorial[z_]]:=Hyperfactorial[z];
+FunctionExpand[SuperFactorial[z_]]:=BarnesG[z+2];
+(*Todo: 微分,级数,格式化*)
+(*AlternatingFactorial*)
+(*Format[AlternatingFactorial[z_],TraditionalForm]:=RowBox[{"AF(",MakeBoxes[z,TraditionalForm],")"}]*)
+SubFactorial[n_?NumericQ]:= Subfactorial[n];
+FunctionExpand[SubFactorial[z_]]:=Subfactorial[z];
+(*Todo: 重载,微分,级数,格式化*)
+RisingFactorial[x_?NumericQ,n_?NumericQ]:=Pochhammer[x,n];
+FallingFactorial[x_?NumericQ, n_?NumericQ] := (-1)^n Pochhammer[-x, n];
+FunctionExpand@RisingFactorial[x_,n_]:=Pochhammer[x,n]
+FunctionExpand@FallingFactorial[x_, n_] := (-1)^n Pochhammer[-x, n];
+(*Todo: 微分,级数,格式化*)
+EulerFactorial[x_?NumericQ]:=Gamma[x+1];
+HadamardFactorial[x_?NumericQ]:=(PolyGamma[1/2-x/2]-PolyGamma[-x/2])/(2Gamma[-x]);
+LuschnyFactorial[x_?NumericQ]:=(1/2+x (PolyGamma[1-x/2]-PolyGamma[1/2-x/2])/2)/(-x)!;
+FunctionExpand@EulerFactorial[x_]:=Gamma[x+1];
+FunctionExpand@HadamardFactorial[x_]:=(PolyGamma[1/2-x/2]-PolyGamma[-x/2])/(2Gamma[-x]);
+FunctionExpand@LuschnyFactorial[x_]:=(1/2+x (PolyGamma[1-x/2]-PolyGamma[1/2-x/2])/2)/(-x)!;
+(*Todo: 微分,级数,格式化*)
+PosIntQ=IntegerQ@#&&#>0&;
+ExpFactorial[0]:=1;
+ExpFactorial[n_?PosIntQ]:=ExpFactorial[n]=n^(ExpFactorial[n-1]);
+Primorial[0]:=1;
+Primorial[1]:=2;
+Primorial[n_?PosIntQ]:=Primorial[n]=Prime[n]Primorial[n-1];
+(*Todo: 微分,级数,格式化*)
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
 End[] ;
-Protected[Sum];
+Protected[Sum,FunctionExpand];
 SetAttributes[
 	{ },
 	{Protected,ReadProtected}
