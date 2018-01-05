@@ -719,10 +719,11 @@ Block[
 (* example of "list" version of iPartialSum: the 对1/n求和 where n has three 9's and one 0, is IrwinSum[{9, 0}, {3, 1}] = 2.888545932755274 . therefore, the threshold must be less than
 this
 
-*)
+
 
 value. in this example, we take the threshold to be 2. iPartialSumThreshold[ { 9, 0 }, { 3, 1 }, 2 ]
 = {27, 1.910422503190251, 28, 2.0043388417551473}
+*)
 { iFormatted = 0, nDigits = 0, totalSum, iPrintLevelSave,
 xSum1 = 0, nDig1 = 0, xSum2, nDig2, errorReturn = {-1, -1, -1, -1}, tAcc, nDec2,
 errStr = "Use backquote notation iPartialSumThreshold[ digit, count, threshold``nDecimals]

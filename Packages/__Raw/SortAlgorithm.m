@@ -66,7 +66,6 @@ ShellSort[start_]:=Block[
 		list[[j]]=temp;liShell=Append[liShell,list];];
 		If[incr==2,incr=1,incr=Round[incr/2.2]]]];
 	SSort[start];
-
 ];
 BubbleSort[start_]:=Block[
 	{liBubble,BuSort},
@@ -201,7 +200,17 @@ NetworkGraphics[net_,seq_]:=Block[
 ];
 (* ::Subsubsection:: *)
 (*排序网络*)
-BatcherNet[n_Integer]/;n>=2:=Block[{q,r,d,p,res={}},Table[d=2^t;p=2^t;r=0;q=2^(Ceiling[Log[2,n]]-1);ExchangeLoop[n],{t,Ceiling[Log[2,n]]-1,0,-1}];DeleteCases[res,Null,\[Infinity]]];
+BatcherNet[n_Integer]/;n>=2:=Block[
+	{q,r,d,p,res={}},
+	Table[
+		d=2^t;
+		p=2^t;
+		r=0;
+		q=2^(Ceiling[Log[2,n]]-1);ExchangeLoop[n],
+		{t,Ceiling[Log[2,n]]-1,0,-1}
+	];
+	DeleteCases[res,Null,\[Infinity]]
+];
 ExchangeLoop[n_Integer]:=(res=Append[res,Table[If[BitAnd[i,2^t]==r,{i+1,i+d+1}],{i,0,n-d-1}]];If[q!=p,d=q-p;q=q/2;r=p;ExchangeLoop[n]]);
 InsertionNet[n_]:=With[
 	{m=Log[2,n]},(Join[#1,Rest[Reverse[#1]]]&)[Rest[Flatten[Transpose[
@@ -331,9 +340,6 @@ NetShow[nn_,net_:OptimalNet,input_:None]:=Block[
 		NetworkGraphics[s,Quiet@ApplySortingList[List/@Flatten[s,1],input]]
 	]
 ];
-
-
-
 (* ::Subsubsection:: *)
 (*功能块 2*)
 
