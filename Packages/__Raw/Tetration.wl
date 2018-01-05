@@ -99,8 +99,8 @@ TetraND[f_,x_,c_,0,h_]:=(f/.x->c);
 TetraND[f_,x_,c_,k_,h_]/;k!=0:=(TetraND[f,x,c+h,k-1,h]-TetraND[f,x,c,k-1,h])/h;
 (*TetraND Gives the k-th numerical derivative of f(x) at x=c:*)
 TetraNDImage=ArrayPlot[
-	Transpose@Partition[ToCharacterCode[#//Compress][[1;;49]],7]
-	,Mesh->True,ColorFunction->ColorData["TemperatureMap"],ImageSize->36
+	Transpose@Partition[ToCharacterCode[#//Compress][[1;;49]],7],
+	Mesh->True,ColorFunction->ColorData["TemperatureMap"],ImageSize->36
 ]&;
 Format[TetraNDFormat[___], OutputForm] := "TetraND[<>]";
 Format[TetraNDFormat[___], InputForm] := "TetraND[<>]";
