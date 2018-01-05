@@ -18,9 +18,7 @@
 (* ::Section:: *)
 (*函数说明*)
 BeginPackage["ExNumber`"];
-MultPrime::usage = "PlusPrime[n]生成n以内所有可以由两个素数相乘得到的整数";
-PlusPrime::usage = "PlusPrime[n]生成n以内所有可以由两个素数相加得到的整数";
-ManyPrime::usage = "ManyPrime[n]生成n以内所有可以由s个素数相乘得到的整数";
+
 DisplaySum::usage = "DisplaySum[f[n],{n,a,b}]显示这个级数的和";
 ImproperSum::usage = "ImproperSum[f[n]]尝试各种手段对f[n]进行无穷求和";
 RTCount::usage="RTCount[max]对小于max的整数可构成的直角三角形计数\r
@@ -207,10 +205,12 @@ SqrtQSelect[(list_)?VectorQ,power_:2]:=
       Ceiling[Surd[Max[list],power]]-Floor[Surd[Min[list],power]]+1,
       Floor[Surd[Min[list],power]]],list];
 
+
+(* Todo: 需要完善,赋予其特殊的显示格式 *)
 BaileyP[s_,b_,n_,A_]:=Block[{k,echo},
   echo=Evaluate[1/b^k  Plus@@(A/Array[(n k+#)&,n])];
   Echo[Inactivate@Sum[echo,{k,0,Infinity}],"和式展开为: "]];
-
+(* Todo: 需要分类,分离出此程序包 *)
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)

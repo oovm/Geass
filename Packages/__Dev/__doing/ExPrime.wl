@@ -23,8 +23,12 @@
 BeginPackage["ExPrime`"];
 DayPrimes::usage = "
 	DayPrimes[year],给出当年的日期质数.\n
-	DayPrimes[year1,year2],从year1到year2所有的日期质数";
+	DayPrimes[year1,year2],从year1到year2所有的日期质数
+";
 SecPrimes::usage = "SecPrimes[day],给出当天所有的质数秒";
+MultPrime::usage = "PlusPrime[n]生成n以内所有可以由两个素数相乘得到的整数";
+PlusPrime::usage = "PlusPrime[n]生成n以内所有可以由两个素数相加得到的整数";
+ManyPrime::usage = "ManyPrime[n]生成n以内所有可以由s个素数相乘得到的整数";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)

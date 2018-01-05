@@ -50,8 +50,9 @@ Begin["`Private`"];
 (* ::Subsubsection:: *)
 (*超加密、超解密*)
 SetAttributes[{CodeToCipher,ExEncrypt},HoldAll];
+(*Todo: 删除这段冗余的加密算法*)
 CodeToCipher[Str_]:=Block[{密匙,输出},
-  密匙=GenerateSymmetricKey[Method-><|"Cipher"->"AES256",
+    密匙=GenerateSymmetricKey[Method-><|"Cipher"->"AES256",
     "InitializationVector"->ByteArray[{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16}]|>];
   输出=Join[Normal@密匙["Key"],Normal@Encrypt[密匙,Compress@Hold@Str]["Data"]]];
 CipherToCode[Str_,Safe_:False]:=Block[{破译密匙,破译内容},
@@ -95,10 +96,12 @@ ExEncrypt[Str_,Language->"长者之问"]:=Block[{ans,ins},
   ans=IntegerDigits[FromDigits[CodeToCipher@Str,256],Length@CharSet[Language->"长者之问"]]+1;
   ins=Select[Accumulate[{RandomInteger[{2,5}]}~Join~RandomInteger[{5,20},Length@ans]],#<Length@ans&];
   StringInsert[StringJoin[CharAss[Language->"长者之问"]/@ans],"?\r",ins]<>"?"];
-ExDecrypt[Str_String,Language->"长者之问",Safe_:False]:=Block[{input,res},
-  input=CharAnti[Language->"长者之问"]/@StringPartition[StringDelete[StringJoin@Str,{"?","\n"}],1];
-  res=IntegerDigits[FromDigits[input-1,Length@CharSet[Language->"长者之问"]],256];
-  CipherToCode[res,Safe]];
+ExDecrypt[Str_String,Language->"长者之问",Safe_:False]:=Block[
+	{input,res},
+	input=CharAnti[Language->"长者之问"]/@StringPartition[StringDelete[StringJoin@Str,{"?","\n"}],1];
+	res=IntegerDigits[FromDigits[input-1,Length@CharSet[Language->"长者之问"]],256];
+	CipherToCode[res,Safe]
+];
 
 
 
@@ -139,7 +142,7 @@ Lispify[s_/;AtomQ[s]]:=s;
 FooReverse[a_?AtomQ]:=a;
 FooReverse[a_?ListQ]:=Reverse[a];
 ExpressionToList[exp_]:=Flatten[Reverse@Map[FooReverse,Lispify[Unevaluated[exp]],Infinity]];
-
+(* Todo: 需要分类,分离出此程序包 *)
 
 
 (* ::Subsubsection:: *)
