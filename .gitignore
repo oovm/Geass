@@ -1,0 +1,11 @@
+# 缓存文件
+.DS_Store
+Thumbs.db
+db.json
+
+# 日志文件
+*.log
+
+# Idea 工程文件
+.idea/
+Geis.iml
