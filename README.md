@@ -1,5 +1,6 @@
 # Geis — Code::Geass
 
+[![Build Status](https://travis-ci.org/GalAster/Geis.svg?branch=master)](https://travis-ci.org/GalAster/Geis)
 [![Mathematica](https://img.shields.io/badge/Mathematica-%3E%3D10.0-brightgreen.svg)](https://www.wolfram.com/mathematica/)
 [![Release Vision](https://img.shields.io/badge/release-v0.3.0-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/GalAster/Geis.svg)](https://github.com/GalAster/Geis.git)
