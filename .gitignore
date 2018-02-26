@@ -8,4 +8,4 @@ db.json
 
 # Idea 工程文件
 .idea/
-Geis.iml
+*.iml
