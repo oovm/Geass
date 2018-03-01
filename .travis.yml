@@ -25,7 +25,7 @@ script:
   - echo $ver
   - cd ..
 before_deploy:
-  - git tag "$nVer"
+  - git tag -a "$nVer" -m "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
   - cd ${GITHUB_REPO}
   # 清理工程文件
   - rm -rf .git
@@ -42,6 +42,7 @@ deploy:
   provider: releases
   api_key: ${TRAVIS_KEY}
   name: AutoBuild-$nVer
+  prerelease: true
   file:
     - ${GITHUB_REPO}.tar.xz
   skip_cleanup: true
