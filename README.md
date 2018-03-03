@@ -1,7 +1,7 @@
 # Geis — Code::Geass
 
 [![Mathematica](https://img.shields.io/badge/Mathematica-%3E%3D10.0-brightgreen.svg)](https://www.wolfram.com/mathematica/)
-[![Release Vision](https://img.shields.io/badge/release-v0.3.0-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
+[![Release Vision](https://img.shields.io/badge/release-v0.7.x-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
 [![Repo Size](https://img.shields.io/github/repo-size/GalAster/Geis.svg)](https://github.com/GalAster/Geis.git)
 
 ![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.png)
@@ -72,7 +72,6 @@ In[2]:=
 ## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/06_Ideas.png) Ideas
 
 ### 联系方式
-
 
 |知乎主页|QQ群聊| 
 |:-:|:-:|
