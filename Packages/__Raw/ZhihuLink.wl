@@ -1,28 +1,53 @@
+(* ::Package:: *)
+(* ::Title:: *)
+(*ZhihuLink*)
+(* ::Subchapter:: *)
+(*程序包介绍*)
+(* ::Text:: *)
+(*Mathematica Package*)
+(*Created by Mathematica Plugin for IntelliJ IDEA*)
+(*Establish from GalAster's template(v1.3)*)
+(**)
+(* ::Text:: *)
+(*Author: 酱紫君*)
+(*Creation Date: 2018-03-08*)
+(*Copyright: Mozilla Public License Version 2.0*)
+(* ::Program:: *)
+(*1.软件产品再发布时包含一份原始许可声明和版权声明。*)
+(*2.提供快速的专利授权。*)
+(*3.不得使用其原始商标。*)
+(*4.如果修改了源代码，包含一份代码修改说明。*)
+(* ::Text:: *)
+(*这里应该填这个函数的介绍*)
+(* ::Section:: *)
+(*函数说明*)
 BeginPackage["ZhihuLink`"];
-ZhihuLink::usage = "ZhihuLink";
+ZhihuLink::usage = "ZhihuLink 是一个获取知乎数据的链接程序.";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
 (*主设置*)
 $ZhihuCookies::usage = "知乎Cookies, 有效期约一个月.";
-ZhihuStatsGet::usage = "";
-ZhihuFollowees::usage = "ZhihuFollowees[id] 获取用户的关注者数据.";
+$ZhihuLinkDirectory::usage = "ZhihuLink的缓存目录.";
+ZhihuStats::usage = "ZhihuStats[id] 获取用户的数据";
+ZhihuFollow::usage = "ZhihuFollow[id] 获取用户的关注者数据.";
 ZhihuCookiesReset::usage = "修改你的 Zhihu Cookies.";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
 ZhihuLink$Version="V1.0";
-ZhihuLink$LastUpdate="2016-11-11";
+ZhihuLink$LastUpdate="2018-03-10";
 (* ::Subsubsection:: *)
 (*Directories*)
 $zdir=FileNameJoin[{$UserBaseDirectory,"ApplicationData","ZhihuLink"}];
 $sd=FileNameJoin[{$zdir,"stats"}];
+$fd=FileNameJoin[{$zdir,"follows"}];
 Quiet@If[
 	CreateDirectory[$zdir]===$Failed,
 	Nothing,
-	CreateDirectory/@{$sd}
+	CreateDirectory/@{$sd,$fd}
 ];
-
+$ZhihuLinkDirectory[]:=SystemOpen@$zdir;
 (* ::Subsubsection:: *)
 (*Keys*)
 $ZhihuLinkAutoSave=True;
@@ -67,12 +92,10 @@ $keywordsNormal={
 	{"pins_count","想法数"},
 	{TimeObject,"时间戳"}
 };
-
-
 (* ::Subsubsection:: *)
 (*ZhihuStats*)
 ZhihuLink::para="非法参数 `1` !";
-Options[ZhihuStatsGet]={Return->Min,Raw->False};
+Options[ZhihuStats]={Return->Min,Raw->False};
 $StatsNeeds="locations,employments,gender,educations,business,voteup_count,thanked_Count,follower_count,cover_url,
 	following_topic_count,following_question_count,following_favlists_count,following_columns_count,avatar_hue,
 	answer_count,articles_count,pins_count,question_count,columns_count,commercial_question_count,favorite_count,
@@ -82,7 +105,7 @@ $StatsNeeds="locations,employments,gender,educations,business,voteup_count,thank
 	is_org_createpin_white_user,mutual_followees_count,vote_to_count,vote_from_count,thank_from_count,
 	thanked_count,description,hosted_live_count,participated_live_count,allow_message,industry_category,
 	org_name,org_homepage,badge[?(type=best_answerer)].topics";
-ZhihuStatsGet[name_String,OptionsPattern[]]:=Block[
+ZhihuStats[name_String,OptionsPattern[]]:=Block[
 	{needs=$StatsNeeds,now=Now,get,return,exname},
 	get=URLExecute[HTTPRequest[<|
 		"Scheme"->"https",
@@ -105,17 +128,16 @@ ZhihuStatsGet[name_String,OptionsPattern[]]:=Block[
 			Association@Thread[Last@@@$keywordsMin->return],
 		Normal,
 			return=Join[$keywordsNormal[[All;;-2,1]],{now}]/.get;
-			Association@Thread[Last@@@$keywordsNormal->return]
-	];
+			Association@Thread[Last@@@$keywordsNormal->return],
+		_,
+			Message[ZhihuLink::para,OptionValue[Return]];
+			Return@Missing["NotAvailable"]
+	]
 ];
-
-
-
-
 (* ::Subsubsection:: *)
-(*ZhihuFollowees*)
+(*ZhihuFollow*)
 ZhihuFolloweesGet[name_String,offset_Integer]:=Block[
-	{get,needs},
+	{get,needs,now=Now},
 	needs="data[*].follower_count,voteup_count,favorited_count,thanked_count";
 	get="data"/.URLExecute[HTTPRequest[<|
 		"Scheme"->"https",
@@ -124,19 +146,30 @@ ZhihuFolloweesGet[name_String,offset_Integer]:=Block[
 		"Path"->{"api/v4/members",name,"followees"},
 		"Query"->{"include"->needs,"offset"->offset,"limit"->offset+20}
 	|>],Authentication->None];
-	ArrayPad[$keywordsMin[[1;;6,1]]/.get,{{0},{0,1}},DateObject[]]
+	exname=StringJoin[ToString@IntegerPart[1000AbsoluteTime@now],".json"];
+	Export[FileNameJoin[{$fd,exname}],get,"json"];
+	ArrayPad[$keywordsMin[[1;;6,1]]/.get,{{0},{0,1}},now]
 ];
-ZhihuFollowees[name_String]:=Block[
+Options[ZhihuFollow]={Format->Dataset};
+ZhihuFollow[name_String,OptionsPattern[]]:=Block[
 	{count,raw,data},
-	count=ZhihuStatsGet[name,Return->Normal]["关注人数"];
+	count=ZhihuStats[name,Return->Normal]["关注人数"];
 	Echo[count,"你关注的用户数: "];
 	raw=Flatten[ZhihuFolloweesGet[name,20#]&/@Range[0,Quotient[count,20]],1];
-	(*TableForm[raw,TableHeadings\[Rule]{None,Last@@@$keywordsMin}];*)
-	data=Association[Rule@@@Transpose@{$keywordsMin[[All,2]],#}]&/@raw;
-	data//Dataset
+	Switch[OptionValue[Format],
+		TableForm,
+			TableForm[raw,TableHeadings\[Rule]{None,Last@@@$keywordsMin}],
+		Dataset,
+			Association[Rule@@@Transpose@{$keywordsMin[[All,2]],#}]&/@raw//Dataset,
+		Raw,
+			raw,
+		_,
+		Message[ZhihuLink::para,OptionValue[Format]];
+		Return@Missing["NotAvailable"]
+	]
 ];
 
-(*Todo: Save 模式, 若关注人数>200则启用*)
+
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
