@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: trusty # 指定 ubuntu 版本
 branches:
   only:
     - master
@@ -11,14 +11,14 @@ env:
    - GITHUB_USER: GalAster               # 你的用户名
    - GITHUB_REPO: Geis                   # 你的项目名
    # 还有一个 TRAVIS_KEY 填在 travis settings 里!
-   # https://github.com/settings/tokens
-   # https://www.travis-ci.org
+   # 教程 https://0x0.life/archives/47a3aed6.html
 before_script:
   - export TZ='Asia/Shanghai'
   - git config --global user.name "${GITHUB_NAME}"
   - git config --global user.email "${GITHUB_MAIL}"
 script:
-  - git clone --depth 20 --branch master --single-branch https://github.com/${GITHUB_USER}/${GITHUB_REPO}
+  # 使用要求 10 次提交之类有 tag 存在, 名称必须为 v1.0.0 类似的形式
+  - git clone --depth 10 --branch master --single-branch https://github.com/${GITHUB_USER}/${GITHUB_REPO}
   - cd ${GITHUB_REPO}
   - ver=`git tag | awk 'END {print}'`
   - nVer=`echo $ver | awk -F. '{printf "%s.%s.%s\n",$1,$2,$3+1}'`
@@ -29,12 +29,11 @@ before_deploy:
   - cd ${GITHUB_REPO}
   # 清理工程文件
   - rm -rf .git
-  - rm -rf build-tools
   - rm -rf Packages/_*
   - rm -rf Resources
   - rm -f .travis.yml
   - rm -f .gitignore
-  # 清理文档, 可选
+  # 清理文档(可选)
   - rm -rf Documentation
   - ls && cd ..
   - tar -cJf ${GITHUB_REPO}.tar.xz ${GITHUB_REPO}
