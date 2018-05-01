@@ -108,13 +108,12 @@ FiniteGroupData[{"DirectProduct",
 (* ::Subsubsection:: *)
 (*功能块 2*)
 MolecularDegree[c_Integer, h_Integer, n_Integer] := (2 * c + 2 - h + n) / 2; (*Degrees of Unsaturation*)
-Options[IsoIterator] = {"Step" -> 1024};
-IsoIterator[c_Integer, h_Integer, o_Integer : 0, n_Integer : 0, OptionsPattern[]] := Block[
+IsoIterator[c_, h_, o_, n_, OptionsPattern[]] := Block[
 	{sol = {}, deg = MolecularDegree[c, h, n], NextMolecular},
 	If[!IntegerQ@deg, Return@Failure];
 	NextMolecular[nC_Integer, nH_Integer, nO_Integer, nN_Integer, curM_, cMap_, tC_, tH_, tO_, tN_, dg_, dU_] := Module[
 		{tM, sortM, fB, fB2},
-		If[Length[sol] < OptionValue["Step"],
+		If[Length[sol] < $RecursionLimit,
 			If[nC == nH == nO == nN == 0 && Total[curM[[All, 1]]] == 0,
 				sol = Append[sol, cMap],
 				If[nC + nH + nO + nN > 0 && Total[curM[[All, 1]]] > 0,
@@ -188,11 +187,10 @@ MolecularQ[nC_, nH_, nO_, nN_] := Module[
 		!(nC == 1 && ((nO != 2 && nH == nN == 0) || (nN > 1 && nH == nO == 0)))
 	}
 ];
-Options[MolecularFind] = {"Step" -> 1024};
-MolecularFind[c_, h_, n_, o_, OptionsPattern[]] := Block[
+MolecularFind[c_Integer, h_Integer, o_Integer : 0, n_Integer : 0] := Block[
 	{raw, modi, all, pos },
 	If[!MolecularQ[c, h, o, n, "Step" -> OptionValue["Step"]], Print["Molecular not Exist!"]];
-	raw = IsoIterator[nC, nH, nO, "Step" -> 100];
+	raw = IsoIterator[nC, nH, nO];
 	modi = CanonicalGraph /@ Graph /@ DeleteDuplicates /@ Map[Sort, raw, 2];
 	all = DeleteDuplicates[modi];
 	pos = Flatten[Table[Position[mod, all[[i]], 1, 1], {i, 1, Length[all]}]];

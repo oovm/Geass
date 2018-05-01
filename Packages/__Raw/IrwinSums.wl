@@ -88,16 +88,16 @@ Unprotect[IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLe
 nf0[y_, nDec_] :=
 	If[ y == 0,
 		0,
-		N[y, Max[1, Floor[1+Log[10, Abs[y]]]] + nDec]
+		N[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec]
 	];
 (* nf1 formats a number to (nDec) decimal places, with a space every 5 digits *)
 nf1[y_, nDec_] :=
 	If[ y == 0,
 		0,
-		NumberForm[y, Max[1, Floor[1+Log[10, Abs[y]]]] + nDec, DigitBlock->5, NumberSeparator->{""," "}]
+		NumberForm[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec, DigitBlock -> 5, NumberSeparator -> {"", " "}]
 	];
 (* depending on the flag, this does either standard or "NumberForm" formatting *)
-nf[y_, nDec_, iFlag_:0] :=
+nf[y_, nDec_, iFlag_ : 0] :=
 	If[ iFlag == 0,
 		nf0[y, nDec],
 		nf1[y, nDec]
@@ -129,7 +129,7 @@ bn[iBase_Integer, n_Integer, nConditions_Integer, digitList_?VectorQ] :=
 			Return[iBase - nConditions]
 		];
 		(* iBase minus number of special digits *)
-		For[k = 1, k <= iBase - 1, k++,If[ isThisASpecialDigit[k, nConditions, digitList] != 0,
+		For[k = 1, k <= iBase - 1, k++, If[ isThisASpecialDigit[k, nConditions, digitList] != 0,
 			Continue[]
 		];
 		bn += power[k, n];];
@@ -141,7 +141,7 @@ getArrayIndexFromList[n_Integer, ci_?VectorQ, iList_?VectorQ] :=
 	Block[
 	(* this is called with nConditions = n and countList = ci. this function is the inverse of getListFromArrayIndex. *) { i, IrwinSum = 0, iProd = 1 },
 		IrwinSum = iList[[1]];
-		For[i = 2, i <= n, i++,iProd = iProd * (ci[[i-1]] + 1);
+		For[i = 2, i <= n, i++, iProd = iProd * (ci[[i - 1]] + 1);
 		IrwinSum += iList[[i]] * iProd;];
 		IrwinSum + 1
 	(* return this value; all arrays in mathematica are 1-based *)
@@ -150,14 +150,14 @@ getArrayIndexFromList[n_Integer, ci_?VectorQ, iList_?VectorQ] :=
 getListFromArrayIndex[iArrayIndex_Integer, n_Integer, ci_?VectorQ] :=
 	Block[
 	(*given an array index, find the list iList[1..n] that gives this index. this is called with nConditions = n and countList = ci.this function is the inverse of getArrayIndexFromList.*) { i, iProd = 1, iTemp, iList = Table[0, {n}] },
-		iProd = Product[ci[[i]] + 1, {i, n-1}];
+		iProd = Product[ci[[i]] + 1, {i, n - 1}];
 		iTemp = iArrayIndex;
 		iTemp = iTemp - 1;
 		(* for mma *)
-		For[i = n-1, i >= 1, i--,iList[[i+1]] = Floor[ iTemp/iProd ];
-		iTemp = iTemp - iProd*iList[[i+1]];
+		For[i = n - 1, i >= 1, i--, iList[[i + 1]] = Floor[ iTemp / iProd ];
+		iTemp = iTemp - iProd * iList[[i + 1]];
 		(* remainder *)
-		iProd = Floor[ iProd/(ci[[i]] + 1) ];];
+		iProd = Floor[ iProd / (ci[[i]] + 1) ];];
 		iList[[1]] = iTemp;
 		iList
 	(* return this list *)
@@ -167,9 +167,9 @@ updateCumulativeSums1[iBase_Integer, nConditions_Integer, countList_?VectorQ] :=
 	Block[
 	(* if there is one condition, and we are summing the series for k occurrences of a digit, then keep track of all cumulative sums for i = 0, 1, 2, ..., k occurrences of that digit. *) { i, iArrayIndex, kOccurFound },
 		kOccurFound = Table[ 0, {iBase + 1} ];
-		For[i = 0, i <= countList[[1]], i++,kOccurFound[[1]] = i;
+		For[i = 0, i <= countList[[1]], i++, kOccurFound[[1]] = i;
 		iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
-		cumulativeSums1[[i+1]] += sjkPrev[[ 1, iArrayIndex ]];];
+		cumulativeSums1[[i + 1]] += sjkPrev[[ 1, iArrayIndex ]];];
 	];
 (* end of updateCumulativeSums1 *)
 printAllSums1[iDigit_Integer, nDec_Integer, nConditions_Integer, countList_?VectorQ, iFormatted_Integer] :=
@@ -181,14 +181,14 @@ printAllSums1[iDigit_Integer, nDec_Integer, nConditions_Integer, countList_?Vect
 		If[ iDigit > 0,
 			Print[" iDigit = ", iDigit]
 		];
-		For[k = 0, k <= countList[[1]], k++,Print[" sum for ", k, " occurrences = ", nf[cumulativeSums1[[k+1]] , nDec, iFormatted] ]];
+		For[k = 0, k <= countList[[1]], k++, Print[" sum for ", k, " occurrences = ", nf[cumulativeSums1[[k + 1]] , nDec, iFormatted] ]];
 	];
 (* end of printAllSums1 *)
 directSummation[iBase_Integer, numDigits_Integer, maxPower_Integer, nConditions_Integer, digitList_?VectorQ, countList_?VectorQ, nDec_Integer] :=
 	Block[
 	(* compute partial sums by directly adding terms whose denominators have (numDigits) digits *) { nTerms,
 	(* return this value *)
-		iStart, iLast, i, iNumber, iDigitPos, iQuot, iRemainder, iDigit, jPower, k, kFound, iOK, iMatch, sumK = 0,kOccurFound, iArrayIndex,xNumb, xRecip, xRecipPower},
+		iStart, iLast, i, iNumber, iDigitPos, iQuot, iRemainder, iDigit, jPower, k, kFound, iOK, iMatch, sumK = 0, kOccurFound, iArrayIndex, xNumb, xRecip, xRecipPower},
 		kOccurFound = Table[0, {nConditions}];
 		(* 1-based, one for each special digit *)
 		nTerms = 0;
@@ -200,8 +200,8 @@ directSummation[iBase_Integer, numDigits_Integer, maxPower_Integer, nConditions_
 		(* clear all counts *)
 			For[k = 1, k <= nConditions, k++, kOccurFound[[k]] = 0];
 			iNumber = i;
-			For[iDigitPos = 1, iDigitPos <= numDigits, iDigitPos++, iQuot = Floor[ iNumber/iBase ];
-			iRemainder = iNumber - iBase*iQuot;
+			For[iDigitPos = 1, iDigitPos <= numDigits, iDigitPos++, iQuot = Floor[ iNumber / iBase ];
+			iRemainder = iNumber - iBase * iQuot;
 			iDigit = iRemainder;
 			kFound = isThisASpecialDigit[iDigit, nConditions, digitList];
 			(* if this is the digit for condition number 2, increment the 2nd total *)
@@ -227,13 +227,13 @@ directSummation[iBase_Integer, numDigits_Integer, maxPower_Integer, nConditions_
 				nTerms = nTerms + 1
 			];
 			xNumb = i;
-			xRecip = N[1/xNumb, nDec];
+			xRecip = N[1 / xNumb, nDec];
 			(* now compute the place in the sjkPrev array where this sum belongs *)
 			iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
 			sjkPrev[[ 1, iArrayIndex ]] += xRecip;
 			xRecipPower = xRecip;
 			(* xNumb^(-1) *)
-			For[jPower = 2, jPower <= maxPower, jPower++,xRecipPower = xRecipPower*xRecip;
+			For[jPower = 2, jPower <= maxPower, jPower++, xRecipPower = xRecipPower * xRecip;
 			(* xNumb^(-jPower) *)
 			sjkPrev[[ jPower, iArrayIndex ]] += xRecipPower;];
 			Label[nextI];];
@@ -253,9 +253,9 @@ computeMaxPowerNeeded[iBase_Integer, nDecimals_Integer, dsDigits_Integer] :=
 		a = iBase^(dsDigits - 1);
 		b = iBase^dsDigits - 1;
 		(* this r0 is usually a good approximation to the value we want *)
-		r0 = Ceiling[ Log[iBase, 10] * nDecimals/(dsDigits - 1) ];
+		r0 = Ceiling[ Log[iBase, 10] * nDecimals / (dsDigits - 1) ];
 		(* find a value that guarantees NSum < eps *)
-		For[k = r0, k <= 10*r0, k++,ns = NSum[1/n^k, {n, a, b}];
+		For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
 		ns = Re[ns];
 		(* needed only for mathematica version 5.2 *)
 		If[ ns < eps,
@@ -264,12 +264,12 @@ computeMaxPowerNeeded[iBase_Integer, nDecimals_Integer, dsDigits_Integer] :=
 		(* end for k loop *)
 
 		(* if we get here, we will have to solve the equation *)
-		r = FindRoot[(b^(1 - c) - a^(1 - c))/(1 - c) == eps, {c, r0} ];
+		r = FindRoot[(b^(1 - c) - a^(1 - c)) / (1 - c) == eps, {c, r0} ];
 		r0 = Ceiling[c /. r];
 		(* get the numerical value from the rule *)
 
 		(* find a value that guarantees NSum < eps *)
-		For[k = r0, k <= 10*r0, k++, ns = NSum[1/n^k, {n, a, b}];
+		For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
 		ns = Re[ns];
 		(* needed only for mathematica version 5.2 *)
 		If[ ns < eps,
@@ -284,31 +284,31 @@ computeMaxPowerNeeded[iBase_Integer, nDecimals_Integer, dsDigits_Integer] :=
 	];
 (* end of computeMaxPowerNeeded *)
 Clear[computeIrwinSum];
-computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals0_Integer, iFormatted_Integer,nDigits_:0, threshold_:-1 ] :=
+computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals0_Integer, iFormatted_Integer, nDigits_ : 0, threshold_ : -1 ] :=
 	Block[
 	(* this private function is the main calculation routine for the package. if nDigits > 0, this computes the partial sum through denominatorsof (nDigits) digits, that is, denominators that are < 10^nDigits,and then terminates without computing the complete sum. this parameter is used when the user calls iPartialSum[ ].threshold is used when the user calls iPartialSumThreshold.this usually returns a single number: either the sum >= 0, or an error value < 0. however, if a threshold > 0 was specified as input, then a 2-element list{ sum, digit number } is returned.*) {
 	(* iPrint= 0 for no output except for the final result,= 1 for minimal output,= 2 for some extra output,= 3 for some output for each iteration of the loop,= 4 for more output during the loop*)
-		iPrint,nShow = 10,
+		iPrint, nShow = 10,
 	(* number of digits, for displaying during the loop *)
 		nConditions,
 	(* number of digits with a condition placed on them *)
-		directSumDigits,nDecimals, nDec,i, j, nMax, n, j1, k1,
+		directSumDigits, nDecimals, nDec, i, j, nMax, n, j1, k1,
 	(* index values in various loops *)
 		iDigit, jPower, iDigitStart, k, numTerms, iAllTiny,
 	(* given a digit distribution, the array index values tell where to store a sum in the sjk and sjkPrev arrays *)
-		iArrayIndex, iArrayIndex0, iArrayIndex2, maxIndexUsed, maxJ,jMaxPower,maxDigits,
+		iArrayIndex, iArrayIndex0, iArrayIndex2, maxIndexUsed, maxJ, jMaxPower, maxDigits,
 	(* arbitrary upper limit on outer loop, to prevent infinite loop *)
 		maxTermAddedI,
 	(* max term added for one iteration of the iDigit loop *)
 		maxTermAddedJ,
 	(* max term added for one iteration of the jPower loop *)
-		maxTermArray,iSpecialSum = 0, iDone = 0, tiny1, tiny2,
+		maxTermArray, iSpecialSum = 0, iDone = 0, tiny1, tiny2,
 	(* sum = cumulative sum that we are looking for, with exactly n1 d1's, n2 d2's, etc. *)
 		requestedSum = 0,
 	(* sumOneDigit = requested sum for a single value of iDigit (that is, one power of 10) *)
 		sumOneDigit = 0,
 	(* sumSmallerK is the cumulative sum over all 0 <= k1 <= n1, 0 <= k2 <= n2, etc. *)
-		sumSmallerK = 0,sumB1, sumB2, term1, term2, bnx2, ajn, kList, tableOfLists,time0, time1, time2},
+		sumSmallerK = 0, sumB1, sumB2, term1, term2, bnx2, ajn, kList, tableOfLists, time0, time1, time2},
 		iPrint = iSumPrintLevel;
 		(* we use nDecimals because we cannot reset the input parameter nDecimals0 *)
 		nDecimals = nDecimals0;
@@ -339,11 +339,11 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 			Print["Mismatch: digit list and count list have different lengths (", Length[digitList], " and ", Length[countList], ")"];
 			Return[0];
 		];
-		For[i = 1, i <= nConditions, i++,If[ (digitList[[i]] < 0) || (digitList[[i]] >= iBase),
+		For[i = 1, i <= nConditions, i++, If[ (digitList[[i]] < 0) || (digitList[[i]] >= iBase),
 			Print["digit # ", i, " = ", digitList[[i]], " is not valid in base ", iBase];
 			Return[0];
 		];
-		For[j = i+1, j <= nConditions, j++, If[ digitList[[i]] == digitList[[j]],
+		For[j = i + 1, j <= nConditions, j++, If[ digitList[[i]] == digitList[[j]],
 			Print["error: digit # ", i, " = ", digitList[[i]], " is duplicated"];
 			Return[0];
 		];];
@@ -355,15 +355,15 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 		(* end for i loop *)
 
 		(* if every non-zero digit has zero occurrences, then we have an empty sum. example: the 对1/n求和 where n has no 1 in base 2. just return 0 and a message. *)
-		If[ nConditions == iBase-1,
+		If[ nConditions == iBase - 1,
 			j = 0;
-			For[i = 0, i <= iBase-1, i++,If[ (countList[[i]] == 0) && (digitList[[i]] != 0),
+			For[i = 0, i <= iBase - 1, i++, If[ (countList[[i]] == 0) && (digitList[[i]] != 0),
 				j++;
 			];
 			(* end If[ ] *)
 			];
 			(* end for i loop *)
-			If[ j == iBase-1,
+			If[ j == iBase - 1,
 				Print["all non-zero digits have 0 occurrences: this is an empty sum"];
 				Return[0];
 			];
@@ -371,8 +371,8 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 		(* end If[ ] *)
 
 		(* at this point, we can assume all input is valid. proceed with the calculation. *)
-		tiny1 = 1/10^(2 * nDec);
-		tiny2 = 1/10^(nDec + 5);
+		tiny1 = 1 / 10^(2 * nDec);
+		tiny2 = 1 / 10^(nDec + 5);
 		(* the larger nDecimals is, the larger maxDigits and jMaxPower need to be. in most cases, maxDigits = 60 * nDecimals works.maxDigits is used only to make sure the outer loop is finite, so we can set it to any reasonable value.*)
 		maxDigits = 60 * nDecimals;
 		If[ maxDigits < 500,
@@ -501,7 +501,7 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 				kList = getListFromArrayIndex[iArrayIndex, nConditions, countList];
 				sumB1 = sumB2 = 0;
 				(* here is the "infinite" loop, where n goes from 0 to infinity *)
-				For[n = 0, n <= nMax, n++,ajn = Binomial[jPower + n - 1, n] / power[iBase, jPower + n];
+				For[n = 0, n <= nMax, n++, ajn = Binomial[jPower + n - 1, n] / power[iBase, jPower + n];
 				If[ OddQ[n],
 					ajn = -ajn
 				];
@@ -537,7 +537,7 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 			If[ (threshold > 0) && (requestedSum > threshold),
 				Return[ { requestedSum , iDigit } ];
 			];
-			For[i = 1, i <= maxIndexUsed, i++,sumSmallerK += sjk[[1, i]]
+			For[i = 1, i <= maxIndexUsed, i++, sumSmallerK += sjk[[1, i]]
 			(* update the sum for all 'at most' conditions *)
 			];
 			If[ (nDigits > 0) && (nDigits == iDigit),
@@ -604,7 +604,7 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 				If[ (sjk[[1, iArrayIndex0 ]] != 0) && (sjk[[1, iArrayIndex0 ]] / requestedSum < tiny2),
 					iDone = 1;
 					time2 = TimeUsed[];
-					time2 = Round[time2-time0];
+					time2 = Round[time2 - time0];
 					If[ iPrint >= 2,
 						Print["last iteration of main loop:"];
 						Print[" max term added = ", maxTermAddedI, ", sum for ", iDigit, " digits = ", nf[sumOneDigit, nShow]];
@@ -643,13 +643,13 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 (* end of private function computeIrwinSum *)
 (* here are the functions that the user can call:IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLevel *)
 Clear[IrwinSum];
-IrwinSum[digitList_?VectorQ, countList_?VectorQ, nDecimals_:15, iBase_:10, iFormatted_:0] :=
+IrwinSum[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] :=
 	Block[
 	(* examples:IrwinSum[ { 9 }, { 3 } ] = 对1/n求和 where n has exactly three 9's.IrwinSum[ { 9 }, { 3 }, 30 ] = same calculation, display result rounded to 30 decimals. IrwinSum[{9, 3}, {2, 0}] = 对1/n求和 where n has two 9's and no 3's= 2.593253652747189 .*) { },
 		computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted]
 	];
 (* end of IrwinSum[digit list, count list, decimals, base] *)
-IrwinSum[d_Integer, iCount_Integer, nDecimals_:15, iBase_:10, iFormatted_:0] :=
+IrwinSum[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] :=
 	Block[
 	(* examples:IrwinSum[ 9, 0 ] = 对1/n求和 where n has no 9's. IrwinSum[ 9, 2 ] = 对1/n求和 where n has two 9's.IrwinSum[ 9, 2, 30 ] = same calculation, to 30 decimals.*) { },
 	(* just call the "list" version of IrwinSum *)
@@ -657,12 +657,12 @@ IrwinSum[d_Integer, iCount_Integer, nDecimals_:15, iBase_:10, iFormatted_:0] :=
 	];
 (* end of IrwinSum[digit, count, decimals, base] *)
 Clear[iSumFormatted];
-iSumFormatted[digitList_?VectorQ, countList_?VectorQ, nDecimals_:15, iBase_:10] :=
+iSumFormatted[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10] :=
 	Block[ { iFormatted = 1 },
 		IrwinSum[digitList, countList, nDecimals, iBase, iFormatted]
 	];
 (* end of iSumFormatted[digit list, count list, decimals, base] *)
-iSumFormatted[d_Integer, iCount_Integer, nDecimals_:15, iBase_:10] :=
+iSumFormatted[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10] :=
 	Block[ { iFormatted = 1 },
 		IrwinSum[d, iCount, nDecimals, iBase, iFormatted]
 	];
@@ -681,13 +681,13 @@ setPrintLevel[i_Integer] :=
 	];
 (* end of setPrintLevel *)
 Clear[iPartialSum];
-iPartialSum[digitList_?VectorQ, countList_?VectorQ, nDigits_Integer?Positive, nDecimals_:15, iBase_:10] :=
+iPartialSum[digitList_?VectorQ, countList_?VectorQ, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] :=
 	Block[
 	(* examples of "list" version of iPartialSum:iPartialSum[ {9}, {0}, 30 ] = sum to 10^30 of 1/n where n has no 9's.iPartialSum[ { 9, 0 }, { 3, 1 }, 20 ] = sum to 10^20 of 1/n where n has three 9's and one0.*) { iFormatted = 0 },
 		computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted, nDigits]
 	];
 (* end of iPartialSum[digit list, count list, numDigits, decimals, base] *)
-iPartialSum[d_Integer, iCount_Integer, nDigits_Integer?Positive, nDecimals_:15, iBase_:10] :=
+iPartialSum[d_Integer, iCount_Integer, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] :=
 	Block[
 	(* examples:iPartialSum[ 9, 0, 20 ] = sum to 10^20 of 1/n where n has no 9's. iPartialSum[ 9, 2, 20 ] = sum to 10^20 of 1/n where n has two 9's. iPartialSum[ 9, 2, 20, 30 ] = same calculation, to 30 decimals.iPartialSum[1, 1, 6, 15, 2] = partial 对1/n求和 where n has one 1in base 2, for n < 2^6, to 15 decimals.*) { },
 	(* just call the "list" version of iPartialSum *)
@@ -695,9 +695,9 @@ iPartialSum[d_Integer, iCount_Integer, nDigits_Integer?Positive, nDecimals_:15, 
 	];
 (* end of iPartialSum[digit, count, numDigits, decimals, base] *)
 Clear[iPartialSumThreshold];
-iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, threshold_?Positive, nDecimals_:15, iBase_:10] :=
+iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] :=
 	Block[
-	(* example of "list" version of iPartialSum: the 对1/n求和 where n has three 9's and one 0, is IrwinSum[{9, 0}, {3, 1}] = 2.888545932755274 . therefore, the threshold must be less thanthisvalue. in this example, we take the threshold to be 2. iPartialSumThreshold[ { 9, 0 }, { 3, 1 }, 2 ]= {27, 1.910422503190251, 28, 2.0043388417551473}*) { iFormatted = 0, nDigits = 0, totalSum, iPrintLevelSave,xSum1 = 0, nDig1 = 0, xSum2, nDig2, errorReturn = {-1, -1, -1, -1}, tAcc, nDec2,errStr = "Use backquote notation iPartialSumThreshold[ digit, count, threshold``nDecimals]],\or enclose the threshold in double quotes"},
+	(* example of "list" version of iPartialSum: the 对1/n求和 where n has three 9's and one 0, is IrwinSum[{9, 0}, {3, 1}] = 2.888545932755274 . therefore, the threshold must be less thanthisvalue. in this example, we take the threshold to be 2. iPartialSumThreshold[ { 9, 0 }, { 3, 1 }, 2 ]= {27, 1.910422503190251, 28, 2.0043388417551473}*) { iFormatted = 0, nDigits = 0, totalSum, iPrintLevelSave, xSum1 = 0, nDig1 = 0, xSum2, nDig2, errorReturn = {-1, -1, -1, -1}, tAcc, nDec2, errStr = "Use backquote notation iPartialSumThreshold[ digit, count, threshold``nDecimals]],\or enclose the threshold in double quotes"},
 		tAcc = 1 + Floor[Accuracy[threshold]];
 		If[ tAcc == Infinity,
 			nDec2 = nDecimals,
@@ -746,14 +746,14 @@ iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, threshold_?Positive
 		{ nDig1, xSum1, nDig2, xSum2 }
 	];
 (* end of iPartialSumThreshold[digit list, count list, threshold, decimals, base] *)
-iPartialSumThreshold[d_Integer, iCount_Integer, threshold_?Positive, nDecimals_:15, iBase_:10] :=
+iPartialSumThreshold[d_Integer, iCount_Integer, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] :=
 	Block[
 	(* examples:iPartialSumThreshold[9, 1, 23]: for the 对1/n求和 where n has one 9,whose sum is IrwinSum[9, 1] = 23.044287080747848, iPartialSumThreshold[9, 1, 23] computes about how far we need to go to reach a partial sum of 23.the output is {80, 22.995762680948152, 81, 23.000125707332644}interpretation of output:the partial 对1/n求和 through n < 10^80 is 22.99576..., which is less than 23. however, if we include all terms through 81 digits (that is, n < 10^81),then the partial sum is 23.000125707332644, greater than your threshold. now that we have the 80 and 81, we can use iPartialSum to verify this result:iPartialSum[9, 1, 80] = 22.995762680948152iPartialSum[9, 1, 81] = 23.000125707332644 .iPartialSumThreshold[9, 1, 23, 30]: same calculation, to 30 decimals.IrwinSum[1, 1, 15, 2] = 2 = sum (to 15 decimals) of 1/n where n has one 1 in base 2. iPartialSumThreshold[1, 1, 1.99, 15, 2] = point at which above series reaches 1.99:{7, 1.984375000000000, 8, 1.9921875000000000}iPartialSum confirms this result:iPartialSum[1, 1, 7, 15, 2] = 1.984375000000000iPartialSum[1, 1, 8, 15, 2] = 1.992187500000000 .iPartialSumThreshold[9, 1, 23.044287080747] fails because the threshold is too close to the sum of the entire series. the best solution is to use Mathematica's backquote notation to increase the accuracy of the threshold. 23.044287080747``25 = 23.044287080747000000000000. the following gives the correct answer:iPartialSumThreshold[9, 1, 23.044287080747``25] returns{327, 23.04428708074693636344610077, 328, 23.04428708074702511802366170} .you can also use double quotes to convert the threshold to a string: iPartialSumThreshold[9, 1, "23.044287080747"]also returns the correct result{327, 23.044287080746936363, 328, 23.044287080747025118} .*) { },
 	(* call the list version of this function *)
 		iPartialSumThreshold[ { d }, { iCount }, threshold, nDecimals, iBase ]
 	];
 (* end of iPartialSumThreshold[digit, count, threshold, decimals, base] *)
-iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, pSumStr_String, nDecimals_:15, iBase_:10] :=
+iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, pSumStr_String, nDecimals_ : 15, iBase_ : 10] :=
 	Block[
 	(* the threshold was entered as a string. add double backquotes to specify the accuracy, then call another version of iPartialSumThreshold. *) { pSum, inputStr2, decPtList, quoteList, nDecimalsInput, nDec2, errorReturn = { -1, -1, -1, -1 }},
 		decPtList = StringPosition[pSumStr, "."];
@@ -778,7 +778,7 @@ iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, pSumStr_String, nDe
 		iPartialSumThreshold[digitList, countList, pSum, nDecimals, iBase]
 	];
 (* end of iPartialSumThreshold[digit list, count list, threshold string, decimals, base] *)
-iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_:15, iBase_:10] :=
+iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_ : 15, iBase_ : 10] :=
 	Block[ { },
 		iPartialSumThreshold[ { d }, { iCount }, pSumStr, nDecimals, iBase]
 	];
@@ -787,6 +787,6 @@ iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_:15, i
 End[ ];
 SetAttributes[
 	{IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLevel},
-	{Protected,ReadProtected}
+	{Protected, ReadProtected}
 ];
 EndPackage[]

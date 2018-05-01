@@ -330,18 +330,18 @@ Off[ General::spell ];
 nDefaultDecimals = 15;
 
 nf[y_, nDec_] :=
-  If[y == 0, 0,
-    NumberForm[y, Max[ 1, Floor[1+Log[10, Abs[y]]] ] + nDec, DigitBlock->5, NumberSeparator->{""," "}]
-  ];
+	If[y == 0, 0,
+		NumberForm[y, Max[ 1, Floor[1 + Log[10, Abs[y]]] ] + nDec, DigitBlock -> 5, NumberSeparator -> {"", " "}]
+	];
 
 removeDups[inputList_?VectorQ] :=
-Block[
-  (* remove duplicates from a list without changing the order;
-     (Union[ ] removes duplicates, but also sorts the list) *)
-  { },
-  elimReps[u_, v_] := If[MemberQ[u, v], u, Append[u, v]];
-  Fold[elimReps, {First[inputList]}, Rest[inputList]]
-];
+	Block[
+	(* remove duplicates from a list without changing the order;
+	   (Union[ ] removes duplicates, but also sorts the list) *)
+		{ },
+		elimReps[u_, v_] := If[MemberQ[u, v], u, Append[u, v]];
+		Fold[elimReps, {First[inputList]}, Rest[inputList]]
+	];
 
 
 (* Mathematica version 4 does not have a Norm[x, y] function.  so, to make this package
@@ -376,881 +376,881 @@ Clear[setT, kSumX];
 
 Clear[convertInputListToStrings];
 convertInputListToStrings[inputList_?VectorQ] :=
-Block[
-  (* convert input list to all strings; if a list element is neither a string
-     nor an integer, return an empty list. *)
-  { len, i, str, outputList = { }, bSet },
-  len = Length[inputList];
-  For[i = 1, i <= len, i++,
-    bSet = False;
-    If[StringQ[ inputList[[i]] ], str = inputList[[i]]; bSet = True];
-    If[IntegerQ[ inputList[[i]] ], str = ToString[ inputList[[i]] ]; bSet = True];
-    If[bSet == False,
-      Print["Error: Invalid input list: value #", i ," is neither a String nor an Integer."];
-      Return[ {} ]
-    ];
-    AppendTo[outputList, str];
-  ];
-  outputList
-];
+	Block[
+	(* convert input list to all strings; if a list element is neither a string
+	   nor an integer, return an empty list. *)
+		{ len, i, str, outputList = { }, bSet },
+		len = Length[inputList];
+		For[i = 1, i <= len, i++,
+			bSet = False;
+			If[StringQ[ inputList[[i]] ], str = inputList[[i]]; bSet = True];
+			If[IntegerQ[ inputList[[i]] ], str = ToString[ inputList[[i]] ]; bSet = True];
+			If[bSet == False,
+				Print["Error: Invalid input list: value #", i , " is neither a String nor an Integer."];
+				Return[ {} ]
+			];
+			AppendTo[outputList, str];
+		];
+		outputList
+	];
 
 
-setT[stringList_?VectorQ, iBase_:10] :=
-Block[ (* enter with a list of strings {s1, s2, ...}, like { "12", "345" }; return the T matrix *)
-  (* note: this function returns a 2-dimensional matrix, not a list.  even when the output
-     matrix has only one row, it is a matrix of the form {{1,2,3. ...}}, not a vector of the
-     form {1,2,3, ...}. *)
-  (* programming note: this function was not written in mathematica's efficient "functional" style.
-     this function does not need to be very efficient.  this function sets up the T matrix farily,
-     quickly.  calculating the sum takes far longer.  readers are welcomed to improve this code.
-  *)
-  { nInputStrings, i, s, s2, len, validDigits, j, t, iRow, firstNChars, d, dTest, found, jStart,
-    inputList0, inputList = {},    (* copy of input list *)
-    nSingleDigits = 0, nRows = 0, firstRow, nSetStrings = 0, setStrings = {},
-    firstJChars, bFound, k, dString, s2Appended, maxMatched, nCompare, iSaved, t2 },
+setT[stringList_?VectorQ, iBase_ : 10] :=
+	Block[ (* enter with a list of strings {s1, s2, ...}, like { "12", "345" }; return the T matrix *)
+	(* note: this function returns a 2-dimensional matrix, not a list.  even when the output
+	   matrix has only one row, it is a matrix of the form {{1,2,3. ...}}, not a vector of the
+	   form {1,2,3, ...}. *)
+	(* programming note: this function was not written in mathematica's efficient "functional" style.
+	   this function does not need to be very efficient.  this function sets up the T matrix farily,
+	   quickly.  calculating the sum takes far longer.  readers are welcomed to improve this code.
+	*)
+		{ nInputStrings, i, s, s2, len, validDigits, j, t, iRow, firstNChars, d, dTest, found, jStart,
+			inputList0, inputList = {}, (* copy of input list *)
+			nSingleDigits = 0, nRows = 0, firstRow, nSetStrings = 0, setStrings = {},
+			firstJChars, bFound, k, dString, s2Appended, maxMatched, nCompare, iSaved, t2 },
 
-  (* preliminaries: check input validity, make a list of input strings with spaces removed. *)
+	(* preliminaries: check input validity, make a list of input strings with spaces removed. *)
 
-  If[( iBase < 2) || (IntegerQ[iBase] == False),
-    Print["Error: Base = ", iBase," is not valid."];
-    t = Table[-1, {1}, {1}];    (* return this invalid 1 by 1 matrix *)
-    Return[t]
-  ];
+		If[( iBase < 2) || (IntegerQ[iBase] == False),
+			Print["Error: Base = ", iBase, " is not valid."];
+			t = Table[-1, {1}, {1}];    (* return this invalid 1 by 1 matrix *)
+			Return[t]
+		];
 
-  inputList0 = removeDups[stringList];    (* remove duplicate strings, but keep the order unchanged *)
+		inputList0 = removeDups[stringList];    (* remove duplicate strings, but keep the order unchanged *)
 
-  nInputStrings = Length[inputList0];
-  If[nInputStrings < 1,
-    Print["Error: No input string specified."];
-    t = Table[-1, {1}, {iBase}];    (* return this invalid 1 by iBase matrix *)
-    Return[t]
-  ];
+		nInputStrings = Length[inputList0];
+		If[nInputStrings < 1,
+			Print["Error: No input string specified."];
+			t = Table[-1, {1}, {iBase}];    (* return this invalid 1 by iBase matrix *)
+			Return[t]
+		];
 
-  If[iBase <= 10,    (* make a list of all valid digits in this base *)
-    validDigits = CharacterRange["0", ToString[iBase-1]]
-  ];
-  (* if iBase > 10, how should we check that the digits are valid?
-     perhaps we could use lower-case letters a-z for bases 11-36,
-     as Mathematica does for BaseForm[ ].  note: we can still enter
-     a digit in any base, say 0 in base 100 or base 1000.  for example,
-       KempnerSum[0, 10, 100] = 460.5252026385
-     and
-       KempnerSum[0, 10, 1000] = 6907.756101048 . *)
+		If[iBase <= 10, (* make a list of all valid digits in this base *)
+			validDigits = CharacterRange["0", ToString[iBase - 1]]
+		];
+		(* if iBase > 10, how should we check that the digits are valid?
+		   perhaps we could use lower-case letters a-z for bases 11-36,
+		   as Mathematica does for BaseForm[ ].  note: we can still enter
+		   a digit in any base, say 0 in base 100 or base 1000.  for example,
+			 KempnerSum[0, 10, 100] = 460.5252026385
+		   and
+			 KempnerSum[0, 10, 1000] = 6907.756101048 . *)
 
-  For[i = 1, i <= nInputStrings, i++,
-    (* make sure this list element is an integer or a string *)
-    If[UnsameQ[ Head[inputList0[[i]]] , String ] && UnsameQ[ Head[inputList0[[i]]] , Integer ],
-      Print["Error: Invalid input list: value[",i,"] is not a String."];
-      If[Head[inputList0[[i]]] === Symbol, Print["Two commas in a row."] ];
-      t = Table[-1, {1}, {iBase}];    (* return this invalid (1 by iBase) matrix *)
-      Return[t]
-    ];
+		For[i = 1, i <= nInputStrings, i++,
+		(* make sure this list element is an integer or a string *)
+			If[UnsameQ[ Head[inputList0[[i]]] , String ] && UnsameQ[ Head[inputList0[[i]]] , Integer ],
+				Print["Error: Invalid input list: value[", i, "] is not a String."];
+				If[Head[inputList0[[i]]] === Symbol, Print["Two commas in a row."] ];
+				t = Table[-1, {1}, {iBase}];    (* return this invalid (1 by iBase) matrix *)
+				Return[t]
+			];
 
-    s = inputList0[[i]];
+			s = inputList0[[i]];
 
-    If[Head[s] === Integer, s = ToString[s]];
-    s2 = StringReplace[s, " " -> ""];    (* for convenience, user can include spaces, but we ignore them *)
-    len = StringLength[s2];
-    If[len == 0, Continue[]];
+			If[Head[s] === Integer, s = ToString[s]];
+			s2 = StringReplace[s, " " -> ""];    (* for convenience, user can include spaces, but we ignore them *)
+			len = StringLength[s2];
+			If[len == 0, Continue[]];
 
-    If[iBase <= 10,  (* verify that this input string is a valid number in this base *)
-      For[j = 1, j <= len, j++,
-        If[MemberQ[validDigits, StringTake[s2, {j}]] == False,  (* jth character *)
-          Print["Error: input character '", StringTake[s2, {j}], "' is not a valid digit in base ", iBase];
-          t = Table[-1, {1}, {iBase}];    (* return this invalid (1 by iBase) matrix *)
-          Return[t]
-        ];
-      ];
-    ];
-    (* this string is ok, so add it to inputList *)
-    AppendTo[inputList, s2];
-    If[len == 1, nSingleDigits++];
-  ];    (* end For[ i ] loop *)
+			If[iBase <= 10, (* verify that this input string is a valid number in this base *)
+				For[j = 1, j <= len, j++,
+					If[MemberQ[validDigits, StringTake[s2, {j}]] == False, (* jth character *)
+						Print["Error: input character '", StringTake[s2, {j}], "' is not a valid digit in base ", iBase];
+						t = Table[-1, {1}, {iBase}];    (* return this invalid (1 by iBase) matrix *)
+						Return[t]
+					];
+				];
+			];
+			(* this string is ok, so add it to inputList *)
+			AppendTo[inputList, s2];
+			If[len == 1, nSingleDigits++];
+		];    (* end For[ i ] loop *)
 
-  (* if only single digits are present, return this one-row matrix *)
-  If[nSingleDigits == nInputStrings,
-    (* the first row has zeros in the positions corresponding to
-       input strings of length 1.  other positions have non-zero entries. *)
-    firstRow = Table[1, {1}, {iBase}];
-    For[i = 1, i <= nInputStrings, i++,
-      If[StringLength[ inputList[[i]] ] == 1,
-        j = ToExpression[ inputList[[i]] ];
-        firstRow[[1, j+1]] = 0;
-      ];
-    ];
-    Return[firstRow]
-  ];
+		(* if only single digits are present, return this one-row matrix *)
+		If[nSingleDigits == nInputStrings,
+		(* the first row has zeros in the positions corresponding to
+		   input strings of length 1.  other positions have non-zero entries. *)
+			firstRow = Table[1, {1}, {iBase}];
+			For[i = 1, i <= nInputStrings, i++,
+				If[StringLength[ inputList[[i]] ] == 1,
+					j = ToExpression[ inputList[[i]] ];
+					firstRow[[1, j + 1]] = 0;
+				];
+			];
+			Return[firstRow]
+		];
 
-  (* now we set up the unique strings that define all the sets.
-     see the schmelzer-baillie paper for details.
+		(* now we set up the unique strings that define all the sets.
+		   see the schmelzer-baillie paper for details.
 
-     example 1: suppose the input string is { "314" }.
-     let S be the set of all integers not containing this string.
-     then we make 3 subsets of S:
-     set 2 is all elements of S that end in "3" ;
-     set 3 is all elements of S that end in "31" ;
-     set 1 is all other elements of S.
+		   example 1: suppose the input string is { "314" }.
+		   let S be the set of all integers not containing this string.
+		   then we make 3 subsets of S:
+		   set 2 is all elements of S that end in "3" ;
+		   set 3 is all elements of S that end in "31" ;
+		   set 1 is all other elements of S.
 
-     example 2: suppose the input list is { "12", "345", "3467" }.
-     let S be the set of all integers containing none of these strings.
-     then we make 4 subsets of S:
-     set 2 is all elements of S that end in "1" ;
-     set 3 is all elements of S that end in "3" ;
-     set 4 is all elements of S that end in "34" ;
-     set 5 is all elements of S that end in "346" ;
-     set 1 is all other elements of S.
+		   example 2: suppose the input list is { "12", "345", "3467" }.
+		   let S be the set of all integers containing none of these strings.
+		   then we make 4 subsets of S:
+		   set 2 is all elements of S that end in "1" ;
+		   set 3 is all elements of S that end in "3" ;
+		   set 4 is all elements of S that end in "34" ;
+		   set 5 is all elements of S that end in "346" ;
+		   set 1 is all other elements of S.
 
-     example 3: complicated example from the schmelzer-baillie paper:
-     suppose the input list is { "0", "2", "4", "6", "8", "55", "13579" }.
-     then we make 6 subsets of S:
-     set 2 is all elements of S that end in "5" but not "135" ;
-     set 3 is all elements of S that end in "1" ;
-     set 4 is all elements of S that end in "13" ;
-     set 5 is all elements of S that end in "135" ;
-     set 6 is all elements of S that end in "1357" ;
-     set 1 is all other elements of S.
-  *)
+		   example 3: complicated example from the schmelzer-baillie paper:
+		   suppose the input list is { "0", "2", "4", "6", "8", "55", "13579" }.
+		   then we make 6 subsets of S:
+		   set 2 is all elements of S that end in "5" but not "135" ;
+		   set 3 is all elements of S that end in "1" ;
+		   set 4 is all elements of S that end in "13" ;
+		   set 5 is all elements of S that end in "135" ;
+		   set 6 is all elements of S that end in "1357" ;
+		   set 1 is all other elements of S.
+		*)
 
-  setStrings = { "" }; nSetStrings = 1;    (* for first set (first row) *)
+		setStrings = { "" }; nSetStrings = 1;    (* for first set (first row) *)
 
-  For[i = 1, i <= nInputStrings, i++,    (* process the ith input string *)
-    s2 = inputList[[i]];
-    len = StringLength[s2];
-    If[len > 1,    (* input strings of length 1 are processed elsewhere *)
-      For[j = 1, j <= len-1, j++,
-        firstJChars = StringTake[s2, j];
+		For[i = 1, i <= nInputStrings, i++, (* process the ith input string *)
+			s2 = inputList[[i]];
+			len = StringLength[s2];
+			If[len > 1, (* input strings of length 1 are processed elsewhere *)
+				For[j = 1, j <= len - 1, j++,
+					firstJChars = StringTake[s2, j];
 
-        (* make sure that string firstJChars is not already in the setStrings list *)
-        bFound = False;
-        For[k = 1, k <= nSetStrings, k++,
-          If[setStrings[[k]] == firstJChars, bFound = True; Break[] ];
-        ];
+					(* make sure that string firstJChars is not already in the setStrings list *)
+					bFound = False;
+					For[k = 1, k <= nSetStrings, k++,
+						If[setStrings[[k]] == firstJChars, bFound = True; Break[] ];
+					];
 
-        If[bFound == False,
-          AppendTo[setStrings, firstJChars];
-          nSetStrings++;
-        ];
-      ];    (* end For[ j ] loop *)
-    ];    (* end If[len > ... 1] *)
-  ];    (* end For[ i ] loop *)
+					If[bFound == False,
+						AppendTo[setStrings, firstJChars];
+						nSetStrings++;
+					];
+				];    (* end For[ j ] loop *)
+			];    (* end If[len > ... 1] *)
+		];    (* end For[ i ] loop *)
 
-  (* at this point, we have setStrings = {1, 3, 34, 346}.
-     the number of rows will be the number of elements in setStrings. *)
+		(* at this point, we have setStrings = {1, 3, 34, 346}.
+		   the number of rows will be the number of elements in setStrings. *)
 
-  nRows = Length[setStrings];
-  (* now we know the dimensions of the matrix *)
-  t =  Table[1, {nRows}, {iBase}];
+		nRows = Length[setStrings];
+		(* now we know the dimensions of the matrix *)
+		t = Table[1, {nRows}, {iBase}];
 
-  (* now set the elements of the matrix *)
+		(* now set the elements of the matrix *)
 
-  For[iRow = 1, iRow <= nRows, iRow++,
-    s2 = setStrings[[iRow]];
-    (* append each digit to string s2 and see which set the appended string belongs to *)
-    For[d = 0, d < iBase, d++,
-      (* create a string (s2Appended) that consists of the string
-         for this set, with the single digit d appended. *)
-      dString = ToString[d];
-      s2Appended = StringJoin[s2, dString];
-      (* if d is a prohibited digit, set t[..] = 0 *)
-      If[ Length[Position[inputList, dString]] > 0,
-        t[[iRow, d+1]] = 0;
-        Continue[];    (* next d *)
-      ];
-      (* if s2Appended equals any of the prohibited input strings, then set t[..] = 0 *)
-      bFound = False;
+		For[iRow = 1, iRow <= nRows, iRow++,
+			s2 = setStrings[[iRow]];
+			(* append each digit to string s2 and see which set the appended string belongs to *)
+			For[d = 0, d < iBase, d++,
+			(* create a string (s2Appended) that consists of the string
+			   for this set, with the single digit d appended. *)
+				dString = ToString[d];
+				s2Appended = StringJoin[s2, dString];
+				(* if d is a prohibited digit, set t[..] = 0 *)
+				If[ Length[Position[inputList, dString]] > 0,
+					t[[iRow, d + 1]] = 0;
+					Continue[];    (* next d *)
+				];
+				(* if s2Appended equals any of the prohibited input strings, then set t[..] = 0 *)
+				bFound = False;
 
-      For[i = 1, i <= nInputStrings, i++,
-        If[ s2Appended == inputList[[i]], t[[iRow, d+1]] = 0;
-          bFound = True; Break[] ];  (* end If *)
-      ];  (* end For[ i ] loop *)
+				For[i = 1, i <= nInputStrings, i++,
+					If[ s2Appended == inputList[[i]], t[[iRow, d + 1]] = 0;
+					bFound = True; Break[] ];  (* end If *)
+				];  (* end For[ i ] loop *)
 
-      If[bFound == True, Continue[] ];
+				If[bFound == True, Continue[] ];
 
-      (* if we get here, then s2Appended is not a prohibited input string.
-         see if s2Appended contains a prohibited string. *)
-      For[i = 1, i <= nInputStrings, i++,
-        If[ Length[StringPosition[ s2Appended, inputList[[i]] ] ] > 0,
-           t[[iRow, d+1]] = 0;
-           bFound = True; Break[];
-        ];
-      ];
+				(* if we get here, then s2Appended is not a prohibited input string.
+				   see if s2Appended contains a prohibited string. *)
+				For[i = 1, i <= nInputStrings, i++,
+					If[ Length[StringPosition[ s2Appended, inputList[[i]] ] ] > 0,
+						t[[iRow, d + 1]] = 0;
+						bFound = True; Break[];
+					];
+				];
 
-      If[bFound == True, Continue[] ];
+				If[bFound == True, Continue[] ];
 
-      (* if we get here, then this (row, column) was not set to 0.
-         see which set s2Appended belongs in.  an example in the schmelzer-baillie
-         paper shows that a string ending in "5" could be in two sets ("5" and "135").
-         so, first, try to select the set (if any) whose string equals s2Appended.
-      *)
+				(* if we get here, then this (row, column) was not set to 0.
+				   see which set s2Appended belongs in.  an example in the schmelzer-baillie
+				   paper shows that a string ending in "5" could be in two sets ("5" and "135").
+				   so, first, try to select the set (if any) whose string equals s2Appended.
+				*)
 
-      (* final digits of s2Appended could match more than one setStrings[[i]].
-         among the matches, save the value of i for which
-         StringLength[ setStrings[[i]] ] is largest.
-      *)
-      maxMatched = 0;    (* max number of final digits that match *)
-      iSaved = 0;
-      For[i = 2, i <= nSetStrings, i++,
-        nCompare = StringLength[ setStrings[[i]] ];
-        (* if s2Appended is shorter than setStrings[[i]], then it cannot match setStrings[[i]] *)
-        If[StringLength[s2Appended] < nCompare, Continue[] ];
-        (* compare the last (nCompare) characters of s2Appended and setStrings[[i]] *)
-        If[ StringTake[s2Appended, -nCompare] == StringTake[setStrings[[i]], -nCompare],
-          bFound = True;
-          If[StringLength[ setStrings[[i]] ] > maxMatched,
-            maxMatched = StringLength[ setStrings[[i]] ];
-            iSaved = i;
-          ];
-        ];
-      ];  (* end For[ i ] loop *)
+				(* final digits of s2Appended could match more than one setStrings[[i]].
+				   among the matches, save the value of i for which
+				   StringLength[ setStrings[[i]] ] is largest.
+				*)
+				maxMatched = 0;    (* max number of final digits that match *)
+				iSaved = 0;
+				For[i = 2, i <= nSetStrings, i++,
+					nCompare = StringLength[ setStrings[[i]] ];
+					(* if s2Appended is shorter than setStrings[[i]], then it cannot match setStrings[[i]] *)
+					If[StringLength[s2Appended] < nCompare, Continue[] ];
+					(* compare the last (nCompare) characters of s2Appended and setStrings[[i]] *)
+					If[ StringTake[s2Appended, -nCompare] == StringTake[setStrings[[i]], -nCompare],
+						bFound = True;
+						If[StringLength[ setStrings[[i]] ] > maxMatched,
+							maxMatched = StringLength[ setStrings[[i]] ];
+							iSaved = i;
+						];
+					];
+				];  (* end For[ i ] loop *)
 
-      If[bFound, t[[iRow, d+1]] = iSaved];
+				If[bFound, t[[iRow, d + 1]] = iSaved];
 
-    ];  (* end For[ d ] loop *)
-  ];    (* end For[ iRow ] loop *)
+			];  (* end For[ d ] loop *)
+		];    (* end For[ iRow ] loop *)
 
-  t    (* return this matrix *)
-];    (* end of setT *)
+		t    (* return this matrix *)
+	];    (* end of setT *)
 
 
 kSumX[stringList_?VectorQ, T_?MatrixQ, nDecimals0_Integer, iBase_] :=
-Block[
-  (* the user calls KempnerSum[ ] or kSumFormatted[ ].  those functions call this
-     private function kSumX, which does all the work. *)
-  { nDecimals, inputLen, nDecSum, f, c, a, S, z, nInputDigits, totalDigits,
-    iMaxBase, goalMult, matB, wTrunc2, i, d, l, m, w, h,
-    iPrint = 0,
-    xi },
+	Block[
+	(* the user calls KempnerSum[ ] or kSumFormatted[ ].  those functions call this
+	   private function kSumX, which does all the work. *)
+		{ nDecimals, inputLen, nDecSum, f, c, a, S, z, nInputDigits, totalDigits,
+			iMaxBase, goalMult, matB, wTrunc2, i, d, l, m, w, h,
+			iPrint = 0,
+			xi },
 
-  Clear[A, Psi, extraPol, n, iMaxBase];    (* clear the global variables *)
+		Clear[A, Psi, extraPol, n, iMaxBase];    (* clear the global variables *)
 
-  (* in base 10, if the input is one string of N digits, then the sum will have N+1 digits.
-     if there are additional strings, they can only lower the sum.  therefore, the shortest
-     string in the list provides an upper bound for the number of digits in the sum. *)
-  (* inputLen = Min[StringLength[stringList]]; *)
-  (* StringLength[ ] is not Listable in version 4; next line works in versions 4, 5, and 6 *)
-  inputLen = Min[Map[StringLength, stringList]];
+		(* in base 10, if the input is one string of N digits, then the sum will have N+1 digits.
+		   if there are additional strings, they can only lower the sum.  therefore, the shortest
+		   string in the list provides an upper bound for the number of digits in the sum. *)
+		(* inputLen = Min[StringLength[stringList]]; *)
+		(* StringLength[ ] is not Listable in version 4; next line works in versions 4, 5, and 6 *)
+		inputLen = Min[Map[StringLength, stringList]];
 
-  (* iMaxBase and goalMult depend on the base.  their values were determined empirically.
-     to insure that we get as many decimal places of precision as the user requested. *)
+		(* iMaxBase and goalMult depend on the base.  their values were determined empirically.
+		   to insure that we get as many decimal places of precision as the user requested. *)
 
-  (* iMaxBase is roughly the log of 1000 to base (iBase). so, for base 10, iMaxBase = 3.
-     for base 2, iMaxBase = 10.  for base 100 if we use "Apply[Plus, N[1/S[i, j]^k, nDecSum]]",
-     then iMaxBase = 3 uses too much memory.
-  *)
-  nDecimals = nDecimals0;
-  If[nDecimals < 1, nDecimals = 1];
+		(* iMaxBase is roughly the log of 1000 to base (iBase). so, for base 10, iMaxBase = 3.
+		   for base 2, iMaxBase = 10.  for base 100 if we use "Apply[Plus, N[1/S[i, j]^k, nDecSum]]",
+		   then iMaxBase = 3 uses too much memory.
+		*)
+		nDecimals = nDecimals0;
+		If[nDecimals < 1, nDecimals = 1];
 
-  iMaxBase = Ceiling[ Log[iBase, 1000] ];
+		iMaxBase = Ceiling[ Log[iBase, 1000] ];
 
-  (* for base 1000, KempnerSum[0, 20, 1000] = 6907.75610104793192687449 .
-     for this, we need iMaxBase > 1 *)
-  If[iMaxBase < 2, iMaxBase = 2];    (* could happen if iBase = 1000 *)
+		(* for base 1000, KempnerSum[0, 20, 1000] = 6907.75610104793192687449 .
+		   for this, we need iMaxBase > 1 *)
+		If[iMaxBase < 2, iMaxBase = 2];    (* could happen if iBase = 1000 *)
 
-  iBaseSave = iBase;    (* used in kPartialSum *)
+		iBaseSave = iBase;    (* used in kPartialSum *)
 
-  (* goalMult = 1.1 is ok for base 100, but is too small for base 10.
-     1.4 is usually enough for base 10.  an exception: 100th decimal place of kSumFormatted["99", 100]
-     is different from that of kSumFormatted["99", 110].  so, use 1.5 for base 10.
-     for base 2, we need an even larger multiplier: 3.1 is too small, but 3.2 works.
-     for bases between 2 and 10, a goalMult < 3.2 might work, but we will use 3.2.
-  *)
-  goalMult = 1.5;
-  If[iBase < 10,   goalMult = 3.2 ];
-  If[iBase >= 100, goalMult = 1.1 ];
+		(* goalMult = 1.1 is ok for base 100, but is too small for base 10.
+		   1.4 is usually enough for base 10.  an exception: 100th decimal place of kSumFormatted["99", 100]
+		   is different from that of kSumFormatted["99", 110].  so, use 1.5 for base 10.
+		   for base 2, we need an even larger multiplier: 3.1 is too small, but 3.2 works.
+		   for bases between 2 and 10, a goalMult < 3.2 might work, but we will use 3.2.
+		*)
+		goalMult = 1.5;
+		If[iBase < 10, goalMult = 3.2 ];
+		If[iBase >= 100, goalMult = 1.1 ];
 
-  (* for base 10, the number of correct decimal places turns out to be about (2/3) * nDecSum.
-     therefore, adjust nDecSum accordingly, based on the input (nDecimals).
-     also, an N-digit string gives rise to a sum with N+1 digits to the left of the
-     decimal point.  for base 100, the sum has 2N+1 digits to the left of the decimal point.
-  *)
+		(* for base 10, the number of correct decimal places turns out to be about (2/3) * nDecSum.
+		   therefore, adjust nDecSum accordingly, based on the input (nDecimals).
+		   also, an N-digit string gives rise to a sum with N+1 digits to the left of the
+		   decimal point.  for base 100, the sum has 2N+1 digits to the left of the decimal point.
+		*)
 
-  nInputDigits = inputLen;
-  totalDigits = nDecimals + nInputDigits;    (* works in base 10 *)
-  If[iBase > 10, totalDigits = nDecimals + 2*nInputDigits ];
+		nInputDigits = inputLen;
+		totalDigits = nDecimals + nInputDigits;    (* works in base 10 *)
+		If[iBase > 10, totalDigits = nDecimals + 2 * nInputDigits ];
 
-  nDecSum = Floor[goalMult * totalDigits];
+		nDecSum = Floor[goalMult * totalDigits];
 
-  (* for large bases (say 1000), we may have to slightly increase the number of digits
-     to prevent this: KempnerSum[0, 10, 1000] = 6907.756101048 (only 9 decimals shown). *)
-  If[iBase > 10,    
-    nDecSum = nDecSum + Ceiling[Log[10, iBase]*nInputDigits]
-  ];
+		(* for large bases (say 1000), we may have to slightly increase the number of digits
+		   to prevent this: KempnerSum[0, 10, 1000] = 6907.756101048 (only 9 decimals shown). *)
+		If[iBase > 10,
+			nDecSum = nDecSum + Ceiling[Log[10, iBase] * nInputDigits]
+		];
 
-  (* the computation of A here is the same code as kSumGetA. *)
-  f[j_, l_, m_] := f[j, l, m] = If[T[[l, m]] == j, 1, 0] ;
+		(* the computation of A here is the same code as kSumGetA. *)
+		f[j_, l_, m_] := f[j, l, m] = If[T[[l, m]] == j, 1, 0] ;
 
-  n = Dimensions[T][[1]] ;    (* number of rows *)
+		n = Dimensions[T][[1]] ;    (* number of rows *)
 
-  A = (1/iBase) Sum[ Table[f[j, l, m + 1], {j, n}, {l, n}] , {m, 0, iBase-1} ] ;
+		A = (1 / iBase) Sum[ Table[f[j, l, m + 1], {j, n}, {l, n}] , {m, 0, iBase - 1} ] ;
 
-  c[k_, w_] := c[k, w] = Binomial[k + w - 1, w] ;
+		c[k_, w_] := c[k, w] = Binomial[k + w - 1, w] ;
 
-  a[k_, w_, m_] := iBase^(-k - w) * c[k, w] * (-1)^w * power2[m, w] ;
+		a[k_, w_, m_] := iBase^(-k - w) * c[k, w] * (-1)^w * power2[m, w] ;
 
-  matB[a_?MatrixQ] := (Inverse[# - a] - #) &[IdentityMatrix[Length[a]]];
+		matB[a_?MatrixQ] := (Inverse[# - a] - #) &[IdentityMatrix[Length[a]]];
 
-  wTrunc2[i_, k_] := Max[Floor[(nDecSum + 1)/(i - 1) + 1 - k] + 1, 0] ; (* function of i, k, and nDecSum *)
+		wTrunc2[i_, k_] := Max[Floor[(nDecSum + 1) / (i - 1) + 1 - k] + 1, 0] ; (* function of i, k, and nDecSum *)
 
-  extraPol = nDecSum + 1;
+		extraPol = nDecSum + 1;
 
-(*
-  If[iPrint > 0,
-    Print["nDecimals = ", nDecimals, ", iMaxBase = ", iMaxBase, ", goalMult = ", goalMult];
-    Print["nDecSum = ", nDecSum];
-  ];
-*)
+		(*
+		  If[iPrint > 0,
+			Print["nDecimals = ", nDecimals, ", iMaxBase = ", iMaxBase, ", goalMult = ", goalMult];
+			Print["nDecSum = ", nDecSum];
+		  ];
+		*)
 
-  S[i_, j_] := S[i, j] =
-  If[i == 1, Complement[Extract[Table[d, {d, 0, iBase-1}], Position[T[[1]], j]], {0}] ,
-    Block[{ p, el, m, k, elel, mm },
-           p = Position[Table[T[[el, m]], {el, n}, {m, iBase}], j]; h = {};
-           For[k = 1, k <= Length[p], k++,
-             {elel, mm} = p[[k]]; h = Join[h, iBase * S[i - 1, elel] + (mm - 1)]
-           ]
-          ];    (* end Block *)
-(* If[iPrint == 1, Print["h[", i, ",", j,"]=", h] ]; *)
-    h    (* return this list of i-digit integers = S[i,j] *)
-  ] ;    (* end If *)
+		S[i_, j_] := S[i, j] =
+			If[i == 1, Complement[Extract[Table[d, {d, 0, iBase - 1}], Position[T[[1]], j]], {0}] ,
+				Block[{ p, el, m, k, elel, mm },
+					p = Position[Table[T[[el, m]], {el, n}, {m, iBase}], j]; h = {};
+					For[k = 1, k <= Length[p], k++,
+						{elel, mm} = p[[k]]; h = Join[h, iBase * S[i - 1, elel] + (mm - 1)]
+					]
+				];    (* end Block *)
+				(* If[iPrint == 1, Print["h[", i, ",", j,"]=", h] ]; *)
+				h    (* return this list of i-digit integers = S[i,j] *)
+			] ;    (* end If *)
 
 
-(* here are two ways to compute Psi:
-     N[Apply[Plus, 1/S[i, j]^k], nDecSum]    this is slow but uses little memory
-   or
-     Apply[Plus, N[1/S[i, j]^k, nDecSum]]    this is fast but uses lots of memory
+		(* here are two ways to compute Psi:
+			 N[Apply[Plus, 1/S[i, j]^k], nDecSum]    this is slow but uses little memory
+		   or
+			 Apply[Plus, N[1/S[i, j]^k, nDecSum]]    this is fast but uses lots of memory
 
-   lst1 = Range[11, 99]
-   lst1 = Select[Range[11, 99], Mod[#, 10] != 0 &]  (* for KempnerSum[0], remove 20, 30, ..., 90 *)
-   there is a difference in how these two expressions are evaluated:
-     N[Apply[Plus, 1/lst1^k], nDecSum]
-     Apply[Plus, N[1/lst1^k, nDecSum]]
-     f1[k_, nDec_] := N[Apply[Plus, 1/lst1^k], nDec] - Apply[Plus, N[1/lst1^k, nDec]]
-     f2[nDec_] := { N[Apply[Plus, 1/lst1], nDec] , Apply[Plus, N[1/lst1, nDec]] } // N
-*)
+		   lst1 = Range[11, 99]
+		   lst1 = Select[Range[11, 99], Mod[#, 10] != 0 &]  (* for KempnerSum[0], remove 20, 30, ..., 90 *)
+		   there is a difference in how these two expressions are evaluated:
+			 N[Apply[Plus, 1/lst1^k], nDecSum]
+			 Apply[Plus, N[1/lst1^k, nDecSum]]
+			 f1[k_, nDec_] := N[Apply[Plus, 1/lst1^k], nDec] - Apply[Plus, N[1/lst1^k, nDec]]
+			 f2[nDec_] := { N[Apply[Plus, 1/lst1], nDec] , Apply[Plus, N[1/lst1, nDec]] } // N
+		*)
 
-  Psi[i_, j_, k_] := Psi[i, j, k] =
-    If[i <= iMaxBase,
+		Psi[i_, j_, k_] := Psi[i, j, k] =
+			If[i <= iMaxBase,
 
-   (* If[speedMode == 0,
-        N[Apply[Plus, 1/S[i, j]^k], nDecSum],  (* slow, but uses little memory; N[long rational] *)
-        (* Apply[Plus, N[1/S[i, j]^k, nDecSum]] *)   (* fast, but uses lots of memory; sum of decimals *)
-        (* compute only one 1/S[i, j]^k at a time to save memory; 1/21/2008 *)
-        (* xSum = 0; For[xi = 1, xi <= Length[S[i, j]], xi++, xSum += N[1/(S[i, j][[xi]])^k, nDecSum]]; xSum *)
-        Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]    (* 1/24/2008 *)
-      ] *) (* end If[speedMode] *)
+			(* If[speedMode == 0,
+				 N[Apply[Plus, 1/S[i, j]^k], nDecSum],  (* slow, but uses little memory; N[long rational] *)
+				 (* Apply[Plus, N[1/S[i, j]^k, nDecSum]] *)   (* fast, but uses lots of memory; sum of decimals *)
+				 (* compute only one 1/S[i, j]^k at a time to save memory; 1/21/2008 *)
+				 (* xSum = 0; For[xi = 1, xi <= Length[S[i, j]], xi++, xSum += N[1/(S[i, j][[xi]])^k, nDecSum]]; xSum *)
+				 Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]    (* 1/24/2008 *)
+			   ] *) (* end If[speedMode] *)
 
-      Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]
-     ,
-      (* below, i > iMaxBase *)
-      Sum[f[j, l, m + 1]*Sum[a[k, w, m]*Psi[i - 1, l, k + w],
-         {w, 0, wTrunc2[i, k]}], {m, 0, iBase-1}, {l, 1, n}]
-    ] ;    (* end If *)
+				Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]
+				,
+			(* below, i > iMaxBase *)
+				Sum[f[j, l, m + 1] * Sum[a[k, w, m] * Psi[i - 1, l, k + w],
+					{w, 0, wTrunc2[i, k]}], {m, 0, iBase - 1}, {l, 1, n}]
+			] ;    (* end If *)
 
-(*
-If[iPrint == -1,
-  Print["kSumx: extraPol = ", extraPol, ", n = ", n];
-  (* print the Psi values that will be used in computing z, below.  the 3rd argument
-     is always 1 there, but values of Psi[i-1, j, k] where k > 1 were used above
-     to compute Psi[i, j, k]. *)
-  Print["  (1) Psi (1..", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}], 5] // TableForm ];
-  Print["  (2) Psi (", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[extraPol, j, 1], {j, n}], 5] // TableForm ];
-];
-*)
+		(*
+		If[iPrint == -1,
+		  Print["kSumx: extraPol = ", extraPol, ", n = ", n];
+		  (* print the Psi values that will be used in computing z, below.  the 3rd argument
+			 is always 1 there, but values of Psi[i-1, j, k] where k > 1 were used above
+			 to compute Psi[i, j, k]. *)
+		  Print["  (1) Psi (1..", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}], 5] // TableForm ];
+		  Print["  (2) Psi (", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[extraPol, j, 1], {j, n}], 5] // TableForm ];
+		];
+		*)
 
-  (* use normOne[v] instead of Norm[v, 1] so this can run with Mathematica 4.0 *)
-  z = Sum[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}] +
-    normOne[matB[A] . Table[Psi[extraPol, j, 1], {j, n}] ];
+		(* use normOne[v] instead of Norm[v, 1] so this can run with Mathematica 4.0 *)
+		z = Sum[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}] +
+			normOne[matB[A] . Table[Psi[extraPol, j, 1], {j, n}] ];
 
-  (* return z, rounded to the number of decimal places requested *)
-  If[z == 0, kSumSave = 0, kSumSave = N[z, Floor[ 1 + Log[10, z] ] + nDecimals ] ];
+		(* return z, rounded to the number of decimal places requested *)
+		If[z == 0, kSumSave = 0, kSumSave = N[z, Floor[ 1 + Log[10, z] ] + nDecimals ] ];
 
-  nDecimalsSave = nDecimals;
+		nDecimalsSave = nDecimals;
 
-(* If[iPrint == 1, Print["z = ", z] ]; *)
+		(* If[iPrint == 1, Print["z = ", z] ]; *)
 
-  kSumSave    (* kSumSave is used in kPartialSum *)
+		kSumSave    (* kSumSave is used in kPartialSum *)
 
-];    (* end of kSumX *)
+	];    (* end of kSumX *)
 
 
 KempnerSum[T_?MatrixQ, nDecimals_Integer] :=
-Block[ (* in this version, we input a T matrix, not a string *)
-  (* note: the base is not a parameter; the base is the number of columns in the matrix *)
-  (* warning - a matrix is a type of list.  therefore, this KempnerSum[matrix] function must be
-     placed before KempnerSum[list] in this source code file. *)
-  { n, iBase, i, stringList = { }, s = ""},
+	Block[ (* in this version, we input a T matrix, not a string *)
+	(* note: the base is not a parameter; the base is the number of columns in the matrix *)
+	(* warning - a matrix is a type of list.  therefore, this KempnerSum[matrix] function must be
+	   placed before KempnerSum[list] in this source code file. *)
+		{ n, iBase, i, stringList = { }, s = ""},
 
-  If[nDecimals < 1, nDecimals = 1];
-  n = Dimensions[T][[1]];    (* number of rows *)
-  If[Length[ Dimensions[T] ] == 1,
-    iBase = Length[T],          (* T is a 1 by n matrix *)
-    iBase = Dimensions[T][[2]]; (* iBase is the number of columns in the T matrix *)
-  ];
+		If[nDecimals < 1, nDecimals = 1];
+		n = Dimensions[T][[1]];    (* number of rows *)
+		If[Length[ Dimensions[T] ] == 1,
+			iBase = Length[T], (* T is a 1 by n matrix *)
+			iBase = Dimensions[T][[2]]; (* iBase is the number of columns in the T matrix *)
+		];
 
-  (* make a string of length n.  it doesn't matter what its digits are; only the length matters. *)
-  For[i = 1, i <= n, i++, s = StringJoin[s, "0"] ];
+		(* make a string of length n.  it doesn't matter what its digits are; only the length matters. *)
+		For[i = 1, i <= n, i++, s = StringJoin[s, "0"] ];
 
-  AppendTo[stringList, s];
-  kSumX[stringList, T, nDecimals, iBase]
-];    (* end of KempnerSum[T matrix, nDec] *)
+		AppendTo[stringList, s];
+		kSumX[stringList, T, nDecimals, iBase]
+	];    (* end of KempnerSum[T matrix, nDec] *)
 
 
 KempnerSum[T_?MatrixQ] :=
-Block[ (* in this version, we input a T matrix, not a string *)
-  (* note: the base is not a parameter; the base is the number of columns in the matrix *)
-  { },
+	Block[ (* in this version, we input a T matrix, not a string *)
+	(* note: the base is not a parameter; the base is the number of columns in the matrix *)
+		{ },
 
-  KempnerSum[T, nDefaultDecimals]
-];    (* end of KempnerSum[T matrix] *)
+		KempnerSum[T, nDefaultDecimals]
+	];    (* end of KempnerSum[T matrix] *)
 
 
-KempnerSum[inputList_?VectorQ, nDecimals_Integer, iBase_:10] :=
-Block[
-  { lst, T },
-  lst = convertInputListToStrings[inputList];
-  If[Length[lst] == 0, Return[0] ];
-  T = setT[lst, iBase];
-  If[ T[[1, 1]] < 0, Return[0] ];
-  kSumX[lst, T, nDecimals, iBase]
-] ;   (* end of KempnerSum[list, nDec, base] *)
+KempnerSum[inputList_?VectorQ, nDecimals_Integer, iBase_ : 10] :=
+	Block[
+		{ lst, T },
+		lst = convertInputListToStrings[inputList];
+		If[Length[lst] == 0, Return[0] ];
+		T = setT[lst, iBase];
+		If[ T[[1, 1]] < 0, Return[0] ];
+		kSumX[lst, T, nDecimals, iBase]
+	] ;   (* end of KempnerSum[list, nDec, base] *)
 
 
 KempnerSum[inputList_?VectorQ] :=
-Block[
-  { },
-  KempnerSum[inputList, nDefaultDecimals]
-];    (* end of KempnerSum[list] *)
+	Block[
+		{ },
+		KempnerSum[inputList, nDefaultDecimals]
+	];    (* end of KempnerSum[list] *)
 
 
-KempnerSum[s_String, nDecimals_Integer, iBase_:10] :=
-Block[
-  { stringList = { s } },
-  KempnerSum[stringList, nDecimals, iBase]
-] ;   (* end of KempnerSum[string, nDec, base] *)
+KempnerSum[s_String, nDecimals_Integer, iBase_ : 10] :=
+	Block[
+		{ stringList = { s } },
+		KempnerSum[stringList, nDecimals, iBase]
+	] ;   (* end of KempnerSum[string, nDec, base] *)
 
 
 KempnerSum[s_String] :=
-Block[
-  { stringList = { s } },
-  KempnerSum[stringList, nDefaultDecimals]
-];    (* end of KempnerSum[string] *)
+	Block[
+		{ stringList = { s } },
+		KempnerSum[stringList, nDefaultDecimals]
+	];    (* end of KempnerSum[string] *)
 
 
-KempnerSum[i_Integer, nDecimals_Integer, iBase_:10] :=
-Block[
-  { stringList = { ToString[i] } },
-  KempnerSum[stringList, nDecimals, iBase]
-];    (* end of KempnerSum[integer, nDec, base] *)
+KempnerSum[i_Integer, nDecimals_Integer, iBase_ : 10] :=
+	Block[
+		{ stringList = { ToString[i] } },
+		KempnerSum[stringList, nDecimals, iBase]
+	];    (* end of KempnerSum[integer, nDec, base] *)
 
 
 KempnerSum[i_Integer] :=
-Block[
-  { stringList = { ToString[i] } },
-  KempnerSum[stringList, nDefaultDecimals]
-];    (* end of KempnerSum[integer] *)
+	Block[
+		{ stringList = { ToString[i] } },
+		KempnerSum[stringList, nDefaultDecimals]
+	];    (* end of KempnerSum[integer] *)
 
 
 
-kSumFormatted[T_?MatrixQ, nDecimals_Integer, iBase_:10] :=
-Block[ (* in this version, we input a T matrix *)
-  (* returns a formatted value of type NumberForm, not a number *)
-  { z = KempnerSum[T, nDecimals] },
-  nf[z, nDecimals]
-];    (* end of kSumFormatted[matrix, nDec, base] *)
+kSumFormatted[T_?MatrixQ, nDecimals_Integer, iBase_ : 10] :=
+	Block[ (* in this version, we input a T matrix *)
+	(* returns a formatted value of type NumberForm, not a number *)
+		{ z = KempnerSum[T, nDecimals] },
+		nf[z, nDecimals]
+	];    (* end of kSumFormatted[matrix, nDec, base] *)
 
 kSumFormatted[T_?MatrixQ] :=
-Block[ (* in this version, we input a T matrix *)
-  (* returns a formatted value of type NumberForm, not a number *)
-  { nDecimals = nDefaultDecimals, z },
-  z = KempnerSum[T, nDecimals];
-  nf[z, nDecimals]
-];    (* end of kSumFormatted[matrix] *)
+	Block[ (* in this version, we input a T matrix *)
+	(* returns a formatted value of type NumberForm, not a number *)
+		{ nDecimals = nDefaultDecimals, z },
+		z = KempnerSum[T, nDecimals];
+		nf[z, nDecimals]
+	];    (* end of kSumFormatted[matrix] *)
 
 
-kSumFormatted[inputList_?VectorQ, nDecimals_Integer, iBase_:10] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { z = KempnerSum[inputList, nDecimals, iBase] },
-  nf[z, nDecimals]
-] ;   (* end of kSumFormatted[list, nDec, base] *)
+kSumFormatted[inputList_?VectorQ, nDecimals_Integer, iBase_ : 10] :=
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ z = KempnerSum[inputList, nDecimals, iBase] },
+		nf[z, nDecimals]
+	] ;   (* end of kSumFormatted[list, nDec, base] *)
 
 
 kSumFormatted[inputList_?VectorQ] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { nDecimals = nDefaultDecimals, z },
-  z = KempnerSum[inputList, nDecimals];
-  nf[z, nDecimals]
-]  ;  (* end of kSumFormatted[list] *)
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ nDecimals = nDefaultDecimals, z },
+		z = KempnerSum[inputList, nDecimals];
+		nf[z, nDecimals]
+	]  ;  (* end of kSumFormatted[list] *)
 
 
-kSumFormatted[s_String, nDecimals_Integer, iBase_:10] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { stringList = { s } },
-  kSumFormatted[stringList, nDecimals, iBase]
-] ;   (* end of kSumFormatted[string, nDec, base] *)
+kSumFormatted[s_String, nDecimals_Integer, iBase_ : 10] :=
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ stringList = { s } },
+		kSumFormatted[stringList, nDecimals, iBase]
+	] ;   (* end of kSumFormatted[string, nDec, base] *)
 
 
 kSumFormatted[s_String] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { stringList = { s } },
-  kSumFormatted[stringList, nDefaultDecimals]
-]  ;  (* end of kSumFormatted[string] *)
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ stringList = { s } },
+		kSumFormatted[stringList, nDefaultDecimals]
+	]  ;  (* end of kSumFormatted[string] *)
 
 
-kSumFormatted[i_Integer, nDecimals_Integer, iBase_:10] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { stringList = { ToString[i] } },
-  kSumFormatted[stringList, nDecimals, iBase]
-]  ;  (* end of kSumFormatted[integer, nDec, base] *)
+kSumFormatted[i_Integer, nDecimals_Integer, iBase_ : 10] :=
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ stringList = { ToString[i] } },
+		kSumFormatted[stringList, nDecimals, iBase]
+	]  ;  (* end of kSumFormatted[integer, nDec, base] *)
 
 
 kSumFormatted[i_Integer] :=
-Block[ (* returns a formatted value of type NumberForm, not a number *)
-  { stringList = { ToString[i] } },
-  kSumFormatted[stringList, nDefaultDecimals]
-];    (* end of kSumFormatted[integer] *)
+	Block[ (* returns a formatted value of type NumberForm, not a number *)
+		{ stringList = { ToString[i] } },
+		kSumFormatted[stringList, nDefaultDecimals]
+	];    (* end of kSumFormatted[integer] *)
 
 
 kPartialSum[nDigits_Integer?Positive, nDecimals_Integer] :=
-Block[ (* partial sum calculation, using previous KempnerSum *)
-  (* using the same input just passed to KempnerSum[ ], compute the partial sum of 1/k,
-     where k has <= nDigits digits (that is, denominators are < 10^nDigits).
-     warning: this could underflow if nDigits > about 2*10^9.
-     first, call KempnerSum[string, decimals].  then, we can call kPartialSum[digits, decimals].
-     this function uses the existing values of global variables A, extraPol, n, Psi,
-     iBaseSave, and kSumSave, all of which were set in the last call to KempnerSum.
-     note: if this returns less than the requested number of decimal places, then you must
-     call KempnerSum again with the desired number of places.
-  *)
-  { partSum = 0, i, j, matBTrunc },
+	Block[ (* partial sum calculation, using previous KempnerSum *)
+	(* using the same input just passed to KempnerSum[ ], compute the partial sum of 1/k,
+	   where k has <= nDigits digits (that is, denominators are < 10^nDigits).
+	   warning: this could underflow if nDigits > about 2*10^9.
+	   first, call KempnerSum[string, decimals].  then, we can call kPartialSum[digits, decimals].
+	   this function uses the existing values of global variables A, extraPol, n, Psi,
+	   iBaseSave, and kSumSave, all of which were set in the last call to KempnerSum.
+	   note: if this returns less than the requested number of decimal places, then you must
+	   call KempnerSum again with the desired number of places.
+	*)
+		{ partSum = 0, i, j, matBTrunc },
 
-(* formal definition, but this is slow
-  matBTrunc[a_?MatrixQ, M_] :=
-    ((# - MatrixPower[a, M+1]).Inverse[# - a] - #) &[ IdentityMatrix[Length[a]] ];
-*)
+	(* formal definition, but this is slow
+	  matBTrunc[a_?MatrixQ, M_] :=
+		((# - MatrixPower[a, M+1]).Inverse[# - a] - #) &[ IdentityMatrix[Length[a]] ];
+	*)
 
-  matBTrunc[a_?MatrixQ, M_] :=
-  Block[
-    (* instead of computing the exact value of a^(M+1), we first convert "a"
-       to floating-point, then exponentiate.  if enough decimal places are used,
-       this will produce an accurate value of a^(M+1).
-    *)
-    { nDec, ndigSum, (* a2, *) a3 },
+		matBTrunc[a_?MatrixQ, M_] :=
+			Block[
+			(* instead of computing the exact value of a^(M+1), we first convert "a"
+			   to floating-point, then exponentiate.  if enough decimal places are used,
+			   this will produce an accurate value of a^(M+1).
+			*)
+				{ nDec, ndigSum, (* a2, *) a3 },
 
-    If[nDecimals < 1, nDecimals = 1];
-    ndigSum = 1 + Floor[Log[10, kSumSave]];
-    (* nDec = nDecimals + ndigSum + IntegerLength[M+1] + 5; *)
-    nDec = nDecimals + ndigSum + (1+Floor[Log[10, M+1]]) + 5;  (* for mma version 5.2 *)
+				If[nDecimals < 1, nDecimals = 1];
+				ndigSum = 1 + Floor[Log[10, kSumSave]];
+				(* nDec = nDecimals + ndigSum + IntegerLength[M+1] + 5; *)
+				nDec = nDecimals + ndigSum + (1 + Floor[Log[10, M + 1]]) + 5;  (* for mma version 5.2 *)
 
-    (* a3 = MatrixPower[a, M+1] ; *)    (* very slow *)
-    (* a2 = iBaseSave * a; a3 = N[MatrixPower[a2, M+1], nDec] / iBaseSave^(M+1); *)
-    (* a2 = iBaseSave * a; a3 = MatrixPower[N[a2, nDec], M+1] / iBaseSave^(M+1); *)
+				(* a3 = MatrixPower[a, M+1] ; *)    (* very slow *)
+				(* a2 = iBaseSave * a; a3 = N[MatrixPower[a2, M+1], nDec] / iBaseSave^(M+1); *)
+				(* a2 = iBaseSave * a; a3 = MatrixPower[N[a2, nDec], M+1] / iBaseSave^(M+1); *)
 
-    a3 = MatrixPower[N[a, nDec], M+1] ;  (* fast *)
+				a3 = MatrixPower[N[a, nDec], M + 1] ;  (* fast *)
 
-    ((# - a3).Inverse[# - a] - #) &[ IdentityMatrix[Length[a]] ]
-  ];    (* end of matBTrunc *)
+				((# - a3).Inverse[# - a] - #) &[ IdentityMatrix[Length[a]] ]
+			];    (* end of matBTrunc *)
 
 
-  If[ (extraPol <= 0) || (kSumSave == 0),    (* must call KempnerSum[ ] or kSumFormatted[ ] first *)
-    Print["Error: no sum has been computed yet.  Call KempnerSum[ ] or kSumFormatted[ ] first."];
-    Return[0]
-  ];
+		If[ (extraPol <= 0) || (kSumSave == 0), (* must call KempnerSum[ ] or kSumFormatted[ ] first *)
+			Print["Error: no sum has been computed yet.  Call KempnerSum[ ] or kSumFormatted[ ] first."];
+			Return[0]
+		];
 
-  If[nDigits > extraPol,
-     (* Check[ ] forces partSum to be 0 if an overflow or underflow occurs *)
-     partSum = Check[ Sum[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}] +
-       normOne[matBTrunc[A, nDigits - extraPol] . Table[Psi[extraPol, j, 1], {j, n}] ] ,
-           (* 0, { General::unfl , General::ovfl } ]; *)
-           0, General::unfl ];    (* check only for underflow for mma version 5.2 *)
-   ,
-     (* else: nDigits <= extraPol; just sum up to i = nDigits *)
-     partSum = Sum[Psi[i, j, 1], {i, 1, nDigits}, {j, 1, n}]
-  ];  (* end If *)
+		If[nDigits > extraPol,
+		(* Check[ ] forces partSum to be 0 if an overflow or underflow occurs *)
+			partSum = Check[ Sum[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}] +
+				normOne[matBTrunc[A, nDigits - extraPol] . Table[Psi[extraPol, j, 1], {j, n}] ] ,
+			(* 0, { General::unfl , General::ovfl } ]; *)
+				0, General::unfl ];    (* check only for underflow for mma version 5.2 *)
+			,
+		(* else: nDigits <= extraPol; just sum up to i = nDigits *)
+			partSum = Sum[Psi[i, j, 1], {i, 1, nDigits}, {j, 1, n}]
+		];  (* end If *)
 
-  If[partSum == 0, 0, N[partSum, Floor[ 1 + Log[10, partSum] ] + nDecimals ] ]
+		If[partSum == 0, 0, N[partSum, Floor[ 1 + Log[10, partSum] ] + nDecimals ] ]
 
-] ;   (* end of kPartialSum[nDigits, nDec] *)
+	] ;   (* end of kPartialSum[nDigits, nDec] *)
 
 
 kPartialSum[nDigits_Integer?Positive] :=
-Block[ (* partial sum calculation, based on previous KempnerSum *)
-(* using the previous input to KempnerSum[ ], compute the
-   partial sum of 1/k, where k has <= nDigits digits. *)
-  { },
-  kPartialSum[nDigits, nDefaultDecimals]
-];    (* end of kPartialSum[nDigits] *)
+	Block[ (* partial sum calculation, based on previous KempnerSum *)
+	(* using the previous input to KempnerSum[ ], compute the
+	   partial sum of 1/k, where k has <= nDigits digits. *)
+		{ },
+		kPartialSum[nDigits, nDefaultDecimals]
+	];    (* end of kPartialSum[nDigits] *)
 
 
 Clear[kPartialSumThreshold];
 Clear[kPartialSumThresholdX];
 kPartialSumThresholdX[pSum0_?NumericQ, nDecDefault_] :=
-Block[
-  (* this private function is called by public functions kPartialSumThreshold.
+	Block[
+	(* this private function is called by public functions kPartialSumThreshold.
 
-     using the previous input to KempnerSum[ ], compute the number of digits
-     at which the partial sum exceeds pSum0.
-     example:
-       KempnerSum[9] = 22.920676619264150.
-       kPartialSumThreshold[22] tells approximately how far we must go in the series
-       to make the partial sum exceed 22.
-       kPartialSumThreshold[22] returns {30, 31, 21.971055078178619, 22.066017232287173}.
-       this means that if we add all terms in the series including all those having
-       30 digits (that is, denominators < 10^30), the sum will be 21.971055078178619,
-       and if we also include terms with denominators having 31 digits, the sum will
-       be 22.066017232287173.  therefore, we would need at least some 31-digit
-       denominators in order to make the sum exceed 22.
+	   using the previous input to KempnerSum[ ], compute the number of digits
+	   at which the partial sum exceeds pSum0.
+	   example:
+		 KempnerSum[9] = 22.920676619264150.
+		 kPartialSumThreshold[22] tells approximately how far we must go in the series
+		 to make the partial sum exceed 22.
+		 kPartialSumThreshold[22] returns {30, 31, 21.971055078178619, 22.066017232287173}.
+		 this means that if we add all terms in the series including all those having
+		 30 digits (that is, denominators < 10^30), the sum will be 21.971055078178619,
+		 and if we also include terms with denominators having 31 digits, the sum will
+		 be 22.066017232287173.  therefore, we would need at least some 31-digit
+		 denominators in order to make the sum exceed 22.
 
-     in general, the input value (22, in this example) will lie  between the partial sums
-     that are returned:
-       21.971055078178619 < 22 < 22.066017232287173.
+	   in general, the input value (22, in this example) will lie  between the partial sums
+	   that are returned:
+		 21.971055078178619 < 22 < 22.066017232287173.
 
-     two warnings about using this function:
-     1.  if pSum is very close to the actual sum returned by KempnerSum[ ], you may be asked to
-     call KempnerSum[ ] again, with more decimals, then to call kPartialSumThreshold[ ] again.
+	   two warnings about using this function:
+	   1.  if pSum is very close to the actual sum returned by KempnerSum[ ], you may be asked to
+	   call KempnerSum[ ] again, with more decimals, then to call kPartialSumThreshold[ ] again.
 
-     2.  also, if you specify pSum as a decimal value, mathematica may slightly change
-     your input before kPartialSumThreshold can process it.  therefore, if pSum is close
-     to the actual sum, you could get incorrect results.
+	   2.  also, if you specify pSum as a decimal value, mathematica may slightly change
+	   your input before kPartialSumThreshold can process it.  therefore, if pSum is close
+	   to the actual sum, you could get incorrect results.
 
-     here is an example showing how this can heppen.  suppose you compute
-       KempnerSum[314, 20] = 2299.82978276751833845359.
-     then, if you enter
-       kPartialSumThreshold[2299.8297827675],
-     this function will print out:
-       Calculate where the partial sum exceeds 2299.8297827675000917225
-       {32386, 32387, 2299.82978276750008978870, 2299.82978276750010807399}
-     notice that mathematica has changed your input to 2299.829782767500092.
-     then, because kPartialSumThreshold uses this changed input, the output you
-     got is not the correct output for the input you specified: notice that
-     your input value is not between the two partial sums shown.
+	   here is an example showing how this can heppen.  suppose you compute
+		 KempnerSum[314, 20] = 2299.82978276751833845359.
+	   then, if you enter
+		 kPartialSumThreshold[2299.8297827675],
+	   this function will print out:
+		 Calculate where the partial sum exceeds 2299.8297827675000917225
+		 {32386, 32387, 2299.82978276750008978870, 2299.82978276750010807399}
+	   notice that mathematica has changed your input to 2299.829782767500092.
+	   then, because kPartialSumThreshold uses this changed input, the output you
+	   got is not the correct output for the input you specified: notice that
+	   your input value is not between the two partial sums shown.
 
-     there are three ways to prevent mathematica from changing your input.
-     1. you can use mathematica's backquote notation to specify the accuracy of
-        your input.  so, you could enter:
-          kPartialSumThreshold[2299.8297827675``10]
-        this time, you get the correct output:
-          Calculate where the partial sum exceeds 2299.8297827675000000000
-          {32381, 32382, 2299.82978276749999808677, 2299.82978276750001646395}
-     2. enter your input using quotes:
-          kPartialSumThreshold["2299.8297827675"]
-     3. enter an exact rational number:
-         kPartialSumThreshold[2299 + 8297827675/10000000000].
-     these three methods all produce the correct output for the input you specified.
+	   there are three ways to prevent mathematica from changing your input.
+	   1. you can use mathematica's backquote notation to specify the accuracy of
+		  your input.  so, you could enter:
+			kPartialSumThreshold[2299.8297827675``10]
+		  this time, you get the correct output:
+			Calculate where the partial sum exceeds 2299.8297827675000000000
+			{32381, 32382, 2299.82978276749999808677, 2299.82978276750001646395}
+	   2. enter your input using quotes:
+			kPartialSumThreshold["2299.8297827675"]
+	   3. enter an exact rational number:
+		   kPartialSumThreshold[2299 + 8297827675/10000000000].
+	   these three methods all produce the correct output for the input you specified.
 
-     the bottom line is this: if you specify a decimal value for the partial sum,
-     it is a good idea to use the backslash notation, such as 2299.8297827675``10.
-  *)
+	   the bottom line is this: if you specify a decimal value for the partial sum,
+	   it is a good idea to use the backslash notation, such as 2299.8297827675``10.
+	*)
 
-  { i, s, psa, psb, psc, a, b, c, nDec, diff, pSum, iLimit = 30,
-    errorReturn = { -1, -1, -1, -1 } },
+		{ i, s, psa, psb, psc, a, b, c, nDec, diff, pSum, iLimit = 30,
+			errorReturn = { -1, -1, -1, -1 } },
 
-  If[ (extraPol <= 0) || (kSumSave == 0),
-    Print["Error: no sum has been computed yet.  Call KempnerSum[ ] or kSumFormatted[ ] first."];
-    Return[ errorReturn ]
-  ];
+		If[ (extraPol <= 0) || (kSumSave == 0),
+			Print["Error: no sum has been computed yet.  Call KempnerSum[ ] or kSumFormatted[ ] first."];
+			Return[ errorReturn ]
+		];
 
-  pSum = pSum0;
+		pSum = pSum0;
 
-  If[pSum <= 0, Return[ errorReturn ] ];    (* error *)
-  nDec = nDecDefault;
+		If[pSum <= 0, Return[ errorReturn ] ];    (* error *)
+		nDec = nDecDefault;
 
-  If[nDec < nDecimalsSave, nDec = nDecimalsSave];
-  If[Accuracy[pSum] < nDec, pSum = SetAccuracy[pSum, nDec] ];
+		If[nDec < nDecimalsSave, nDec = nDecimalsSave];
+		If[Accuracy[pSum] < nDec, pSum = SetAccuracy[pSum, nDec] ];
 
-  Print["Calculate where the partial sum exceeds ", pSum];
+		Print["Calculate where the partial sum exceeds ", pSum];
 
-  s = kSumSave;
+		s = kSumSave;
 
-  If[pSum > s,
-    Print["Value must be less than the actual sum (", s, ")."];
-    Return[ errorReturn ]
-  ];    (* error *)
+		If[pSum > s,
+			Print["Value must be less than the actual sum (", s, ")."];
+			Return[ errorReturn ]
+		];    (* error *)
 
 
-  If[pSum >= s,
-    Print[pSum, " is too close to the actual sum (", s, ")."];
-    Print["Either enter a smaller value, or call KempnerSum again with more than ", nDecimalsSave, " decimal places."];
-    Return[ errorReturn ]
-  ];    (* error *)
+		If[pSum >= s,
+			Print[pSum, " is too close to the actual sum (", s, ")."];
+			Print["Either enter a smaller value, or call KempnerSum again with more than ", nDecimalsSave, " decimal places."];
+			Return[ errorReturn ]
+		];    (* error *)
 
-  a = 1;
-  psa = kPartialSum[a, nDec] ;
-  If[pSum < psa,
-    Return[ { 0, 1, 0.0, psa }];
-  ];
-  b = a;
-  For[i = 1, i <= iLimit, i++,
-    psb = kPartialSum[b, nDec] ;
-    If[psb > pSum, Break[ ] ];
-    a = b; psa = psb;
-    b = b * 2;
-  ];
+		a = 1;
+		psa = kPartialSum[a, nDec] ;
+		If[pSum < psa,
+			Return[ { 0, 1, 0.0, psa }];
+		];
+		b = a;
+		For[i = 1, i <= iLimit, i++,
+			psb = kPartialSum[b, nDec] ;
+			If[psb > pSum, Break[ ] ];
+			a = b; psa = psb;
+			b = b * 2;
+		];
 
-  (* get here with b such that partial sum > pSum *)
-  If[psb == pSum,
-    Print[pSum, " is too close to the actual sum."];
-    Print["Either use a smaller value, or increase the number of decimals (2nd parameter)."];
-    Return[ errorReturn ]    (* error *)
-  ];
-  If[psb < pSum, Return[ errorReturn ] ];    (* error *)
+		(* get here with b such that partial sum > pSum *)
+		If[psb == pSum,
+			Print[pSum, " is too close to the actual sum."];
+			Print["Either use a smaller value, or increase the number of decimals (2nd parameter)."];
+			Return[ errorReturn ]    (* error *)
+		];
+		If[psb < pSum, Return[ errorReturn ] ];    (* error *)
 
-  (* enter the loop below with psa < pSum and psb > pSum.
-     compute c = (a + b)/2, then compute psc. *)
+		(* enter the loop below with psa < pSum and psb > pSum.
+		   compute c = (a + b)/2, then compute psc. *)
 
-  diff = b - a;
-  c = a + diff/2;
+		diff = b - a;
+		c = a + diff / 2;
 
-  For[i = 1, i <= iLimit, i++,
-    psc = kPartialSum[c, nDec] ;
-    If[psc > pSum,
-      b = c; psb = psc;
-     ,
-      a = c; psa = psc;
-    ];
-    diff = b - a;
-    If[diff < 2, Break[] ];
-    c = a + diff/2;
+		For[i = 1, i <= iLimit, i++,
+			psc = kPartialSum[c, nDec] ;
+			If[psc > pSum,
+				b = c; psb = psc;
+				,
+				a = c; psa = psc;
+			];
+			diff = b - a;
+			If[diff < 2, Break[] ];
+			c = a + diff / 2;
 
-  ];    (* end loop *)
+		];    (* end loop *)
 
-  If[ (pSum <= psa) || (psb <= pSum),
-    nDecimalsNeeded = -Floor[Log[10, Abs[psb - psa]]] + 5;
-    nDecimalsNeeded = 5*(1 + Floor[(nDecimalsNeeded-1)/5]);  (* round up to mult of 5 *)
-    If[nDecimalsNeeded > nDec,
-      Print["More decimals are needed.  You should re-compute KempnerSum to at least ",
-            nDecimalsNeeded, " decimals, then call kPartialSumThreshold again."] ,
-      Print["More precision is needed.  You should re-compute KempnerSum to more decimals,\
+		If[ (pSum <= psa) || (psb <= pSum),
+			nDecimalsNeeded = -Floor[Log[10, Abs[psb - psa]]] + 5;
+			nDecimalsNeeded = 5 * (1 + Floor[(nDecimalsNeeded - 1) / 5]);  (* round up to mult of 5 *)
+			If[nDecimalsNeeded > nDec,
+				Print["More decimals are needed.  You should re-compute KempnerSum to at least ",
+					nDecimalsNeeded, " decimals, then call kPartialSumThreshold again."] ,
+				Print["More precision is needed.  You should re-compute KempnerSum to more decimals,\
  then call kPartialSumThreshold again."];
-    ];
-    Return[ errorReturn ];
-  ];
+			];
+			Return[ errorReturn ];
+		];
 
-  Return[ { a, b, psa, psb } ];
-];    (* end of kPartialSumThresholdX *)
+		Return[ { a, b, psa, psb } ];
+	];    (* end of kPartialSumThresholdX *)
 
 
 kPartialSumThreshold[pSumStr_String, nDecDefault_] :=
-Block[
-  (* a string was entered.  add double backquotes to specify the accuracy,
-     then call the private function kPartialSumThresholdX. *)
-  { pSum, inputStr2, decPtList, quoteList, nDecimalsInput, nDec2,
-    errorReturn = { -1, -1, -1, -1 }
-  },
+	Block[
+	(* a string was entered.  add double backquotes to specify the accuracy,
+	   then call the private function kPartialSumThresholdX. *)
+		{ pSum, inputStr2, decPtList, quoteList, nDecimalsInput, nDec2,
+			errorReturn = { -1, -1, -1, -1 }
+		},
 
-  decPtList = StringPosition[pSumStr, "."];    (* get list of starting, ending positions *)
-  quoteList = StringPosition[pSumStr, "`"];
+		decPtList = StringPosition[pSumStr, "."];    (* get list of starting, ending positions *)
+		quoteList = StringPosition[pSumStr, "`"];
 
-  If[ (Length[decPtList] == 1) && (Length[quoteList] == 0),
-    (* input has one decimal point and no backquotes (usual case); number of
-       decimals = number of chars between decimal point and end of string.
-       append backquotes and a number to specify the accuracy of the input,
-       then convert the new string to a floating-point number with that accuracy.
-    *)
-    nDecimalsInput = StringLength[pSumStr] - decPtList[[1]][[1]] ;
-    nDec2 = Max[nDecimalsInput + 2, nDecDefault];
-    inputStr2 = pSumStr <> "``" <> ToString[nDec2] ;
-    pSum = ToExpression[inputStr2];
-   ,
-    (* otherwise (backquotes already in use, or input is an integer):
-       just convert the input string to a number *)
-    pSum = ToExpression[pSumStr]
-  ];
+		If[ (Length[decPtList] == 1) && (Length[quoteList] == 0),
+		(* input has one decimal point and no backquotes (usual case); number of
+		   decimals = number of chars between decimal point and end of string.
+		   append backquotes and a number to specify the accuracy of the input,
+		   then convert the new string to a floating-point number with that accuracy.
+		*)
+			nDecimalsInput = StringLength[pSumStr] - decPtList[[1]][[1]] ;
+			nDec2 = Max[nDecimalsInput + 2, nDecDefault];
+			inputStr2 = pSumStr <> "``" <> ToString[nDec2] ;
+			pSum = ToExpression[inputStr2];
+			,
+		(* otherwise (backquotes already in use, or input is an integer):
+		   just convert the input string to a number *)
+			pSum = ToExpression[pSumStr]
+		];
 
-  If[ (pSum == $Failed) || (NumericQ[pSum] == False),
-    Print["Invalid input"];  (* cannot convert input to a numeric value *)
-    Return[ errorReturn ]
-  ];
-  kPartialSumThresholdX[pSum, nDecDefault]
-];    (* end of kPartialSumThreshold[string, decimals] *)
+		If[ (pSum == $Failed) || (NumericQ[pSum] == False),
+			Print["Invalid input"];  (* cannot convert input to a numeric value *)
+			Return[ errorReturn ]
+		];
+		kPartialSumThresholdX[pSum, nDecDefault]
+	];    (* end of kPartialSumThreshold[string, decimals] *)
 
 
 kPartialSumThreshold[pSumStr_String] :=
-Block[
-  { },
-  kPartialSumThreshold[pSumStr, nDefaultDecimals]
-];    (* end of kPartialSumThreshold[string] *)
+	Block[
+		{ },
+		kPartialSumThreshold[pSumStr, nDefaultDecimals]
+	];    (* end of kPartialSumThreshold[string] *)
 
 
 kPartialSumThreshold[pSum0_?NumericQ] :=
-Block[
-(* a numeric value was entered.  assume the user has included double backquotes
-    if they are needed; this calls the private function kPartialSumThresholdX. *)
-  { },
-  kPartialSumThresholdX[pSum0, nDefaultDecimals]
-];
+	Block[
+	(* a numeric value was entered.  assume the user has included double backquotes
+		if they are needed; this calls the private function kPartialSumThresholdX. *)
+		{ },
+		kPartialSumThresholdX[pSum0, nDefaultDecimals]
+	];
 
 kPartialSumThreshold[pSum0_?NumericQ, nDecDefault_] :=
-Block[
-(* a numeric value was entered.  assume the user has included double backquotes
-    if they are needed.  if they did not, there is no way to include them now.
-    this calls the private function kPartialSumThresholdX. *)
-  { },
-  kPartialSumThresholdX[pSum0, nDecDefault]
-];
+	Block[
+	(* a numeric value was entered.  assume the user has included double backquotes
+		if they are needed.  if they did not, there is no way to include them now.
+		this calls the private function kPartialSumThresholdX. *)
+		{ },
+		kPartialSumThresholdX[pSum0, nDecDefault]
+	];
 
 
 
 (* these return the A and T matrices *)
 
-kSumGetT[inputList_?VectorQ, iBase_:10] :=
-Block[ (* given the input list, return the matrix A *)
-  { lst },
-  lst = convertInputListToStrings[inputList];
-  If[Length[lst] == 0, Return[ {{0}} ] ];
-  setT[lst, iBase]    (* return this matrix *)
-];    (* end of kSumGetT[list] *)
+kSumGetT[inputList_?VectorQ, iBase_ : 10] :=
+	Block[ (* given the input list, return the matrix A *)
+		{ lst },
+		lst = convertInputListToStrings[inputList];
+		If[Length[lst] == 0, Return[ {{0}} ] ];
+		setT[lst, iBase]    (* return this matrix *)
+	];    (* end of kSumGetT[list] *)
 
-kSumGetT[s_String, iBase_:10] :=
-Block[ (* given the input string s, return the matrix A *)
-  { stringList = { s } },
-  kSumGetT[stringList, iBase]
-] ;   (* end of kSumGetT[string] *)
+kSumGetT[s_String, iBase_ : 10] :=
+	Block[ (* given the input string s, return the matrix A *)
+		{ stringList = { s } },
+		kSumGetT[stringList, iBase]
+	] ;   (* end of kSumGetT[string] *)
 
-kSumGetT[i_Integer, iBase_:10] :=
-Block[ (* given the input integer, return the matrix A *)
-  { stringList = { ToString[i] } },
-  kSumGetT[stringList, iBase]
-] ;   (* end of kSumGetT[integer] *)
+kSumGetT[i_Integer, iBase_ : 10] :=
+	Block[ (* given the input integer, return the matrix A *)
+		{ stringList = { ToString[i] } },
+		kSumGetT[stringList, iBase]
+	] ;   (* end of kSumGetT[integer] *)
 
 
 kSumShowA[] := A;    (* show the current (private context) A matrix for the previously-entered input *)
 
-kSumGetA[inputList_?VectorQ, iBase_:10] :=
-Block[ (* given the input list, return the matrix A *)
-  { lst2, T, f, j, l, m, A, n },
+kSumGetA[inputList_?VectorQ, iBase_ : 10] :=
+	Block[ (* given the input list, return the matrix A *)
+		{ lst2, T, f, j, l, m, A, n },
 
-  (* use only local variables here, not the global variables A and n.
-     this allows the user to call KempnerSum, then kSumGetA, then kPartialSum,
-     without kSumGetA interfering with the global variables.
-  *)
+	(* use only local variables here, not the global variables A and n.
+	   this allows the user to call KempnerSum, then kSumGetA, then kPartialSum,
+	   without kSumGetA interfering with the global variables.
+	*)
 
-  lst2 = convertInputListToStrings[inputList];
-  If[Length[lst2] == 0, Return[ {{0}} ] ];
-  T = setT[lst2, iBase];
+		lst2 = convertInputListToStrings[inputList];
+		If[Length[lst2] == 0, Return[ {{0}} ] ];
+		T = setT[lst2, iBase];
 
-  (* the computation of A here is the same code as kSumX *)
-  f[j_, l_, m_] := f[j, l, m] = If[T[[l, m]] == j, 1, 0] ;
+		(* the computation of A here is the same code as kSumX *)
+		f[j_, l_, m_] := f[j, l, m] = If[T[[l, m]] == j, 1, 0] ;
 
-  n = Dimensions[T][[1]] ;    (* number of rows *)
+		n = Dimensions[T][[1]] ;    (* number of rows *)
 
-  A = (1/iBase) Sum[ Table[f[j, l, m + 1], {j, n}, {l, n}] , {m, 0, iBase-1} ] ;
+		A = (1 / iBase) Sum[ Table[f[j, l, m + 1], {j, n}, {l, n}] , {m, 0, iBase - 1} ] ;
 
-  A    (* return this matrix *)
+		A    (* return this matrix *)
 
-];    (* end of kSumGetA[list] *)
+	];    (* end of kSumGetA[list] *)
 
-kSumGetA[s_String, iBase_:10] :=
-Block[ (* given the input string s, return the matrix A *)
-  { stringList = {} },
-  AppendTo[stringList, s];
-  kSumGetA[stringList, iBase]
-];    (* end of kSumGetA[string] *)
+kSumGetA[s_String, iBase_ : 10] :=
+	Block[ (* given the input string s, return the matrix A *)
+		{ stringList = {} },
+		AppendTo[stringList, s];
+		kSumGetA[stringList, iBase]
+	];    (* end of kSumGetA[string] *)
 
-kSumGetA[i_Integer, iBase_:10] :=
-Block[ (* given the input integer, return the matrix A *)
-  { stringList = {} },
-  AppendTo[stringList, ToString[i]];
-  kSumGetA[stringList, iBase]
-];    (* end of kSumGetA[integer] *)
+kSumGetA[i_Integer, iBase_ : 10] :=
+	Block[ (* given the input integer, return the matrix A *)
+		{ stringList = {} },
+		AppendTo[stringList, ToString[i]];
+		kSumGetA[stringList, iBase]
+	];    (* end of kSumGetA[integer] *)
 
 
 
@@ -1258,41 +1258,41 @@ Block[ (* given the input integer, return the matrix A *)
 
 
 kSumTimeAndMemory[nDigits_] :=
-Block[
-  (* display the estimated time and memory needed to calculate KempnerSum[9, nDigits].
-     based on calculations on a dell laptop for 100, 200, ..., 600 digits. *)
-  { nd, t1, t0, tFast, mFast},
-  nd = nDigits;
-  If[nd < 50, nd = 50];
+	Block[
+	(* display the estimated time and memory needed to calculate KempnerSum[9, nDigits].
+	   based on calculations on a dell laptop for 100, 200, ..., 600 digits. *)
+		{ nd, t1, t0, tFast, mFast},
+		nd = nDigits;
+		If[nd < 50, nd = 50];
 
-  t1 = Timing[ KempnerSum[9, 100] ][[1]];
+		t1 = Timing[ KempnerSum[9, 100] ][[1]];
 
-  (* t0 = actual time for KempnerSum[9, 100] on the laptop used for benchmark *)
-  t0 = 3.647 ;
+		(* t0 = actual time for KempnerSum[9, 100] on the laptop used for benchmark *)
+		t0 = 3.647 ;
 
-  tFast = .55227 + .017407*nd + .00017173*nd^2 + (3.3708*10^-7)*nd^3 ;
-  mFast = (6.5614*10^6) + 2836.1*nd + 18.432*nd^2 + .0054213*nd^3 ;
+		tFast = .55227 + .017407 * nd + .00017173 * nd^2 + (3.3708 * 10^-7) * nd^3 ;
+		mFast = (6.5614 * 10^6) + 2836.1 * nd + 18.432 * nd^2 + .0054213 * nd^3 ;
 
-  (* the following cubic polynomial works better for 100 <= nd <= 1000 *)
+		(* the following cubic polynomial works better for 100 <= nd <= 1000 *)
 
-  Print["Estimated time and memory for KempnerSum[9, ", nd, "]:" ];
-  Print[Round[tFast*t1/t0], " seconds, ", Round[mFast/1000000], " MBytes of memory"];
-  Print["  Note: KempnerSum[99, ", nd, "], KempnerSum[999, ", nd,"] etc., will use more time and memory." ];
-];    (* end of kSumTimeAndMemory *)
+		Print["Estimated time and memory for KempnerSum[9, ", nd, "]:" ];
+		Print[Round[tFast * t1 / t0], " seconds, ", Round[mFast / 1000000], " MBytes of memory"];
+		Print["  Note: KempnerSum[99, ", nd, "], KempnerSum[999, ", nd, "] etc., will use more time and memory." ];
+	];    (* end of kSumTimeAndMemory *)
 
 
 kSumSetDefaultDecimals[i_Integer] :=
-Block[
-  (* set the number of default decimal places *)
-  { },
-  If[i < 1, i = 1];
-  If[nDefaultDecimals == i,
-    Print["Default number of decimal places is now set to ", i] ,
-    Print["Default number of decimal places has been changed from ", nDefaultDecimals, " to ", i]
-  ];
-  nDefaultDecimals = i;
-  nDefaultDecimals    (* return this value *)
-];
+	Block[
+	(* set the number of default decimal places *)
+		{ },
+		If[i < 1, i = 1];
+		If[nDefaultDecimals == i,
+			Print["Default number of decimal places is now set to ", i] ,
+			Print["Default number of decimal places has been changed from ", nDefaultDecimals, " to ", i]
+		];
+		nDefaultDecimals = i;
+		nDefaultDecimals    (* return this value *)
+	];
 
 kSumShowDefaultDecimals := nDefaultDecimals;
 
@@ -1306,6 +1306,6 @@ SetAttributes[
 		kSumTimeAndMemory, kSumSetDefaultDecimals, kSumShowDefaultDecimals,
 		kPartialSumThreshold
 	},
-	{Protected,ReadProtected}
+	{Protected, ReadProtected}
 ];
 EndPackage[];
