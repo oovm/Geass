@@ -29,7 +29,8 @@ before_deploy:
   - cd ${GITHUB_REPO}
   # 清理工程文件
   - rm -rf .git
-  - rm -rf Packages/_*
+  - rm -rf Packages/__Dev
+  - rm -rf Packages/Module
   - rm -rf Resources
   - rm -f .travis.yml
   - rm -f .gitignore
