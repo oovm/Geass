@@ -3,18 +3,12 @@ MolecularQ::usage = "";
 MolecularFind::usage = "";
 MolecularShow::usage = "";
 MolecularShow3D::usage = "";
+AlkaneSeries2D::usage = "临时";
+AlkaneSeries3D::usage = "临时";
 Isomerism::usage = "程序包的说明,这里抄一遍";
 Begin["`Isomerism`"];
 Isomerism$Version = "V1.0";
 Isomerism$LastUpdate = "2018-03-03";
-A[z_] := Evaluate@Normal@Fold[
-	Series[1 + z / 6(#^3 + 3# ComposeSeries[#, z^2 + O[z]^#2] + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
-	1 + O[z], Range@Floor@n
-];
-A[z_] := Evaluate@Normal@Fold[
-	Series[1 + z / 3(#^3 + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
-	1 + O[z], Range@Floor[n / 2]
-];
 AlkaneSeries2D[n_Integer] := Block[
 	{A, P, Q, S, G},
 	A[z_] := Evaluate@Normal@Fold[
