@@ -30,6 +30,7 @@ MolecularShow::usage = "";
 MolecularShow3D::usage = "";
 AlkaneSeries2D::usage = "临时";
 AlkaneSeries3D::usage = "临时";
+FreeRadicalX::usage = "临时";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -40,6 +41,15 @@ Begin["`Private`"];
 (*主体代码*)
 Isomerism$Version = "V1.0";
 Isomerism$LastUpdate = "2018-03-03";
+
+
+
+FreeRadicalX[n_] := Normal@Fold[
+	Series[1 + z / 6(#^3 + 3# ComposeSeries[#, z^2 + O[z]^#2] + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
+	1 + O[z], Range@n
+];
+
+
 
 (* ::Subsubsection:: *)
 (*AlkaneCount*)
@@ -180,8 +190,8 @@ MolecularQ[nC_, nH_, nO_, nN_] := Module[
 ];
 MolecularFind[c_Integer, h_Integer, o_Integer : 0, n_Integer : 0] := Block[
 	{raw, modi, all, pos },
-	If[!MolecularQ[c, h, o, n, "Step" -> OptionValue["Step"]], Print["Molecular not Exist!"]];
-	raw = IsoIterator[nC, nH, nO];
+	If[!MolecularQ[c, h, o, n], Print["Molecular not Exist!"]];
+	raw = IsoIterator[c, h, o, n];
 	modi = CanonicalGraph /@ Graph /@ DeleteDuplicates /@ Map[Sort, raw, 2];
 	all = DeleteDuplicates[modi];
 	pos = Flatten[Table[Position[mod, all[[i]], 1, 1], {i, 1, Length[all]}]];
