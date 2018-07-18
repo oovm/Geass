@@ -28,7 +28,9 @@ MolecularQ::usage = "";
 MolecularFind::usage = "";
 MolecularShow::usage = "";
 MolecularShow3D::usage = "";
-AlkaneSeries2D::usage = "临时";
+AlkaneSeries::usage = "烷烃计数";
+KetoSeries::ussge="酮基, 对称群 S2, 并去掉醇类";
+BenzeneSeries::ussge="苯烷计数, 二面体群 D6";
 AlkaneSeries3D::usage = "临时";
 FreeRadicalX::usage = "临时";
 (* ::Section:: *)
@@ -43,9 +45,9 @@ Isomerism$Version = "V1.0";
 Isomerism$LastUpdate = "2018-03-03";
 
 
-
-FreeRadicalX[n_] := Normal@Fold[
-	Series[1 + z / 6(#^3 + 3# ComposeSeries[#, z^2 + O[z]^#2] + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
+FreeRadicalX[n_] := Coefficient[FreeRadicalX[n, z], z, n];
+FreeRadicalX[n_, z_] := Normal@Fold[
+	Series[1 + z / 6(#1^3 + 3#1 ComposeSeries[#1, z^2 + O[z]^#2] + 2 ComposeSeries[#1, z^3 + O[z]^#2]), {z, 0, #2}]&,
 	1 + O[z], Range@n
 ];
 
@@ -53,17 +55,40 @@ FreeRadicalX[n_] := Normal@Fold[
 
 (* ::Subsubsection:: *)
 (*AlkaneCount*)
-AlkaneSeries2D[n_Integer] := Block[
+
+
+
+(*CycleIndexPolynomial[DihedralGroup[6],Array[A[z^#]&,6]]*)
+BenzeneSeries[n_] := Coefficient[BenzeneSeries[n, z], z, n];
+BenzeneSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 6, var]]},
+	PolynomialMod[z^6(A[z]^6 + 3 A[z]^2 A[z^2]^2 + 4A[z^2]^3 + 2A[z^3]^2 + 2A[z^6]) / 12, z^(30 + 1)]
+];
+
+
+
+AlkaneSeries[n_,z_] := Block[
 	{A, P, Q, S, G},
-	A[z_] := Evaluate@Normal@Fold[
-		Series[1 + z / 6(#^3 + 3# ComposeSeries[#, z^2 + O[z]^#2] + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
-		1 + O[z], Range@Floor[n / 2]
-	];
+	A = Function[var, Evaluate@FreeRadicalX[Floor[n/2], var]];
 	P[z_] = z CycleIndexPolynomial[SymmetricGroup[4], Array[A[z^#]&, 4]];
 	Q[z_] = CycleIndexPolynomial[SymmetricGroup[2], Array[A[z^#] - 1&, 2]];
 	S[z_] = A[z^2];
 	Series[P[z] - Q[z] + S[z] - 1, {z, 0, n}]
 ];
+
+
+
+(*z CycleIndexPolynomial[SymmetricGroup[2],Array[A[z^#]&,2]]-z A[z]*)
+KetoSeries[n_]:=Coefficient[KetoSeries[n,z],z,n];
+KetoSeries[n_,z_]:=Block[
+	{A=Function[var,Evaluate@FreeRadicalX[n-1,var]]},
+	PolynomialMod[z ((A[z]-2) A[z]+A[z^2])/2,z^(n+1)]
+]
+
+
+
+
+
 AlkaneSeries3D[n_Integer] := Block[
 	{A, P, Q, S, G},
 	A[z_] := Evaluate@Normal@Fold[
@@ -74,17 +99,6 @@ AlkaneSeries3D[n_Integer] := Block[
 	Q[z_] = CycleIndexPolynomial[SymmetricGroup[2], Array[A[z^#] - 1&, 2]];
 	S[z_] = A[z^2];
 	Series[P[z] - Q[z] + S[z] - 1, {z, 0, n}]
-];
-AlkaneCount[n_, OptionsPattern[]] := Block[
-	{},
-	Switch[OptionValue[]
-
-
-	];
-	Switch[Head@n,
-		Integer, AlkaneSeries[n],
-		List, AlkaneSeries[n]
-	]
 ];
 
 
