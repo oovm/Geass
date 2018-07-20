@@ -28,11 +28,16 @@ MolecularQ::usage = "";
 MolecularFind::usage = "";
 MolecularShow::usage = "";
 MolecularShow3D::usage = "";
+FreeRadicalX::usage = "烷基自由基计数.";
 AlkaneSeries::usage = "烷烃计数";
-KetoSeries::ussge="酮基, 对称群 S2, 并去掉醇类";
-BenzeneSeries::ussge="苯烷计数, 二面体群 D6";
+OlefinsSeries::usage = "烯烃计数";
+AlkyneSeries::usage = "炔烃, 对称群 S2";
+AlcoholSeries::ussge = "醇类, 同烷基自由基";
+CarboxylicSeries::ussge = "羧酸, 同烷基自由基";
+KetoSeries::ussge = "酮基, 对称群 S2, 并去掉醇类";
+EsterSeries::ussge = "酯基";
+BenzeneSeries::ussge = "苯烷计数, 二面体群 D6";
 AlkaneSeries3D::usage = "临时";
-FreeRadicalX::usage = "临时";
 (* ::Section:: *)
 (*程序包正体*)
 (* ::Subsection::Closed:: *)
@@ -45,7 +50,7 @@ Isomerism$Version = "V1.0";
 Isomerism$LastUpdate = "2018-03-03";
 
 
-FreeRadicalX[n_] := Coefficient[FreeRadicalX[n, z], z, n];
+FreeRadicalX[n_Integer] := Coefficient[FreeRadicalX[n, z], z, n];
 FreeRadicalX[n_, z_] := Normal@Fold[
 	Series[1 + z / 6(#1^3 + 3#1 ComposeSeries[#1, z^2 + O[z]^#2] + 2 ComposeSeries[#1, z^3 + O[z]^#2]), {z, 0, #2}]&,
 	1 + O[z], Range@n
@@ -56,10 +61,41 @@ FreeRadicalX[n_, z_] := Normal@Fold[
 (* ::Subsubsection:: *)
 (*AlkaneCount*)
 
+AlkaneSeries[n_Integer] := Coefficient[AlkaneSeries[n, z], z, n];
+AlkaneSeries[n_, z_] := Block[
+	{A, P, Q, S, G},
+	A = Function[var, Evaluate@FreeRadicalX[Floor[n / 2], var]];
+	P[z_] = z CycleIndexPolynomial[SymmetricGroup[4], Array[A[z^#]&, 4]];
+	Q[z_] = CycleIndexPolynomial[SymmetricGroup[2], Array[A[z^#] - 1&, 2]];
+	PolynomialMod[P[z] - Q[z] + A[z^2] - 1, z^(n + 1)]
+];
 
+OlefinsSeries[n_] := Coefficient[OlefinsSeries[n, z], z, n];
+OlefinsSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n, var]]},
+	PolynomialMod[(A[z]^4 + 2A[z]^2A[z^2] + 3A[z^2]^2 + 2A[z^4]) / 8, z^(n + 1)]
+];
+
+
+(*z^2 CycleIndexPolynomial[SymmetricGroup[2],Array[A[z^#]&,2]]*)
+AlkyneSeries[n_Integer] := Coefficient[AlkyneSeries[n, z], z, n];
+AlkyneSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 2, var]]},
+	PolynomialMod[ z^2 (A[z]^2 + A[z^2]) / 2, z^(n + 1)]
+];
+
+
+AlcoholSeries[n_Integer] := Coefficient[AlcoholSeries[n, z], z, n];
+AlcoholSeries[n_, z_] := FreeRadicalX[n , z];
+
+CarboxylicSeries[n_Integer] := Coefficient[CarboxylicSeries[n, z], z, n];
+CarboxylicSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 1, var]]},
+	PolynomialMod[ z A[z], z^(n + 1)]
+];
 
 (*CycleIndexPolynomial[DihedralGroup[6],Array[A[z^#]&,6]]*)
-BenzeneSeries[n_] := Coefficient[BenzeneSeries[n, z], z, n];
+BenzeneSeries[n_Integer] := Coefficient[BenzeneSeries[n, z], z, n];
 BenzeneSeries[n_, z_] := Block[
 	{A = Function[var, Evaluate@FreeRadicalX[n - 6, var]]},
 	PolynomialMod[z^6(A[z]^6 + 3 A[z]^2 A[z^2]^2 + 4A[z^2]^3 + 2A[z^3]^2 + 2A[z^6]) / 12, z^(30 + 1)]
@@ -67,24 +103,19 @@ BenzeneSeries[n_, z_] := Block[
 
 
 
-AlkaneSeries[n_,z_] := Block[
-	{A, P, Q, S, G},
-	A = Function[var, Evaluate@FreeRadicalX[Floor[n/2], var]];
-	P[z_] = z CycleIndexPolynomial[SymmetricGroup[4], Array[A[z^#]&, 4]];
-	Q[z_] = CycleIndexPolynomial[SymmetricGroup[2], Array[A[z^#] - 1&, 2]];
-	S[z_] = A[z^2];
-	Series[P[z] - Q[z] + S[z] - 1, {z, 0, n}]
+(*z CycleIndexPolynomial[SymmetricGroup[2],Array[A[z^#]&,2]]-z A[z]*)
+KetoSeries[n_Integer] := Coefficient[KetoSeries[n, z], z, n];
+KetoSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 1, var]]},
+	PolynomialMod[z ((A[z] - 2) A[z] + A[z^2]) / 2, z^(n + 1)]
 ];
 
 
-
-(*z CycleIndexPolynomial[SymmetricGroup[2],Array[A[z^#]&,2]]-z A[z]*)
-KetoSeries[n_]:=Coefficient[KetoSeries[n,z],z,n];
-KetoSeries[n_,z_]:=Block[
-	{A=Function[var,Evaluate@FreeRadicalX[n-1,var]]},
-	PolynomialMod[z ((A[z]-2) A[z]+A[z^2])/2,z^(n+1)]
-]
-
+EsterSeries[n_Integer] := Coefficient[EsterSeries[n, z], z, n];
+EsterSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 2, var]]},
+	PolynomialMod[ z A[z] (A[z] - 1), z^(30 + 1)]
+];
 
 
 
