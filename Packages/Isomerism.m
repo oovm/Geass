@@ -3,22 +3,64 @@ MolecularQ::usage = "";
 MolecularFind::usage = "";
 MolecularShow::usage = "";
 MolecularShow3D::usage = "";
-AlkaneSeries2D::usage = "临时";
+FreeRadicalX::usage = "烷基自由基计数.";
+AlkaneSeries::usage = "烷烃计数";
+OlefinsSeries::usage = "烯烃计数";
+AlkyneSeries::usage = "炔烃, 对称群 S2";
+AlcoholSeries::ussge = "醇类, 同烷基自由基";
+CarboxylicSeries::ussge = "羧酸, 同烷基自由基";
+KetoSeries::ussge = "酮基, 对称群 S2, 并去掉醇类";
+EsterSeries::ussge = "酯基";
+BenzeneSeries::ussge = "苯烷计数, 二面体群 D6";
 AlkaneSeries3D::usage = "临时";
 Isomerism::usage = "程序包的说明,这里抄一遍";
 Begin["`Isomerism`"];
 Isomerism$Version = "V1.0";
 Isomerism$LastUpdate = "2018-03-03";
-AlkaneSeries2D[n_Integer] := Block[
+FreeRadicalX[n_Integer] := Coefficient[FreeRadicalX[n, z], z, n];
+FreeRadicalX[n_, z_] := Normal@Fold[
+	Series[1 + z / 6(#1^3 + 3#1 ComposeSeries[#1, z^2 + O[z]^#2] + 2 ComposeSeries[#1, z^3 + O[z]^#2]), {z, 0, #2}]&,
+	1 + O[z], Range@n
+];
+AlkaneSeries[n_Integer] := Coefficient[AlkaneSeries[n, z], z, n];
+AlkaneSeries[n_, z_] := Block[
 	{A, P, Q, S, G},
-	A[z_] := Evaluate@Normal@Fold[
-		Series[1 + z / 6(#^3 + 3# ComposeSeries[#, z^2 + O[z]^#2] + 2 ComposeSeries[#, z^3 + O[z]^#2]), {z, 0, #2}]&,
-		1 + O[z], Range@Floor[n / 2]
-	];
+	A = Function[var, Evaluate@FreeRadicalX[Floor[n / 2], var]];
 	P[z_] = z CycleIndexPolynomial[SymmetricGroup[4], Array[A[z^#]&, 4]];
 	Q[z_] = CycleIndexPolynomial[SymmetricGroup[2], Array[A[z^#] - 1&, 2]];
-	S[z_] = A[z^2];
-	Series[P[z] - Q[z] + S[z] - 1, {z, 0, n}]
+	PolynomialMod[P[z] - Q[z] + A[z^2] - 1, z^(n + 1)]
+];
+OlefinsSeries[n_] := Coefficient[OlefinsSeries[n, z], z, n];
+OlefinsSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n, var]]},
+	PolynomialMod[(A[z]^4 + 2A[z]^2A[z^2] + 3A[z^2]^2 + 2A[z^4]) / 8, z^(n + 1)]
+];
+AlkyneSeries[n_Integer] := Coefficient[AlkyneSeries[n, z], z, n];
+AlkyneSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 2, var]]},
+	PolynomialMod[ z^2 (A[z]^2 + A[z^2]) / 2, z^(n + 1)]
+];
+AlcoholSeries[n_Integer] := Coefficient[AlcoholSeries[n, z], z, n];
+AlcoholSeries[n_, z_] := FreeRadicalX[n , z];
+CarboxylicSeries[n_Integer] := Coefficient[CarboxylicSeries[n, z], z, n];
+CarboxylicSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 1, var]]},
+	PolynomialMod[ z A[z], z^(n + 1)]
+];
+BenzeneSeries[n_Integer] := Coefficient[BenzeneSeries[n, z], z, n];
+BenzeneSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 6, var]]},
+	PolynomialMod[z^6(A[z]^6 + 3 A[z]^2 A[z^2]^2 + 4A[z^2]^3 + 2A[z^3]^2 + 2A[z^6]) / 12, z^(30 + 1)]
+];
+KetoSeries[n_Integer] := Coefficient[KetoSeries[n, z], z, n];
+KetoSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 1, var]]},
+	PolynomialMod[z ((A[z] - 2) A[z] + A[z^2]) / 2, z^(n + 1)]
+];
+EsterSeries[n_Integer] := Coefficient[EsterSeries[n, z], z, n];
+EsterSeries[n_, z_] := Block[
+	{A = Function[var, Evaluate@FreeRadicalX[n - 2, var]]},
+	PolynomialMod[ z A[z] (A[z] - 1), z^(30 + 1)]
 ];
 AlkaneSeries3D[n_Integer] := Block[
 	{A, P, Q, S, G},
@@ -31,17 +73,8 @@ AlkaneSeries3D[n_Integer] := Block[
 	S[z_] = A[z^2];
 	Series[P[z] - Q[z] + S[z] - 1, {z, 0, n}]
 ];
-AlkaneCount[n_, OptionsPattern[]] := Block[
-	{},
-	Switch[OptionValue[]
-	];
-	Switch[Head@n,
-		Integer, AlkaneSeries[n],
-		List, AlkaneSeries[n]
-	]
-];
 MolecularDegree[c_Integer, h_Integer, n_Integer] := (2 * c + 2 - h + n) / 2; 
-IsoIterator[c_, h_, o_, n_, OptionsPattern[]] := Block[
+IsoIterator[c_, h_, o_, n_] := Block[
 	{sol = {}, deg = MolecularDegree[c, h, n], NextMolecular},
 	If[!IntegerQ@deg, Return@Failure];
 	NextMolecular[nC_Integer, nH_Integer, nO_Integer, nN_Integer, curM_, cMap_, tC_, tH_, tO_, tN_, dg_, dU_] := Module[
@@ -122,11 +155,11 @@ MolecularQ[nC_, nH_, nO_, nN_] := Module[
 ];
 MolecularFind[c_Integer, h_Integer, o_Integer : 0, n_Integer : 0] := Block[
 	{raw, modi, all, pos },
-	If[!MolecularQ[c, h, o, n, "Step" -> OptionValue["Step"]], Print["Molecular not Exist!"]];
-	raw = IsoIterator[nC, nH, nO];
+	If[!MolecularQ[c, h, o, n], Print["Molecular not Exist!"]];
+	raw = IsoIterator[c, h, o, n];
 	modi = CanonicalGraph /@ Graph /@ DeleteDuplicates /@ Map[Sort, raw, 2];
 	all = DeleteDuplicates[modi];
-	pos = Flatten[Table[Position[mod, all[[i]], 1, 1], {i, 1, Length[all]}]];
+	pos = Flatten[Table[Position[modi, all[[i]], 1, 1], {i, 1, Length[all]}]];
 	Return[raw[[pos]]]
 ];
 MolecularShow = Graph[#, EdgeStyle -> Darker@Green,
@@ -141,7 +174,9 @@ MolecularShow3D = Graph3D[#, EdgeStyle -> Darker@Green,
 ]&;
 End[] ;
 SetAttributes[
-	{ },
+	{
+		MolecularDegree, MolecularQ, MolecularFind, MolecularShow, MolecularShow3D
+	},
 	{Protected, ReadProtected}
 ];
 EndPackage[];

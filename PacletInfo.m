@@ -1,13 +1,13 @@
 (* Created with the Wolfram Language : www.wolfram.com *)
 Paclet[
-    Name -> "Geis",
+    Name -> "Geass",
 	Version -> "0.7.1",
     Extensions -> {
 	    {"Kernel",
 		    "Root" -> ".",
-		    "Context" -> {"Geis`"},
+		    "Context" -> {"Geass`"},
 		    Root -> ".",
-		    Context -> {"Geis`"}
+		    Context -> {"Geass`"}
 	    }
     }
 ];
