@@ -10,25 +10,10 @@
 
 ## ![安装方式](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/02_Install.png) Install
 
-#### 手动安装
-
-- 点击release下载最新的[安装包](https://github.com/GalAster/Geis/releases) [![Build Status](https://travis-ci.org/GalAster/Geis.svg?branch=master)](https://travis-ci.org/GalAster/Geis) 
-
-  - 已启用 Travis CI, release 始终和 master 分支同步 
-
-  - release 版本暂时不带说明文档
-
-- 解压到任意`$Path`路径下
-
-  - 一个常用的路径是`"C:\Users\{yourname}\AppData\Roaming\Mathematica\Applications"`.
-
-  - 如果选择手动安装那么升级也要手动升级(暂时)
-  
-  - 删除原来的文件换上新文件即可
-
 #### 自动安装
 
-- 使用``BTools` ``的部署功能
+- 点击release下载最新的[安装包](https://github.com/GalAster/Geis/releases) [![Build Status](https://travis-ci.org/GalAster/Geass.svg?branch=master)](https://travis-ci.org/GalAster/Geass)
+
 
 ## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/03_ShowTime.png) Show Time!
 

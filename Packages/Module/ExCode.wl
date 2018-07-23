@@ -97,7 +97,7 @@ ExEncrypt[expr_, set_ : "MarySue", OptionsPattern[]] := Block[
 CharSet["Chinese"] := StringPartition[FromCharacterCode[Range[13312, 40869]], 1];
 CharSet["ASCII"] := StringPartition[FromCharacterCode[Range[32, 126]], 1];
 CharSet["TheElder"] := StringPartition["苟利国家生死以岂因祸福避趋之", 1];
-CharSet["MarySue"] := StringPartition["\
+CharSet["MarySue"] = StringPartition["\
 	丝丹丽之乐云亚仪伊优伤佳依俏倩倾兮兰冰凌凝凡凤凪利千华卿可叶吉君咏哀嘉园城基塔墨夏多奥如妍妖妙妮妲姆姣姬娅娜娣娥娴婉婵婷媛嫩宁安宜\
 	寂寇寒岚巧希幻幽弥彩影御心思怡恋恩悠悦情慕慧拉文斯春昭晓晗晶曦曼月朵枝枫柒柔格桂梅梦樱欢欣殇残毓沫泪洁洛浅海涅淑清温渺滢澜澪灵烟然\
 	燕燢爱爽玉玖玛玥玫环玲珊珍珠琉琦琪琬琰琳琴琼瑗瑞瑟瑰瑶瑷璃璎璐璧白百盘眉真碎离秀秋筱米素紫红纨纯纱绯缈美羽翠翼育舒舞艳艺艾芊芝芬花\
@@ -105,9 +105,9 @@ CharSet["MarySue"] := StringPartition["\
 	香馥馨魂魅魑鸢黎黛", 1
 ];
 ExEncryptMarySue[expr_] := Block[
-	{byte, ans, ins},
-	byte = Normal@BinarySerialize[{RandomInteger[100], expr}, PerformanceGoal -> "Size"];
-	ans = set[[IntegerDigits[FromDigits[Reverse@byte, 256], Length[CharSet["MarySue"]]] + 1]];
+	{byte, ans, ins, set = CharSet["MarySue"]},
+	byte = Normal@BinarySerialize[{RandomReal[], expr}, PerformanceGoal -> "Size"];
+	ans = set[[IntegerDigits[FromDigits[Reverse@byte, 256], Length[set]] + 1]];
 	ins = Select[Accumulate[{RandomInteger[{3, 6}]} ~ Join ~ RandomInteger[{2, 8}, Length@ans]], # < Length@ans&];
 	StringInsert[StringJoin[ans], "\[CenterDot]", ins]
 ];
@@ -209,6 +209,31 @@ FooReverse[a_?AtomQ] := a;
 FooReverse[a_?ListQ] := Reverse[a];
 ExpressionToList[exp_] := Flatten[Reverse@Map[FooReverse, Lispify[Unevaluated[exp]], Infinity]];
 
+
+EqCheck = {LessEqual -> Less, GreaterEqual -> Greater};
+pBase[a_, b_, fx_] := (fx /. {x -> (a + b + Sqrt[(x - a)^2] - Sqrt[(x - b)^2]) / 2}) - (fx /. {x -> b});
+pBase[a_, ComplexInfinity, fx_] := fx /. {x -> (x + a + Sqrt[(x - a)^2]) / 2};
+pBase[ComplexInfinity, b_, fx_] := (fx /. {x -> (x + b - Sqrt[(x - b)^2]) / 2}) - (fx /. {x -> b});
+DomainCheck[{dom_, fx_}] := Module[
+	{edom = dom /. EqCheck},
+	If[Head[edom] === Equal, Return[Nothing]];
+	If[Head[edom] === Or,
+		Sequence @@ Map[{#, fx}&, List @@ edom],
+		{edom, fx}
+	]
+];
+Dom2Base[{dom_, fx_}] := Module[
+	{},
+	If[Head@dom === Greater, Return@pBase[Last@dom, ComplexInfinity, fx]];
+	If[Head@dom === Less, Return@pBase[ComplexInfinity, Last@dom, fx]];
+	pBase[First@dom, Last@dom, fx]
+];
+AbsExpand[fx_] := Module[
+	{out, dk},
+	out = PiecewiseExpand[fx, x\[Element]Reals] // FullSimplify // PiecewiseExpand;
+	dk = DomainCheck /@ Transpose[Internal`FromPiecewise@out];
+	Total[Dom2Base /@ dk] /. {Sqrt[(f__)^2] :> Abs[f]}
+];
 
 
 (* ::Subsection::Closed:: *)
