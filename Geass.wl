@@ -1,1 +1,3 @@
-Get["Geass`GeisLoader`"]; 
+If[!TrueQ[Geass`PackageScope`Private`$LoadCompleted],
+	<< Geass`GeassLoader`
+]
