@@ -20,7 +20,7 @@ script:
   # 使用要求 10 次提交之类有 tag 存在, 名称必须为 v1.0.0 类似的形式
   - git clone --depth 10 --branch master --single-branch https://github.com/${GITHUB_USER}/${GITHUB_REPO}
   - cd ${GITHUB_REPO}
-  - ver=`git tag | awk 'END {print}'`
+  - ver=`git describe --abbrev=0 --tags`
   - nVer=`echo $ver | awk -F. '{printf "%s.%s.%s\n",$1,$2,$3+1}'`
   - echo $nVer
   - cd ..
