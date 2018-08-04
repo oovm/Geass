@@ -347,7 +347,7 @@ NetShow[nn_, net_ : OptimalNet, input_ : None] := Block[
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
-End[] ;
+End[];
 SetAttributes[
 	{ },
 	{Protected, ReadProtected}

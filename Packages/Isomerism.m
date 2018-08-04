@@ -15,8 +15,8 @@ BenzeneSeries::ussge = "苯烷计数, 二面体群 D6";
 AlkaneSeries3D::usage = "临时";
 Isomerism::usage = "程序包的说明,这里抄一遍";
 Begin["`Isomerism`"];
-Isomerism$Version = "V1.0";
-Isomerism$LastUpdate = "2018-03-03";
+Version$Isomerism = "V1.0";
+Update$Isomerism = "2018-08-03";
 FreeRadicalX[n_Integer] := Coefficient[FreeRadicalX[n, z], z, n];
 FreeRadicalX[n_, z_] := Normal@Fold[
 	Series[1 + z / 6(#1^3 + 3#1 ComposeSeries[#1, z^2 + O[z]^#2] + 2 ComposeSeries[#1, z^3 + O[z]^#2]), {z, 0, #2}]&,
@@ -172,11 +172,10 @@ MolecularShow3D = Graph3D[#, EdgeStyle -> Darker@Green,
 	VertexSize -> {{"C", _} -> 0.7, {"O", _} -> 0.55, {"H", _} -> 0.35, {"N", _} -> 0.6},
 	VertexStyle -> {{"C", _} -> Lighter[Black], {"O", _} -> Lighter[Red], {"H", _} -> LightBlue, {"N", _} -> Lighter[Blue]}
 ]&;
-End[] ;
 SetAttributes[
 	{
 		MolecularDegree, MolecularQ, MolecularFind, MolecularShow, MolecularShow3D
 	},
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+End[]

@@ -97,7 +97,6 @@ HalfExp[x_?NumericQ, y_?NumericQ, OptionsPattern[]] := Block[
 	TetrationEvaluate[env, TetraLog[x, y] + 1 / OptionValue[Number]]
 ];
 HalfExp[z_?NumericQ, ops : OptionsPattern[]] := HalfExp[E, z, ops];
-End[] ;
 SetAttributes[
 	{Tetrate, TetraLog, TetraRoot, TetraD, HalfExp},
 	{Protected, ReadProtected}

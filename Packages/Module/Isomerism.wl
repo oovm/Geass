@@ -46,8 +46,8 @@ Isomerism::usage = "程序包的说明,这里抄一遍";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
-Isomerism$Version = "V1.0";
-Isomerism$LastUpdate = "2018-03-03";
+Version$Isomerism = "V1.0";
+Update$Isomerism = "2018-08-03";
 
 
 FreeRadicalX[n_Integer] := Coefficient[FreeRadicalX[n, z], z, n];
@@ -257,11 +257,11 @@ MolecularShow3D = Graph3D[#, EdgeStyle -> Darker@Green,
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
-End[] ;
+End[];
 SetAttributes[
 	{
 		MolecularDegree, MolecularQ, MolecularFind, MolecularShow, MolecularShow3D
 	},
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+EndPackage[]

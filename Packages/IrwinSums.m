@@ -12,157 +12,143 @@ sjkPrev;
 cumulativeSums1;
 iSumPrintLevel = 1;
 Unprotect[IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLevel];
-nf0[y_, nDec_] :=
-	If[ y == 0,
-		0,
-		N[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec]
-	];
-nf1[y_, nDec_] :=
-	If[ y == 0,
-		0,
-		NumberForm[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec, DigitBlock -> 5, NumberSeparator -> {"", " "}]
-	];
-nf[y_, nDec_, iFlag_ : 0] :=
-	If[ iFlag == 0,
-		nf0[y, nDec],
-		nf1[y, nDec]
-	];
-Clear[power];
-power[0, 0] :=
-	1;
-power[x_, y_] :=
-	Power[x, y];
-Clear[isThisASpecialDigit];
-isThisASpecialDigit[iDigit_, nConditions_, digitList_List] :=
-	Block[
-	 { j },
-		For[j = 1, j <= nConditions, j++, If[ iDigit == digitList[[j]],
+nf0[y_, nDec_] := If[
+	y == 0,
+	0,
+	N[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec]
+];
+nf1[y_, nDec_] := If[
+	y == 0,
+	0,
+	NumberForm[y, Max[1, Floor[1 + Log[10, Abs[y]]]] + nDec, DigitBlock -> 5, NumberSeparator -> {"", " "}]
+];
+nf[y_, nDec_, iFlag_ : 0] := If[
+	iFlag == 0,
+	nf0[y, nDec],
+	nf1[y, nDec]
+];
+power[0, 0] := 1;
+power[x_, y_] := Power[x, y];
+isThisASpecialDigit[iDigit_, nConditions_, digitList_List] := Block[
+ { j },
+	For[j = 1, j <= nConditions, j++,
+		If[
+			iDigit == digitList[[j]],
 			Return[j]
 		]];
-		0
+	0
+];
+bn[iBase_Integer, n_Integer, nConditions_Integer, digitList_?VectorQ] := Block[
+ { bn = 0, k },
+	If[
+		n == 0,
+		Return[iBase - nConditions]
 	];
-Clear[bn];
-bn[iBase_Integer, n_Integer, nConditions_Integer, digitList_?VectorQ] :=
-	Block[
-	 { bn = 0, k },
-		If[ n == 0,
-			Return[iBase - nConditions]
-		];
-		For[k = 1, k <= iBase - 1, k++, If[ isThisASpecialDigit[k, nConditions, digitList] != 0,
-			Continue[]
-		];
-		bn += power[k, n];];
-		Return[bn];
+	For[k = 1, k <= iBase - 1, k++, If[ isThisASpecialDigit[k, nConditions, digitList] != 0,
+		Continue[]
 	];
-Clear[getArrayIndexFromList];
-getArrayIndexFromList[n_Integer, ci_?VectorQ, iList_?VectorQ] :=
-	Block[
-	 { i, IrwinSum = 0, iProd = 1 },
-		IrwinSum = iList[[1]];
-		For[i = 2, i <= n, i++, iProd = iProd * (ci[[i - 1]] + 1);
-		IrwinSum += iList[[i]] * iProd;];
-		IrwinSum + 1
+	bn += power[k, n];];
+	Return[bn];
+];
+getArrayIndexFromList[n_Integer, ci_?VectorQ, iList_?VectorQ] := Block[
+ { i, IrwinSum = 0, iProd = 1 },
+	IrwinSum = iList[[1]];
+	For[i = 2, i <= n, i++, iProd = iProd * (ci[[i - 1]] + 1);
+	IrwinSum += iList[[i]] * iProd;];
+	IrwinSum + 1
+];
+getListFromArrayIndex[iArrayIndex_Integer, n_Integer, ci_?VectorQ] := Block[
+ { i, iProd = 1, iTemp, iList = Table[0, {n}] },
+	iProd = Product[ci[[i]] + 1, {i, n - 1}];
+	iTemp = iArrayIndex;
+	iTemp = iTemp - 1;
+	For[i = n - 1, i >= 1, i--, iList[[i + 1]] = Floor[ iTemp / iProd ];
+	iTemp = iTemp - iProd * iList[[i + 1]];
+	iProd = Floor[ iProd / (ci[[i]] + 1) ];];
+	iList[[1]] = iTemp;
+	iList
+];
+updateCumulativeSums1[iBase_Integer, nConditions_Integer, countList_?VectorQ] := Block[
+ { i, iArrayIndex, kOccurFound },
+	kOccurFound = Table[ 0, {iBase + 1} ];
+	For[i = 0, i <= countList[[1]], i++, kOccurFound[[1]] = i;
+	iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
+	cumulativeSums1[[i + 1]] += sjkPrev[[ 1, iArrayIndex ]];];
+];
+printAllSums1[iDigit_Integer, nDec_Integer, nConditions_Integer, countList_?VectorQ, iFormatted_Integer] := Block[
+ { k },
+	If[ nConditions != 1,
+		Return[]
 	];
-getListFromArrayIndex[iArrayIndex_Integer, n_Integer, ci_?VectorQ] :=
-	Block[
-	 { i, iProd = 1, iTemp, iList = Table[0, {n}] },
-		iProd = Product[ci[[i]] + 1, {i, n - 1}];
-		iTemp = iArrayIndex;
-		iTemp = iTemp - 1;
-		For[i = n - 1, i >= 1, i--, iList[[i + 1]] = Floor[ iTemp / iProd ];
-		iTemp = iTemp - iProd * iList[[i + 1]];
-		iProd = Floor[ iProd / (ci[[i]] + 1) ];];
-		iList[[1]] = iTemp;
-		iList
+	If[ iDigit > 0,
+		Print[" iDigit = ", iDigit]
 	];
-updateCumulativeSums1[iBase_Integer, nConditions_Integer, countList_?VectorQ] :=
-	Block[
-	 { i, iArrayIndex, kOccurFound },
-		kOccurFound = Table[ 0, {iBase + 1} ];
-		For[i = 0, i <= countList[[1]], i++, kOccurFound[[1]] = i;
-		iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
-		cumulativeSums1[[i + 1]] += sjkPrev[[ 1, iArrayIndex ]];];
-	];
-printAllSums1[iDigit_Integer, nDec_Integer, nConditions_Integer, countList_?VectorQ, iFormatted_Integer] :=
-	Block[
-	 { k },
-		If[ nConditions != 1,
-			Return[]
-		];
-		If[ iDigit > 0,
-			Print[" iDigit = ", iDigit]
-		];
-		For[k = 0, k <= countList[[1]], k++, Print[" sum for ", k, " occurrences = ", nf[cumulativeSums1[[k + 1]] , nDec, iFormatted] ]];
-	];
-directSummation[iBase_Integer, numDigits_Integer, maxPower_Integer, nConditions_Integer, digitList_?VectorQ, countList_?VectorQ, nDec_Integer] :=
-	Block[
-	 { nTerms,
+	For[k = 0, k <= countList[[1]], k++, Print[" sum for ", k, " occurrences = ", nf[cumulativeSums1[[k + 1]] , nDec, iFormatted] ]];
+];
+directSummation[iBase_Integer, numDigits_Integer, maxPower_Integer, nConditions_Integer, digitList_?VectorQ, countList_?VectorQ, nDec_Integer] := Block[
+ { nTerms,
 		iStart, iLast, i, iNumber, iDigitPos, iQuot, iRemainder, iDigit, jPower, k, kFound, iOK, iMatch, sumK = 0, kOccurFound, iArrayIndex, xNumb, xRecip, xRecipPower},
-		kOccurFound = Table[0, {nConditions}];
-		nTerms = 0;
-		iStart = iBase^(numDigits - 1);
-		iLast = iBase^numDigits - 1;
-		For[i = iStart, i <= iLast, i++,
-			For[k = 1, k <= nConditions, k++, kOccurFound[[k]] = 0];
-			iNumber = i;
-			For[iDigitPos = 1, iDigitPos <= numDigits, iDigitPos++, iQuot = Floor[ iNumber / iBase ];
-			iRemainder = iNumber - iBase * iQuot;
-			iDigit = iRemainder;
-			kFound = isThisASpecialDigit[iDigit, nConditions, digitList];
-			If[ kFound > 0,
-				kOccurFound[[kFound]]++;
-			];
-			iNumber = iQuot;];
-			iOK = 1;
-			iMatch = 1;
-			For[k = 1, k <= nConditions, k++, If[ kOccurFound[[k]] > countList[[k]],
-				iOK = 0;
-				Goto[nextI];
-			];
-			If[ kOccurFound[[k]] < countList[[k]],
-				iMatch = 0
-			];];
-			If[ iMatch == 1,
-				nTerms = nTerms + 1
-			];
-			xNumb = i;
-			xRecip = N[1 / xNumb, nDec];
-			iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
-			sjkPrev[[ 1, iArrayIndex ]] += xRecip;
-			xRecipPower = xRecip;
-			For[jPower = 2, jPower <= maxPower, jPower++, xRecipPower = xRecipPower * xRecip;
-			sjkPrev[[ jPower, iArrayIndex ]] += xRecipPower;];
-			Label[nextI];];
-		nTerms
-	];
-Clear[computeMaxPowerNeeded];
-computeMaxPowerNeeded[iBase_Integer, nDecimals_Integer, dsDigits_Integer] :=
-	Block[
-	 { eps, a, b, r0, k, ns, c, r },
-		eps = 10^-nDecimals;
-		a = iBase^(dsDigits - 1);
-		b = iBase^dsDigits - 1;
-		r0 = Ceiling[ Log[iBase, 10] * nDecimals / (dsDigits - 1) ];
-		For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
-		ns = Re[ns];
-		If[ ns < eps,
-			Goto[loopDone]
+	kOccurFound = Table[0, {nConditions}];
+	nTerms = 0;
+	iStart = iBase^(numDigits - 1);
+	iLast = iBase^numDigits - 1;
+	For[i = iStart, i <= iLast, i++,
+		For[k = 1, k <= nConditions, k++, kOccurFound[[k]] = 0];
+		iNumber = i;
+		For[iDigitPos = 1, iDigitPos <= numDigits, iDigitPos++, iQuot = Floor[ iNumber / iBase ];
+		iRemainder = iNumber - iBase * iQuot;
+		iDigit = iRemainder;
+		kFound = isThisASpecialDigit[iDigit, nConditions, digitList];
+		If[ kFound > 0,
+			kOccurFound[[kFound]]++;
+		];
+		iNumber = iQuot;];
+		iOK = 1;
+		iMatch = 1;
+		For[k = 1, k <= nConditions, k++, If[ kOccurFound[[k]] > countList[[k]],
+			iOK = 0;
+			Goto[nextI];
+		];
+		If[ kOccurFound[[k]] < countList[[k]],
+			iMatch = 0
 		];];
-		r = FindRoot[(b^(1 - c) - a^(1 - c)) / (1 - c) == eps, {c, r0} ];
-		r0 = Ceiling[c /. r];
-		For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
-		ns = Re[ns];
-		If[ ns < eps,
-			Goto[loopDone]
-		];];
-		Return[ -r0 ];
-		Label[loopDone];
-		r0 + 2
-	];
-Clear[computeIrwinSum];
-computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals0_Integer, iFormatted_Integer, nDigits_ : 0, threshold_ : -1 ] :=
-	Block[
-	 {
+		If[ iMatch == 1,
+			nTerms = nTerms + 1
+		];
+		xNumb = i;
+		xRecip = N[1 / xNumb, nDec];
+		iArrayIndex = getArrayIndexFromList[nConditions, countList, kOccurFound];
+		sjkPrev[[ 1, iArrayIndex ]] += xRecip;
+		xRecipPower = xRecip;
+		For[jPower = 2, jPower <= maxPower, jPower++, xRecipPower = xRecipPower * xRecip;
+		sjkPrev[[ jPower, iArrayIndex ]] += xRecipPower;];
+		Label[nextI];];
+	nTerms
+];
+computeMaxPowerNeeded[iBase_Integer, nDecimals_Integer, dsDigits_Integer] := Block[
+ { eps, a, b, r0, k, ns, c, r },
+	eps = 10^-nDecimals;
+	a = iBase^(dsDigits - 1);
+	b = iBase^dsDigits - 1;
+	r0 = Ceiling[ Log[iBase, 10] * nDecimals / (dsDigits - 1) ];
+	For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
+	ns = Re[ns];
+	If[ ns < eps,
+		Goto[loopDone]
+	];];
+	r = FindRoot[(b^(1 - c) - a^(1 - c)) / (1 - c) == eps, {c, r0} ];
+	r0 = Ceiling[c /. r];
+	For[k = r0, k <= 10 * r0, k++, ns = NSum[1 / n^k, {n, a, b}];
+	ns = Re[ns];
+	If[ ns < eps,
+		Goto[loopDone]
+	];];
+	Return[ -r0 ];
+	Label[loopDone];
+	r0 + 2
+];
+computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals0_Integer, iFormatted_Integer, nDigits_ : 0, threshold_ : -1 ] := Block[
+ {
 		iPrint, nShow = 10,
 		nConditions,
 		directSumDigits, nDecimals, nDec, i, j, nMax, n, j1, k1,
@@ -174,384 +160,372 @@ computeIrwinSum[iBase_Integer, digitList_?VectorQ, countList_?VectorQ, nDecimals
 		requestedSum = 0,
 		sumOneDigit = 0,
 		sumSmallerK = 0, sumB1, sumB2, term1, term2, bnx2, ajn, kList, tableOfLists, time0, time1, time2},
-		iPrint = iSumPrintLevel;
-		nDecimals = nDecimals0;
-		If[ nDecimals < 5,
-			nDecimals = 5
+	iPrint = iSumPrintLevel;
+	nDecimals = nDecimals0;
+	If[ nDecimals < 5,
+		nDecimals = 5
+	];
+	nDec = nDecimals + 2;
+	If[ iPrint >= 2,
+		Print["iBase = ", iBase, ", digitList = ", digitList, ", countList = ", countList];
+		Print["nDecimals = ", nDecimals];
+	];
+	time0 = TimeUsed[];
+	nConditions = Length[digitList];
+	If[ (iBase < 2) || (iBase > 10),
+		Print["Base = ", iBase, " must be in the range from 2 through 10."];
+		Return[0];
+	];
+	If[ nConditions < 1,
+		Print[" error 1: nConditions = ", nConditions, " must be at least 1."];
+		Return[0];
+	];
+	If[ nConditions > iBase,
+		Print[" error 2: nConditions = ", nConditions, " must be <= base = ", iBase];
+		Return[0];
+	];
+	If[ nConditions != Length[countList],
+		Print["Mismatch: digit list and count list have different lengths (", Length[digitList], " and ", Length[countList], ")"];
+		Return[0];
+	];
+	For[i = 1, i <= nConditions, i++, If[ (digitList[[i]] < 0) || (digitList[[i]] >= iBase),
+		Print["digit # ", i, " = ", digitList[[i]], " is not valid in base ", iBase];
+		Return[0];
+	];
+	For[j = i + 1, j <= nConditions, j++, If[ digitList[[i]] == digitList[[j]],
+		Print["error: digit # ", i, " = ", digitList[[i]], " is duplicated"];
+		Return[0];
+	];];
+	If[ countList[[i]] < 0,
+		Print["count # ", i, " = ", countList[[i]], " must be 0 or greater."];
+		Return[0];
+	];];
+	If[ nConditions == iBase - 1,
+		j = 0;
+		For[i = 0, i <= iBase - 1, i++, If[ (countList[[i]] == 0) && (digitList[[i]] != 0),
+			j++;
 		];
-		nDec = nDecimals + 2;
-		If[ iPrint >= 2,
-			Print["iBase = ", iBase, ", digitList = ", digitList, ", countList = ", countList];
-			Print["nDecimals = ", nDecimals];
 		];
-		time0 = TimeUsed[];
-		nConditions = Length[digitList];
-		If[ (iBase < 2) || (iBase > 10),
-			Print["Base = ", iBase, " must be in the range from 2 through 10."];
+		If[ j == iBase - 1,
+			Print["all non-zero digits have 0 occurrences: this is an empty sum"];
 			Return[0];
 		];
-		If[ nConditions < 1,
-			Print[" error 1: nConditions = ", nConditions, " must be at least 1."];
+	];
+	tiny1 = 1 / 10^(2 * nDec);
+	tiny2 = 1 / 10^(nDec + 5);
+	maxDigits = 60 * nDecimals;
+	If[ maxDigits < 500,
+		maxDigits = 500
+	];
+	If[ Max[countList] > 10,
+		maxDigits = maxDigits * 6
+	];
+	If[ iPrint >= 2,
+		Print["maxDigits = ", maxDigits]
+	];
+	directSumDigits = Ceiling[ Log[iBase, 1000] ];
+	maxJ = computeMaxPowerNeeded[iBase, nDecimals, directSumDigits];
+	If[ maxJ < 0,
+		maxJ = -maxJ;
+		Print["Could not find good estimate for maxJ; computed maxJ = ", maxJ];
+		Return[0];
+	];
+	If[ iPrint >= 2,
+		Print["nDecimals = ", nDecimals, ", directSumDigits = ", directSumDigits, ", computed maxJ = ", maxJ];
+	];
+	jMaxPower = maxJ;
+	If[ nConditions == iBase,
+		iSpecialSum = Sum[countList[[i]], {i, nConditions}]
+	];
+	maxTermArray = Table[ 0, { maxJ } ];
+	maxIndexUsed = Product[1 + countList[[i]], {i, nConditions}];
+	If[ iPrint >= 3,
+		Print["maxIndexUsed = ", maxIndexUsed];
+	];
+	kList = Table[ 0, {nConditions + 1} ];
+	tableOfLists = Table[ 0, { maxIndexUsed }, { nConditions + 1 } ];
+	cumulativeSums1 = Table[ 0, { countList[[1]] + 1 } ];
+	For[i = 1, i <= maxIndexUsed, i++,
+		kList = getListFromArrayIndex[i, nConditions, countList];
+		iArrayIndex = getArrayIndexFromList[nConditions, countList, kList];
+		If[ iArrayIndex != i,
+			Print["error: i = ", i, " != iArrayIndex = ", iArrayIndex];
 			Return[0];
 		];
-		If[ nConditions > iBase,
-			Print[" error 2: nConditions = ", nConditions, " must be <= base = ", iBase];
-			Return[0];
+		For[j = 1, j <= nConditions, j++, tableOfLists[[i, j]] = kList[[j]]];];
+	iArrayIndex0 = getArrayIndexFromList[nConditions, countList, countList];
+	If[ iArrayIndex0 != maxIndexUsed,
+		Print["error: iArrayIndex0 != maxIndexUsed: iArrayIndex0 = ", iArrayIndex0, ", maxIndexUsed = ", maxIndexUsed];
+		Return[0];
+	];
+	sjk = Table[ 0, { maxJ }, { maxIndexUsed } ];
+	For[iDigit = 1, iDigit <= directSumDigits, iDigit++,
+		sjkPrev = Table[ 0, { maxJ }, { maxIndexUsed } ];
+		directSummation[iBase, iDigit, jMaxPower, nConditions, digitList, countList, nDec];
+		requestedSum += sjkPrev[[ 1, iArrayIndex0 ]];
+		For[i = 1, i <= maxIndexUsed, i++, sumSmallerK += sjkPrev[[ 1, i ]]];
+		If[ (nDigits > 0) && (nDigits == iDigit),
+			iDone = 1
 		];
-		If[ nConditions != Length[countList],
-			Print["Mismatch: digit list and count list have different lengths (", Length[digitList], " and ", Length[countList], ")"];
-			Return[0];
+		If[ (threshold > 0) && (requestedSum > threshold),
+			Return[ { requestedSum , iDigit } ];
 		];
-		For[i = 1, i <= nConditions, i++, If[ (digitList[[i]] < 0) || (digitList[[i]] >= iBase),
-			Print["digit # ", i, " = ", digitList[[i]], " is not valid in base ", iBase];
-			Return[0];
-		];
-		For[j = i + 1, j <= nConditions, j++, If[ digitList[[i]] == digitList[[j]],
-			Print["error: digit # ", i, " = ", digitList[[i]], " is duplicated"];
-			Return[0];
-		];];
-		If[ countList[[i]] < 0,
-			Print["count # ", i, " = ", countList[[i]], " must be 0 or greater."];
-			Return[0];
-		];];
-		If[ nConditions == iBase - 1,
-			j = 0;
-			For[i = 0, i <= iBase - 1, i++, If[ (countList[[i]] == 0) && (digitList[[i]] != 0),
-				j++;
-			];
-			];
-			If[ j == iBase - 1,
-				Print["all non-zero digits have 0 occurrences: this is an empty sum"];
-				Return[0];
-			];
-		];
-		tiny1 = 1 / 10^(2 * nDec);
-		tiny2 = 1 / 10^(nDec + 5);
-		maxDigits = 60 * nDecimals;
-		If[ maxDigits < 500,
-			maxDigits = 500
-		];
-		If[ Max[countList] > 10,
-			maxDigits = maxDigits * 6
-		];
-		If[ iPrint >= 2,
-			Print["maxDigits = ", maxDigits]
-		];
-		directSumDigits = Ceiling[ Log[iBase, 1000] ];
-		maxJ = computeMaxPowerNeeded[iBase, nDecimals, directSumDigits];
-		If[ maxJ < 0,
-			maxJ = -maxJ;
-			Print["Could not find good estimate for maxJ; computed maxJ = ", maxJ];
-			Return[0];
-		];
-		If[ iPrint >= 2,
-			Print["nDecimals = ", nDecimals, ", directSumDigits = ", directSumDigits, ", computed maxJ = ", maxJ];
-		];
-		jMaxPower = maxJ;
-		If[ nConditions == iBase,
-			iSpecialSum = Sum[countList[[i]], {i, nConditions}]
-		];
-		maxTermArray = Table[ 0, { maxJ } ];
-		maxIndexUsed = Product[1 + countList[[i]], {i, nConditions}];
-		If[ iPrint >= 3,
-			Print["maxIndexUsed = ", maxIndexUsed];
-		];
-		kList = Table[ 0, {nConditions + 1} ];
-		tableOfLists = Table[ 0, { maxIndexUsed }, { nConditions + 1 } ];
-		cumulativeSums1 = Table[ 0, { countList[[1]] + 1 } ];
-		For[i = 1, i <= maxIndexUsed, i++,
-			kList = getListFromArrayIndex[i, nConditions, countList];
-			iArrayIndex = getArrayIndexFromList[nConditions, countList, kList];
-			If[ iArrayIndex != i,
-				Print["error: i = ", i, " != iArrayIndex = ", iArrayIndex];
-				Return[0];
-			];
-			For[j = 1, j <= nConditions, j++, tableOfLists[[i, j]] = kList[[j]]];];
-		iArrayIndex0 = getArrayIndexFromList[nConditions, countList, countList];
-		If[ iArrayIndex0 != maxIndexUsed,
-			Print["error: iArrayIndex0 != maxIndexUsed: iArrayIndex0 = ", iArrayIndex0, ", maxIndexUsed = ", maxIndexUsed];
-			Return[0];
-		];
-		sjk = Table[ 0, { maxJ }, { maxIndexUsed } ];
-		For[iDigit = 1, iDigit <= directSumDigits, iDigit++,
-			sjkPrev = Table[ 0, { maxJ }, { maxIndexUsed } ];
-			directSummation[iBase, iDigit, jMaxPower, nConditions, digitList, countList, nDec];
-			requestedSum += sjkPrev[[ 1, iArrayIndex0 ]];
-			For[i = 1, i <= maxIndexUsed, i++, sumSmallerK += sjkPrev[[ 1, i ]]];
-			If[ (nDigits > 0) && (nDigits == iDigit),
-				iDone = 1
-			];
-			If[ (threshold > 0) && (requestedSum > threshold),
-				Return[ { requestedSum , iDigit } ];
-			];
-			If[ iDone == 1,
-				If[ iPrint >= 1,
-					If[ iBase == 10,
-						Print["partial sum through ", iDigit, " digits = ", requestedSum],
-						Print["partial sum through ", iDigit, " (base ", iBase, ") digits = ", requestedSum]
-					];
-					If[ (nConditions != 1) || (countList[[1]] != 0),
-						Print[" partial sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
-					];
-				];
-				Break[];
-			];
-			If[ iPrint >= 3,
-				Print[iDigit, " digits"]
-			];
-			If[ iPrint >= 3,
-				Print[" partial sum for ", iDigit, " digits = ", sjkPrev[[ 1, iArrayIndex0 ]] ];
-				Print[" sum = ", requestedSum]
-			];
-			If[ iPrint >= 3,
-				If[ (nConditions != 1) || (countList[[1]] != 0),
-					Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
-				];
-			];
-			If[ nConditions == 1,
-				updateCumulativeSums1[iBase, nConditions, countList]
-			];];
-		time1 = TimeUsed[];
 		If[ iDone == 1,
-			Goto[endLoops]
-		];
-		If[ iPrint >= 2,
-			Print["direct sum through ", directSumDigits, " digits = ", requestedSum]
-		];
-		iDigitStart = directSumDigits + 1;
-		For[iDigit = iDigitStart, iDigit <= maxDigits, iDigit++,
-			maxTermAddedI = 0;
-			maxTermArray = Table[ 0, { jMaxPower } ];
-			For[jPower = 1, jPower <= jMaxPower, jPower++, nMax = jMaxPower - jPower;
-			maxTermAddedJ = 0;
-			For[iArrayIndex = 1, iArrayIndex <= maxIndexUsed, iArrayIndex++,
-				kList = getListFromArrayIndex[iArrayIndex, nConditions, countList];
-				sumB1 = sumB2 = 0;
-				For[n = 0, n <= nMax, n++, ajn = Binomial[jPower + n - 1, n] / power[iBase, jPower + n];
-				If[ OddQ[n],
-					ajn = -ajn
+			If[ iPrint >= 1,
+				If[ iBase == 10,
+					Print["partial sum through ", iDigit, " digits = ", requestedSum],
+					Print["partial sum through ", iDigit, " (base ", iBase, ") digits = ", requestedSum]
 				];
-				For[k = 1, k <= nConditions, k++, If[ kList[[k]] > 0,
-					kList[[k]] = kList[[k]] - 1;
-					iArrayIndex2 = getArrayIndexFromList[nConditions, countList, kList];
-					term1 = power[digitList[[k]], n] * ajn * sjkPrev[[ jPower + n, iArrayIndex2 ]];
-					sumB1 = sumB1 + term1;
-					maxTermAddedJ = Max[maxTermAddedJ, Abs[term1]];
-					kList[[k]] = kList[[k]] + 1;
-				];
-				];
-				bnx2 = bn[iBase, n, nConditions, digitList];
-				term2 = bnx2 * ajn * sjkPrev[[ jPower + n, iArrayIndex ]];
-				maxTermAddedJ = Max[maxTermAddedJ, Abs[term2]];
-				sumB2 = sumB2 + term2;];
-				sjk[[jPower, iArrayIndex]] = sumB1 + sumB2;];
-			maxTermArray[[jPower]] = maxTermAddedJ;
-			maxTermAddedI = Max[maxTermAddedI, maxTermAddedJ];];
-			sumOneDigit = sjk[[1, iArrayIndex0 ]];
-			requestedSum += sumOneDigit;
-			If[ (threshold > 0) && (requestedSum > threshold),
-				Return[ { requestedSum , iDigit } ];
-			];
-			For[i = 1, i <= maxIndexUsed, i++, sumSmallerK += sjk[[1, i]]
-			];
-			If[ (nDigits > 0) && (nDigits == iDigit),
-				iDone = 1;
-				If[ iPrint >= 1,
-					If[ iBase == 10,
-						Print["partial sum through ", iDigit, " digits = ", requestedSum],
-						Print["partial sum through ", iDigit, " (base ", iBase, ") digits = ", requestedSum]
-					];
-					If[ (nConditions != 1) || (countList[[1]] != 0),
-						Print[" partial sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
-					];
-				];
-				Break[];
-			];
-			sjkPrev = sjk;
-			If[ nConditions == 1,
-				updateCumulativeSums1[iBase, nConditions, countList]
-			];
-			If[ iPrint >= 3,
-				Print[" partial sum for ", iDigit, " digits = ", N[sumOneDigit, nShow], ", total = ", N[requestedSum, nShow] ]
-			];
-			If[ iPrint >= 4,
 				If[ (nConditions != 1) || (countList[[1]] != 0),
-					Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", N[sumSmallerK, nShow] ]
+					Print[" partial sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
 				];
 			];
-			If[ (iSpecialSum > 0) && (iDigit > iSpecialSum),
-				iDone = 1;
-				Print["this is a finite series that terminates after ", iSpecialSum, " digits"];
+			Break[];
+		];
+		If[ iPrint >= 3,
+			Print[iDigit, " digits"]
+		];
+		If[ iPrint >= 3,
+			Print[" partial sum for ", iDigit, " digits = ", sjkPrev[[ 1, iArrayIndex0 ]] ];
+			Print[" sum = ", requestedSum]
+		];
+		If[ iPrint >= 3,
+			If[ (nConditions != 1) || (countList[[1]] != 0),
+				Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
 			];
-			If[ jMaxPower > 2,
-				j1 = jMaxPower;
-				For[jPower = jMaxPower, jPower >= 2, jPower--, If[ maxTermArray[[jPower]] < tiny1,
-					j1 = jPower,
-					Break[]
-				];];
-				If[ jMaxPower != j1,
-					If[ iPrint >= 4,
-						Print["iDigit = ", iDigit, ": changing jMaxPower from ", jMaxPower, " to ", j1]
-					];
-					jMaxPower = j1;
+		];
+		If[ nConditions == 1,
+			updateCumulativeSums1[iBase, nConditions, countList]
+		];];
+	time1 = TimeUsed[];
+	If[ iDone == 1,
+		Goto[endLoops]
+	];
+	If[ iPrint >= 2,
+		Print["direct sum through ", directSumDigits, " digits = ", requestedSum]
+	];
+	iDigitStart = directSumDigits + 1;
+	For[iDigit = iDigitStart, iDigit <= maxDigits, iDigit++,
+		maxTermAddedI = 0;
+		maxTermArray = Table[ 0, { jMaxPower } ];
+		For[jPower = 1, jPower <= jMaxPower, jPower++, nMax = jMaxPower - jPower;
+		maxTermAddedJ = 0;
+		For[iArrayIndex = 1, iArrayIndex <= maxIndexUsed, iArrayIndex++,
+			kList = getListFromArrayIndex[iArrayIndex, nConditions, countList];
+			sumB1 = sumB2 = 0;
+			For[n = 0, n <= nMax, n++, ajn = Binomial[jPower + n - 1, n] / power[iBase, jPower + n];
+			If[ OddQ[n],
+				ajn = -ajn
+			];
+			For[k = 1, k <= nConditions, k++, If[ kList[[k]] > 0,
+				kList[[k]] = kList[[k]] - 1;
+				iArrayIndex2 = getArrayIndexFromList[nConditions, countList, kList];
+				term1 = power[digitList[[k]], n] * ajn * sjkPrev[[ jPower + n, iArrayIndex2 ]];
+				sumB1 = sumB1 + term1;
+				maxTermAddedJ = Max[maxTermAddedJ, Abs[term1]];
+				kList[[k]] = kList[[k]] + 1;
+			];
+			];
+			bnx2 = bn[iBase, n, nConditions, digitList];
+			term2 = bnx2 * ajn * sjkPrev[[ jPower + n, iArrayIndex ]];
+			maxTermAddedJ = Max[maxTermAddedJ, Abs[term2]];
+			sumB2 = sumB2 + term2;];
+			sjk[[jPower, iArrayIndex]] = sumB1 + sumB2;];
+		maxTermArray[[jPower]] = maxTermAddedJ;
+		maxTermAddedI = Max[maxTermAddedI, maxTermAddedJ];];
+		sumOneDigit = sjk[[1, iArrayIndex0 ]];
+		requestedSum += sumOneDigit;
+		If[ (threshold > 0) && (requestedSum > threshold),
+			Return[ { requestedSum , iDigit } ];
+		];
+		For[i = 1, i <= maxIndexUsed, i++, sumSmallerK += sjk[[1, i]]
+		];
+		If[ (nDigits > 0) && (nDigits == iDigit),
+			iDone = 1;
+			If[ iPrint >= 1,
+				If[ iBase == 10,
+					Print["partial sum through ", iDigit, " digits = ", requestedSum],
+					Print["partial sum through ", iDigit, " (base ", iBase, ") digits = ", requestedSum]
 				];
-			];
-			If[ nDigits > 0,
-				Continue[];
-			];
-			iAllTiny = 1;
-			For[k1 = 0, k1 <= maxIndexUsed, k1++, If[ sjk[[2, k1 ]] > tiny2,
-				iAllTiny = 0;
-				Break[];
-			]];
-			If[ (iAllTiny == 1) && (sjk[[1, iArrayIndex0 ]] < tiny2),
-				If[ (sjk[[1, iArrayIndex0 ]] != 0) && (sjk[[1, iArrayIndex0 ]] / requestedSum < tiny2),
-					iDone = 1;
-					time2 = TimeUsed[];
-					time2 = Round[time2 - time0];
-					If[ iPrint >= 2,
-						Print["last iteration of main loop:"];
-						Print[" max term added = ", maxTermAddedI, ", sum for ", iDigit, " digits = ", nf[sumOneDigit, nShow]];
-					];
-					If[ iPrint >= 2,
-						Print["iteration done after ", iDigit, "-digit denominators (", time2, " seconds)."]
-					];
-				];
-			];
-			If[ (iDigit == maxDigits) && (iDone == 0),
-				Print["last iteration (", maxDigits, ") of main loop, but no convergence yet."];
-				Print[" suggestion: make 'maxDigits' (now = ", maxDigits, ") larger,"];
-				Print[" read the file in again, and start over."];
-				Print[" partial sum for ", iDigit, " digits = ", N[sjk[[1, iArrayIndex0 ]], nShow] ];
-				requestedSum = 0;
-				Break[]
-			];
-			If[ (iDone == 1) && (iPrint > 0),
-				Print["sum = ", nf[requestedSum, nDecimals, iFormatted] ];
 				If[ (nConditions != 1) || (countList[[1]] != 0),
-					Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", nf[sumSmallerK, nDecimals, iFormatted] ];
-					If[ nConditions == 1,
-						printAllSums1[0, nDecimals, nConditions, countList, iFormatted]
-					];
+					Print[" partial sum for all ", maxIndexUsed, " 'at most' conditions = ", sumSmallerK]
 				];
+			];
+			Break[];
+		];
+		sjkPrev = sjk;
+		If[ nConditions == 1,
+			updateCumulativeSums1[iBase, nConditions, countList]
+		];
+		If[ iPrint >= 3,
+			Print[" partial sum for ", iDigit, " digits = ", N[sumOneDigit, nShow], ", total = ", N[requestedSum, nShow] ]
+		];
+		If[ iPrint >= 4,
+			If[ (nConditions != 1) || (countList[[1]] != 0),
+				Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", N[sumSmallerK, nShow] ]
+			];
+		];
+		If[ (iSpecialSum > 0) && (iDigit > iSpecialSum),
+			iDone = 1;
+			Print["this is a finite series that terminates after ", iSpecialSum, " digits"];
+		];
+		If[ jMaxPower > 2,
+			j1 = jMaxPower;
+			For[jPower = jMaxPower, jPower >= 2, jPower--, If[ maxTermArray[[jPower]] < tiny1,
+				j1 = jPower,
 				Break[]
 			];];
-		Label[endLoops];
-		nf[requestedSum, nDecimals, iFormatted]
-	];
-Clear[IrwinSum];
-IrwinSum[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] :=
-	Block[
-	 { },
-		computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted]
-	];
-IrwinSum[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] :=
-	Block[
-	 { },
-		IrwinSum[ { d }, { iCount }, nDecimals, iBase, iFormatted ]
-	];
-Clear[iSumFormatted];
-iSumFormatted[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10] :=
-	Block[ { iFormatted = 1 },
-		IrwinSum[digitList, countList, nDecimals, iBase, iFormatted]
-	];
-iSumFormatted[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10] :=
-	Block[ { iFormatted = 1 },
-		IrwinSum[d, iCount, nDecimals, iBase, iFormatted]
-	];
-Clear[setPrintLevel];
-setPrintLevel[i_Integer] :=
-	Block[ { i2 },
-		i2 = i;
-		If[ i2 < 0,
-			i2 = 0,
-			Null
+			If[ jMaxPower != j1,
+				If[ iPrint >= 4,
+					Print["iDigit = ", iDigit, ": changing jMaxPower from ", jMaxPower, " to ", j1]
+				];
+				jMaxPower = j1;
+			];
 		];
-		iSumPrintLevel = i2;
-		Print["print level set to ", iSumPrintLevel]
+		If[ nDigits > 0,
+			Continue[];
+		];
+		iAllTiny = 1;
+		For[k1 = 0, k1 <= maxIndexUsed, k1++, If[ sjk[[2, k1 ]] > tiny2,
+			iAllTiny = 0;
+			Break[];
+		]];
+		If[ (iAllTiny == 1) && (sjk[[1, iArrayIndex0 ]] < tiny2),
+			If[ (sjk[[1, iArrayIndex0 ]] != 0) && (sjk[[1, iArrayIndex0 ]] / requestedSum < tiny2),
+				iDone = 1;
+				time2 = TimeUsed[];
+				time2 = Round[time2 - time0];
+				If[ iPrint >= 2,
+					Print["last iteration of main loop:"];
+					Print[" max term added = ", maxTermAddedI, ", sum for ", iDigit, " digits = ", nf[sumOneDigit, nShow]];
+				];
+				If[ iPrint >= 2,
+					Print["iteration done after ", iDigit, "-digit denominators (", time2, " seconds)."]
+				];
+			];
+		];
+		If[ (iDigit == maxDigits) && (iDone == 0),
+			Print["last iteration (", maxDigits, ") of main loop, but no convergence yet."];
+			Print[" suggestion: make 'maxDigits' (now = ", maxDigits, ") larger,"];
+			Print[" read the file in again, and start over."];
+			Print[" partial sum for ", iDigit, " digits = ", N[sjk[[1, iArrayIndex0 ]], nShow] ];
+			requestedSum = 0;
+			Break[]
+		];
+		If[ (iDone == 1) && (iPrint > 0),
+			Print["sum = ", nf[requestedSum, nDecimals, iFormatted] ];
+			If[ (nConditions != 1) || (countList[[1]] != 0),
+				Print[" sum for all ", maxIndexUsed, " 'at most' conditions = ", nf[sumSmallerK, nDecimals, iFormatted] ];
+				If[ nConditions == 1,
+					printAllSums1[0, nDecimals, nConditions, countList, iFormatted]
+				];
+			];
+			Break[]
+		];];
+	Label[endLoops];
+	nf[requestedSum, nDecimals, iFormatted]
+];
+IrwinSum[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] := Block[
+ { },
+	computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted]
+];
+IrwinSum[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10, iFormatted_ : 0] := Block[
+ { },
+	IrwinSum[ { d }, { iCount }, nDecimals, iBase, iFormatted ]
+];
+iSumFormatted[digitList_?VectorQ, countList_?VectorQ, nDecimals_ : 15, iBase_ : 10] := Block[
+	{ iFormatted = 1 },
+	IrwinSum[digitList, countList, nDecimals, iBase, iFormatted]
+];
+iSumFormatted[d_Integer, iCount_Integer, nDecimals_ : 15, iBase_ : 10] := Block[
+	{ iFormatted = 1 },
+	IrwinSum[d, iCount, nDecimals, iBase, iFormatted]
+];
+setPrintLevel[i_Integer] := Block[
+	{ i2 },
+	i2 = i;
+	If[ i2 < 0,
+		i2 = 0,
+		Null
 	];
-Clear[iPartialSum];
-iPartialSum[digitList_?VectorQ, countList_?VectorQ, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] :=
-	Block[
-	 { iFormatted = 0 },
-		computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted, nDigits]
+	iSumPrintLevel = i2;
+	Print["print level set to ", iSumPrintLevel]
+];
+iPartialSum[digitList_?VectorQ, countList_?VectorQ, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] := Block[
+ { iFormatted = 0 },
+	computeIrwinSum[iBase, digitList, countList, nDecimals, iFormatted, nDigits]
+];
+iPartialSum[d_Integer, iCount_Integer, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] := Block[
+ { },
+	iPartialSum[ { d }, { iCount }, nDigits, nDecimals, iBase ]
+];
+iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] := Block[
+ { iFormatted = 0, nDigits = 0, totalSum, iPrintLevelSave, xSum1 = 0, nDig1 = 0, xSum2, nDig2, errorReturn = {-1, -1, -1, -1}, tAcc, nDec2, errStr = "Use backquote notation iPartialSumThreshold[ digit, count, threshold``nDecimals]],\or enclose the threshold in double quotes"},
+	tAcc = 1 + Floor[Accuracy[threshold]];
+	If[ tAcc == Infinity,
+		nDec2 = nDecimals,
+		nDec2 = Max[nDecimals, tAcc]
 	];
-iPartialSum[d_Integer, iCount_Integer, nDigits_Integer?Positive, nDecimals_ : 15, iBase_ : 10] :=
-	Block[
-	 { },
-		iPartialSum[ { d }, { iCount }, nDigits, nDecimals, iBase ]
-	];
-Clear[iPartialSumThreshold];
-iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] :=
-	Block[
-	 { iFormatted = 0, nDigits = 0, totalSum, iPrintLevelSave, xSum1 = 0, nDig1 = 0, xSum2, nDig2, errorReturn = {-1, -1, -1, -1}, tAcc, nDec2, errStr = "Use backquote notation iPartialSumThreshold[ digit, count, threshold``nDecimals]],\or enclose the threshold in double quotes"},
-		tAcc = 1 + Floor[Accuracy[threshold]];
-		If[ tAcc == Infinity,
-			nDec2 = nDecimals,
-			nDec2 = Max[nDecimals, tAcc]
-		];
-		iPrintLevelSave = iSumPrintLevel;
-		iSumPrintLevel = -1;
-		totalSum = IrwinSum[digitList, countList, nDec2, iBase];
-		If[ threshold > totalSum,
-			Print["Error: your threshold is greater than the sum of the entire series."];
-			iSumPrintLevel = iPrintLevelSave;
-			Return[ errorReturn ]
-		];
-		If[ threshold == totalSum,
-			Print["Error: your threshold is very close to the sum of the entire series. You need more accuracy. ", errStr];
-			iSumPrintLevel = iPrintLevelSave;
-			Return[ errorReturn ]
-		];
-		{ xSum2 , nDig2 } = computeIrwinSum[iBase, digitList, countList, nDec2, iFormatted, nDigits, threshold];
-		If[ nDig2 > 1,
-			nDig1 = nDig2 - 1;
-			xSum1 = iPartialSum[digitList, countList, nDig1, nDec2, iBase];
-		];
-		If[ ( ! (xSum1 < threshold)) && (nDig2 > 1),
-			nDig2 = nDig1;
-			xSum2 = xSum1;
-			nDig1 = nDig2 - 1;
-			xSum1 = iPartialSum[digitList, countList, nDig1, nDec2, iBase];
-		];
+	iPrintLevelSave = iSumPrintLevel;
+	iSumPrintLevel = -1;
+	totalSum = IrwinSum[digitList, countList, nDec2, iBase];
+	If[ threshold > totalSum,
+		Print["Error: your threshold is greater than the sum of the entire series."];
 		iSumPrintLevel = iPrintLevelSave;
-		If[ ! (xSum1 < threshold),
-			Print["Not enough accuracy [1]. ", errStr];
-			Return[ errorReturn ]
-		];
-		If[ ! (xSum2 >= threshold),
-			Print["Not enough accuracy [2]. ", errStr];
-			Return[ errorReturn ]
-		];
-		{ nDig1, xSum1, nDig2, xSum2 }
+		Return[ errorReturn ]
 	];
-iPartialSumThreshold[d_Integer, iCount_Integer, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] :=
-	Block[
-	 { },
-		iPartialSumThreshold[ { d }, { iCount }, threshold, nDecimals, iBase ]
+	If[ threshold == totalSum,
+		Print["Error: your threshold is very close to the sum of the entire series. You need more accuracy. ", errStr];
+		iSumPrintLevel = iPrintLevelSave;
+		Return[ errorReturn ]
 	];
-iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, pSumStr_String, nDecimals_ : 15, iBase_ : 10] :=
-	Block[
-	 { pSum, inputStr2, decPtList, quoteList, nDecimalsInput, nDec2, errorReturn = { -1, -1, -1, -1 }},
-		decPtList = StringPosition[pSumStr, "."];
-		quoteList = StringPosition[pSumStr, "`"];
-		If[ (Length[decPtList] == 1) && (Length[quoteList] == 0),
-			nDecimalsInput = StringLength[pSumStr] - decPtList[[1]][[1]];
-			nDec2 = Max[nDecimalsInput + 5, nDecimals];
-			inputStr2 = pSumStr <> "``" <> ToString[nDec2];
-			pSum = ToExpression[inputStr2];,
-			pSum = ToExpression[pSumStr]
-		];
-		If[ (pSum == $Failed) || (NumericQ[pSum] == False),
-			Print["Invalid input"];
-			Return[ errorReturn ]
-		];
-		iPartialSumThreshold[digitList, countList, pSum, nDecimals, iBase]
+	{ xSum2 , nDig2 } = computeIrwinSum[iBase, digitList, countList, nDec2, iFormatted, nDigits, threshold];
+	If[ nDig2 > 1,
+		nDig1 = nDig2 - 1;
+		xSum1 = iPartialSum[digitList, countList, nDig1, nDec2, iBase];
 	];
-iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_ : 15, iBase_ : 10] :=
-	Block[ { },
-		iPartialSumThreshold[ { d }, { iCount }, pSumStr, nDecimals, iBase]
+	If[ ( ! (xSum1 < threshold)) && (nDig2 > 1),
+		nDig2 = nDig1;
+		xSum2 = xSum1;
+		nDig1 = nDig2 - 1;
+		xSum1 = iPartialSum[digitList, countList, nDig1, nDec2, iBase];
 	];
+	iSumPrintLevel = iPrintLevelSave;
+	If[ ! (xSum1 < threshold),
+		Print["Not enough accuracy [1]. ", errStr];
+		Return[ errorReturn ]
+	];
+	If[ ! (xSum2 >= threshold),
+		Print["Not enough accuracy [2]. ", errStr];
+		Return[ errorReturn ]
+	];
+	{ nDig1, xSum1, nDig2, xSum2 }
+];
+iPartialSumThreshold[d_Integer, iCount_Integer, threshold_?Positive, nDecimals_ : 15, iBase_ : 10] := Block[
+ { },
+	iPartialSumThreshold[ { d }, { iCount }, threshold, nDecimals, iBase ]
+];
+iPartialSumThreshold[digitList_?VectorQ, countList_?VectorQ, pSumStr_String, nDecimals_ : 15, iBase_ : 10] := Block[
+ { pSum, inputStr2, decPtList, quoteList, nDecimalsInput, nDec2, errorReturn = { -1, -1, -1, -1 }},
+	decPtList = StringPosition[pSumStr, "."];
+	quoteList = StringPosition[pSumStr, "`"];
+	If[ (Length[decPtList] == 1) && (Length[quoteList] == 0),
+		nDecimalsInput = StringLength[pSumStr] - decPtList[[1]][[1]];
+		nDec2 = Max[nDecimalsInput + 5, nDecimals];
+		inputStr2 = pSumStr <> "``" <> ToString[nDec2];
+		pSum = ToExpression[inputStr2];,
+		pSum = ToExpression[pSumStr]
+	];
+	If[ (pSum == $Failed) || (NumericQ[pSum] == False),
+		Print["Invalid input"];
+		Return[ errorReturn ]
+	];
+	iPartialSumThreshold[digitList, countList, pSum, nDecimals, iBase]
+];
+iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_ : 15, iBase_ : 10] := Block[
+	{ },
+	iPartialSumThreshold[ { d }, { iCount }, pSumStr, nDecimals, iBase]
+];
 SetAttributes[
 	{IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLevel},
 	{Protected, ReadProtected}

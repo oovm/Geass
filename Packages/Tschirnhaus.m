@@ -221,7 +221,6 @@ TschirnhausSolve[poly_, x_, ops : OptionsPattern[]] := Block[
 ] /; PolynomialQ[poly, x];
 noRoot = 10000 Count[#, Root[__], All] + LeafCount[#]&;
 RootSimplify[expr_] := FullSimplify[expr // FunctionExpand, ComplexityFunction -> noRoot];
-End[];
 SetAttributes[
 	{
 		PrincipalTransform, BringJerrardTransform, CanonicalTransform,

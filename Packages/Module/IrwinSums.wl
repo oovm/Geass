@@ -756,7 +756,7 @@ iPartialSumThreshold[d_Integer, iCount_Integer, pSumStr_String, nDecimals_ : 15,
 ];
 (* end of iPartialSumThreshold[digit, count, threshold string, decimals, base] *)
 
-End[ ];
+End[];
 SetAttributes[
 	{IrwinSum, iSumFormatted, iPartialSum, iPartialSumThreshold, setPrintLevel},
 	{Protected, ReadProtected}

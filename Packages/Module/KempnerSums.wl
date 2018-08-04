@@ -708,7 +708,8 @@ kSumX[stringList_?VectorQ, T_?MatrixQ, nDecimals0_Integer, iBase_] := Block[
 		 Apply[Plus, N[1/S[i, j]^k, nDecSum]]    this is fast but uses lots of memory
 
 	   lst1 = Range[11, 99]
-	   lst1 = Select[Range[11, 99], Mod[#, 10] != 0 &]  (* for KempnerSum[0], remove 20, 30, ..., 90 *)
+	   lst1 = Select[Range[11, 99], Mod[#, 10] != 0 &]
+	   for KempnerSum[0], remove 20, 30, ..., 90
 	   there is a difference in how these two expressions are evaluated:
 		 N[Apply[Plus, 1/lst1^k], nDecSum]
 		 Apply[Plus, N[1/lst1^k, nDecSum]]
@@ -720,12 +721,15 @@ kSumX[stringList_?VectorQ, T_?MatrixQ, nDecimals0_Integer, iBase_] := Block[
 		i <= iMaxBase,
 	
 	(* If[speedMode == 0,
-		 N[Apply[Plus, 1/S[i, j]^k], nDecSum],  (* slow, but uses little memory; N[long rational] *)
-		 (* Apply[Plus, N[1/S[i, j]^k, nDecSum]] *)   (* fast, but uses lots of memory; sum of decimals *)
-		 (* compute only one 1/S[i, j]^k at a time to save memory; 1/21/2008 *)
-		 (* xSum = 0; For[xi = 1, xi <= Length[S[i, j]], xi++, xSum += N[1/(S[i, j][[xi]])^k, nDecSum]]; xSum *)
-		 Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]    (* 1/24/2008 *)
-	   ] *) (* end If[speedMode] *)
+		 N[Apply[Plus, 1/S[i, j]^k], nDecSum],
+		 slow, but uses little memory; N[long rational]
+		 Apply[Plus, N[1/S[i, j]^k, nDecSum]]
+		 fast, but uses lots of memory; sum of decimals
+		 compute only one 1/S[i, j]^k at a time to save memory; 1/21/2008
+		  xSum = 0; For[xi = 1, xi <= Length[S[i, j]], xi++, xSum += N[1/(S[i, j][[xi]])^k, nDecSum]]; xSum
+		 Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]
+	   ] *)
+	(* end If[speedMode] *)
 		
 		Sum[ N[1 / (S[i, j][[xi]])^k, nDecSum], { xi, Length[S[i, j]] } ]
 		,
@@ -739,9 +743,9 @@ kSumX[stringList_?VectorQ, T_?MatrixQ, nDecimals0_Integer, iBase_] := Block[
 	(*
 	If[iPrint == -1,
 	  Print["kSumx: extraPol = ", extraPol, ", n = ", n];
-	  (* print the Psi values that will be used in computing z, below.  the 3rd argument
+	  print the Psi values that will be used in computing z, below.  the 3rd argument
 		 is always 1 there, but values of Psi[i-1, j, k] where k > 1 were used above
-		 to compute Psi[i, j, k]. *)
+		 to compute Psi[i, j, k].
 	  Print["  (1) Psi (1..", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[i, j, 1], {i, 1, extraPol}, {j, 1, n}], 5] // TableForm ];
 	  Print["  (2) Psi (", extraPol, ", 1..", n, ", 1) = ", N[Table[Psi[extraPol, j, 1], {j, n}], 5] // TableForm ];
 	];

@@ -144,7 +144,7 @@ HalfExp[z_?NumericQ, ops : OptionsPattern[]] := HalfExp[E, z, ops];
 (*Todo:{}^Inf x 的反函数SSR*)
 (* ::Subsection::Closed:: *)
 (*附加设置*)
-End[] ;
+End[];
 SetAttributes[
 	{Tetrate, TetraLog, TetraRoot, TetraD, HalfExp},
 	{Protected, ReadProtected}

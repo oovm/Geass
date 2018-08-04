@@ -301,7 +301,6 @@ NetShow[nn_, net_ : OptimalNet, input_ : None] := Block[
 		NetworkGraphics[s, Quiet@ApplySortingList[List /@ Flatten[s, 1], input]]
 	]
 ];
-End[] ;
 SetAttributes[
 	{ },
 	{Protected, ReadProtected}

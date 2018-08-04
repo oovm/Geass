@@ -331,7 +331,6 @@ QuinticRootToRadicals[root_Root] := Block[
 		-(-1)^(1 / 5) P + (-1)^(4 / 5) Q - (-1)^(3 / 5) R + (-1)^(2 / 5)S
 	} - b / (5 a), !TrueQ[# != root] &, 1][[1]]
 ];
-End[];
 SetAttributes[
 	{MetacyclicGroup, GaloisGroup, QuinticSolve, SolvableGroupQ},
 	{Protected, ReadProtected}
