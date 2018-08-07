@@ -199,124 +199,64 @@ RandomPebble[n_, sc_ : 0.95] := With[
 (*随机地形*)
 sphTerrainGenCore = Compile[
 	{
-		{tcoords, _Real, 2},
+		{tCoords, _Real, 2},
 		{coords, _Real, 2},
 		{center, _Real, 1},
 		{perturbation, _Real},
 		{offset, _Real}
 	},
 	MapIndexed[
-		center +
-			(coords[[#2[[1]]]] - center) *
-				(1 + perturbation * If[#[[1]] > center[[1]] + offset, 1, -1]) &,
-		tcoords
+		center + (coords[[#2[[1]]]] - center) * (1 + perturbation * If[#[[1]] > center[[1]] + offset, 1, -1]) &,
+		tCoords
 	]
 ];
-sphTerrainGenStep[{coords_, cells_, center_}, {normal_, perturbation_, offset_}] :=
-	{
-		sphTerrainGenCore[
-			RotationTransform[{normal, {1, 0, 0}}, center]@coords,
-			coords,
-			center,
-			perturbation,
-			offset
-		],
-		cells,
-		center
-	};
-sphTerrainGenStep[
-	{coords_, cells_, center_},
-	steps_Integer,
-	perturbationBounds : {_, _} : {.00001, .001},
-	offsetBounds : {_, _} : {0, .1}
-] :=
-	Fold[
-		sphTerrainGenStep[#, #2] &,
-		{coords, cells, center},
-		Transpose@{
-			RandomReal[{-1, 1}, {steps, 3}],
-			RandomReal[perturbationBounds, steps],
-			RandomReal[offsetBounds, steps]
-		}
-	];
-sphTerrainGenStep[{r_?RegionQ, center_},
-	steps_Integer,
-	perturbationBounds : {_, _} : {.00001, .001},
-	offsetBounds : {_, _} : {0, .1}
-] :=
-	With[{ret =
-		sphTerrainGenStep[{
-			MeshCoordinates[r],
-			MeshCells[r, All],
-			center
-		},
-			steps,
-			perturbationBounds
-		]
-	},
-		{
-			MeshRegion[ret[[1]], ret[[2]]],
-			ret[[3]]
-		}
-	]
-Options[sphTerrainGenInit] =
-	Options@DiscretizeGraphics;
-sphTerrainGenInit[
-	pointNum : _Integer : 10000,
-	center : {_?NumericQ, _?NumericQ, _?NumericQ} : {0, 0, 0},
-	rad : _Real : 1,
-	ops : OptionsPattern[]
-] :=
-	{DiscretizeGraphics[Ball[center, rad], ops], center};
-Options[sphTerrainGen] =
-	Options@sphTerrainGenInit;
-sphTerrainGen[
-	steps : _Integer : 100,
-	perturbationBounds : {_, _} : {.00001, .001},
-	ops : OptionsPattern[]
-] :=
-	With[{base = sphTerrainGenInit[ops]},
-		MeshRegion @@ Take[sphTerrainGenStep[base, steps], 2]
-	]
-Options[planetTerrainDataCached] =
-	Options[sphTerrainGenInit];
+sphTerrainGenStep[{coords_, cells_, center_}, {normal_, perturbation_, offset_}] := {
+	sphTerrainGenCore[
+		RotationTransform[{normal, {1, 0, 0}}, center]@coords,
+		coords,
+		center,
+		perturbation,
+		offset
+	],
+	cells,
+	center
+};
+sphTerrainGenStep[{coords_, cells_, center_}, steps_Integer, perturbationBounds : {_, _} : {.00001, .001}, offsetBounds : {_, _} : {0, .1}] := Fold[
+	sphTerrainGenStep[#, #2] &,
+	{coords, cells, center},
+	Transpose@{
+		RandomReal[{-1, 1}, {steps, 3}],
+		RandomReal[perturbationBounds, steps],
+		RandomReal[offsetBounds, steps]
+	}
+];
+sphTerrainGenStep[{r_?RegionQ, center_}, steps_Integer, perturbationBounds : {_, _} : {.00001, .001}, offsetBounds : {_, _} : {0, .1}] := With[
+	{ret = sphTerrainGenStep[{MeshCoordinates[r], MeshCells[r, All], center}, steps, perturbationBounds]},
+	{MeshRegion[ret[[1]], ret[[2]]], ret[[3]]}
+];
+Options[sphTerrainGenInit] = Options@DiscretizeGraphics;
+sphTerrainGenInit[pointNum : _Integer : 10000, center : {_?NumericQ, _?NumericQ, _?NumericQ} : {0, 0, 0}, rad : _Real : 1, ops : OptionsPattern[]] := {
+	DiscretizeGraphics[Ball[center, rad], ops], center
+};
+Options[sphTerrainGen] = Options@sphTerrainGenInit;
+sphTerrainGen[steps : _Integer : 100, perturbationBounds : {_, _} : {.00001, .001}, ops : OptionsPattern[]] := With[
+	{base = sphTerrainGenInit[ops]},
+	MeshRegion @@ Take[sphTerrainGenStep[base, steps], 2]
+];
+Options[planetTerrainDataCached] = Options[sphTerrainGenInit];
 planetTerrainDataCached[0, stepSize_Integer, ops_] :=
-	
-	planetTerrainDataCached[0, stepSize, ops] =
-		sphTerrainGenInit[FilterRules[{ops}, Options@sphTerrainGenInit]];
+	planetTerrainDataCached[0, stepSize, ops] = sphTerrainGenInit[FilterRules[{ops}, Options@sphTerrainGenInit]];
 planetTerrainDataCached[step_Integer, stepSize_Integer, ops_] :=
-	
-	planetTerrainDataCached[step, stepSize, ops] =
-		sphTerrainGenStep[planetTerrainData[step - 1, stepSize, ops],
-			stepSize];
-Options[planetTerrainData] =
-	Options[planetTerrainDataCached];
-planetTerrainData[step_Integer, stepSize : _Integer : 100,
-	ops : OptionsPattern[]] :=
-	
-	With[{o =
-		SortBy[Flatten@
-			FilterRules[{ops}, Options@planetTerrainDataCached], First]},
-		planetTerrainDataCached[step, stepSize, o]
-	];
-Options[planetTerrain] =
-	Options[planetTerrainData];
-planetTerrain[step_Integer, stepSize : _Integer : 100,
-	ops : OptionsPattern[]] :=
-	
-	planetTerrainData[step, stepSize, ops][[1]];
-
-Options[RandomPlanetTerrain] =
-	Join[
-		Options[SliceDensityPlot3D],
-		Options[planetTerrain]
-	];
-RandomPlanetTerrain[i_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] :=
-	RandomPlanetTerrain[
-		planetTerrain[i, stepSize,
-			FilterRules[{ops}, Options[planetTerrain]]],
-		ops
-	];
+	planetTerrainDataCached[step, stepSize, ops] = sphTerrainGenStep[planetTerrainData[step - 1, stepSize, ops], stepSize];
+Options[planetTerrainData] = Options[planetTerrainDataCached];
+planetTerrainData[step_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := With[
+	{o = SortBy[Flatten@FilterRules[{ops}, Options@planetTerrainDataCached], First]},
+	planetTerrainDataCached[step, stepSize, o]
+];
+Options[planetTerrain] = Options[planetTerrainData];
+planetTerrain[step_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := planetTerrainData[step, stepSize, ops][[1]];
+Options[RandomPlanetTerrain] = Join[Options[SliceDensityPlot3D], Options[planetTerrain]];
+RandomPlanetTerrain[i_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := RandomPlanetTerrain[planetTerrain[i, stepSize, FilterRules[{ops}, Options[planetTerrain]]], ops];
 RandomPlanetTerrain[reg_?RegionQ, ops : OptionsPattern[]] := With[
 	{rb = RegionBounds[reg]},
 	SliceDensityPlot3D[
@@ -325,18 +265,17 @@ RandomPlanetTerrain[reg_?RegionQ, ops : OptionsPattern[]] := With[
 		{x, rb[[1, 1]], rb[[1, 2]]},
 		{y, rb[[2, 1]], rb[[2, 2]]},
 		{z, rb[[3, 1]], rb[[3, 2]]},
-		Sequence @@
-			FilterRules[
-				{
-					ops,
-					ColorFunction -> "AlpineColors",
-					Boxed -> False,
-					Axes -> False
-				},
-				Options[SliceDensityPlot3D]
-			] // Evaluate
+		Sequence @@ FilterRules[
+			{
+				ops,
+				ColorFunction -> "AlpineColors",
+				Boxed -> False,
+				Axes -> False
+			},
+			Options[SliceDensityPlot3D]
+		] // Evaluate
 	]
-]
+];
 
 
 
