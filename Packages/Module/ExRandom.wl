@@ -197,6 +197,12 @@ RandomPebble[n_, sc_ : 0.95] := With[
 
 (* ::Subsubsection:: *)
 (*随机地形*)
+Options[sphTerrainGenInit] = Options@DiscretizeGraphics;
+Options[sphTerrainGen] = Options@sphTerrainGenInit;
+Options[planetTerrainDataCached] = Options[sphTerrainGenInit];
+Options[planetTerrainData] = Options[planetTerrainDataCached];
+Options[planetTerrain] = Options[planetTerrainData];
+Options[RandomPlanetTerrain] = Join[Options[SliceDensityPlot3D], Options[planetTerrain]];
 sphTerrainGenCore = Compile[
 	{
 		{tCoords, _Real, 2},
@@ -234,28 +240,20 @@ sphTerrainGenStep[{r_?RegionQ, center_}, steps_Integer, perturbationBounds : {_,
 	{ret = sphTerrainGenStep[{MeshCoordinates[r], MeshCells[r, All], center}, steps, perturbationBounds]},
 	{MeshRegion[ret[[1]], ret[[2]]], ret[[3]]}
 ];
-Options[sphTerrainGenInit] = Options@DiscretizeGraphics;
 sphTerrainGenInit[pointNum : _Integer : 10000, center : {_?NumericQ, _?NumericQ, _?NumericQ} : {0, 0, 0}, rad : _Real : 1, ops : OptionsPattern[]] := {
 	DiscretizeGraphics[Ball[center, rad], ops], center
 };
-Options[sphTerrainGen] = Options@sphTerrainGenInit;
 sphTerrainGen[steps : _Integer : 100, perturbationBounds : {_, _} : {.00001, .001}, ops : OptionsPattern[]] := With[
 	{base = sphTerrainGenInit[ops]},
 	MeshRegion @@ Take[sphTerrainGenStep[base, steps], 2]
 ];
-Options[planetTerrainDataCached] = Options[sphTerrainGenInit];
-planetTerrainDataCached[0, stepSize_Integer, ops_] :=
-	planetTerrainDataCached[0, stepSize, ops] = sphTerrainGenInit[FilterRules[{ops}, Options@sphTerrainGenInit]];
-planetTerrainDataCached[step_Integer, stepSize_Integer, ops_] :=
-	planetTerrainDataCached[step, stepSize, ops] = sphTerrainGenStep[planetTerrainData[step - 1, stepSize, ops], stepSize];
-Options[planetTerrainData] = Options[planetTerrainDataCached];
+planetTerrainDataCached[0, stepSize_Integer, ops_] := planetTerrainDataCached[0, stepSize, ops] = sphTerrainGenInit[FilterRules[{ops}, Options@sphTerrainGenInit]];
+planetTerrainDataCached[step_Integer, stepSize_Integer, ops_] := planetTerrainDataCached[step, stepSize, ops] = sphTerrainGenStep[planetTerrainData[step - 1, stepSize, ops], stepSize];
 planetTerrainData[step_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := With[
 	{o = SortBy[Flatten@FilterRules[{ops}, Options@planetTerrainDataCached], First]},
 	planetTerrainDataCached[step, stepSize, o]
 ];
-Options[planetTerrain] = Options[planetTerrainData];
 planetTerrain[step_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := planetTerrainData[step, stepSize, ops][[1]];
-Options[RandomPlanetTerrain] = Join[Options[SliceDensityPlot3D], Options[planetTerrain]];
 RandomPlanetTerrain[i_Integer, stepSize : _Integer : 100, ops : OptionsPattern[]] := RandomPlanetTerrain[planetTerrain[i, stepSize, FilterRules[{ops}, Options[planetTerrain]]], ops];
 RandomPlanetTerrain[reg_?RegionQ, ops : OptionsPattern[]] := With[
 	{rb = RegionBounds[reg]},
