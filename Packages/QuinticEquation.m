@@ -335,4 +335,4 @@ SetAttributes[
 	{MetacyclicGroup, GaloisGroup, QuinticSolve, SolvableGroupQ},
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+End[]

@@ -166,7 +166,7 @@
    How far do we have to go in the series before this happens?
    kPartialSumThreshold gives us the answer.  kPartialSumThreshold gives us
    the (approximate) point at which a partial sum exceeds a given threshold, and
-   shows how extraordinarily slowly these series converge to their final sums.  
+   shows how extraordinarily slowly these series converge to their final sums.
 
    After computing KempnerSum[314159] = 2302582.333863782607892, we call
      kPartialSumThreshold[1000000].  The result is:
@@ -1303,4 +1303,4 @@ SetAttributes[
 	},
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+EndPackage[]

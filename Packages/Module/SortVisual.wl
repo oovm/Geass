@@ -1,6 +1,6 @@
 (* ::Package:: *)
 (* ::Title:: *)
-(*SortAlgorithm(排序可视化)*)
+(*SortVisualization(排序可视化)*)
 (* ::Subchapter:: *)
 (*程序包介绍*)
 (* ::Text:: *)
@@ -22,7 +22,7 @@
 (*这里应该填这个函数的介绍*)
 (* ::Section:: *)
 (*函数说明*)
-BeginPackage["SortAlgorithm`"];
+BeginPackage["SortVisual`"];
 ShellSort::usage = "ShellSort[List]给出List的希尔排序过程追踪.";
 BubbleSort::usage = "BubbleSort[List]给出List的冒泡排序过程追踪.";
 InsertionSort::usage = "InsertionSort[List]给出List的插入排序过程追踪.";
@@ -352,4 +352,4 @@ SetAttributes[
 	{ },
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+EndPackage[]

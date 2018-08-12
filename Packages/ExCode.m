@@ -38,6 +38,7 @@ CipherToCode[Str_, Safe_ : False] := Block[
 ];
 Options[ExEncrypt] = {Method -> "Compress"};
 ExEncrypt[expr_, set_ : "MarySue", OptionsPattern[]] := Block[
+	{},
 	Switch[set,
 		"MarySue", ExEncryptMarySue[expr],
 		___, Return[Missing[]]
@@ -74,7 +75,7 @@ ExEncryptTheElder[expr_] := Block[
 	ans = CharSet["TheElder"][[IntegerDigits[FromDigits[Reverse@byte, 256], Length[CharSet["TheElder"]]] + 1]];
 	ins = Select[Accumulate[{RandomInteger[{2, 5}]} ~ Join ~ RandomInteger[{5, 20}, Length@ans]], # < Length@ans&];
 	StringInsert[StringJoin@ans, "?\r", ins] <> "?"
-]
+];
 ExEncryptTemp[Str_, Language -> "长者之问"] := Block[{ans, ins},
 	ans = IntegerDigits[FromDigits[CodeToCipher@Str, 256], Length@CharSet[Language -> "长者之问"]] + 1;
 	ins = Select[Accumulate[{RandomInteger[{2, 5}]} ~ Join ~ RandomInteger[{5, 20}, Length@ans]], # < Length@ans&];
@@ -169,4 +170,4 @@ SetAttributes[
 	{ },
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+End[]

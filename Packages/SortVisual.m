@@ -19,7 +19,7 @@ OptimalNet::usage = "OptimalNet[n],n<=10时输出完美排序网络,10<n<=16输�
 NetEfficiency::usage = "NetEfficiency[net]分析排序网络net的工作效率.";
 NetShow::usage = "NetShow[n,net,input]大小为n的排序网络,选用排序网络算法net,input为待排序数据.";
 ExNumber::usage = "程序包的说明,这里抄一遍";
-Begin["`SortAlgorithm`"];
+Begin["`SortVisual`"];
 Example$Version = "V1.0";
 Example$LastUpdate = "2016-11-11";
 ShellSort[start_] := Block[
@@ -305,4 +305,4 @@ SetAttributes[
 	{ },
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+End[]

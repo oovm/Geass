@@ -28,9 +28,27 @@ module.exports = {
 				]
 			},
 			{
-				title: 'MagicSquare 模块',
+				title: 'ExCode 模块',
 				children: [
-					'/MagicSquare/'
+					'/ExCode/'
+				]
+			},
+			{
+				title: 'ExForm 模块',
+				children: [
+					'/ExForm/'
+				]
+			},
+			{
+				title: 'ExRandom 模块',
+				children: [
+					'/ExRandom/'
+				]
+			},
+			{
+				title: 'SortVisual 模块',
+				children: [
+					'/SortVisual/'
 				]
 			}
 		]

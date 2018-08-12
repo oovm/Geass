@@ -244,4 +244,4 @@ SetAttributes[
 	{ },
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+EndPackage[]

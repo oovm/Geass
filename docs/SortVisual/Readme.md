@@ -1,46 +1,45 @@
 # Functions
 
-Sudoku 模块
-
-- 模块未完成
+SortVisual 模块
 
 - 模块可单独加载
 
 ```haskell
-Import["https://deus.netlify.com/pkg/Sudoku.wl"];
+Import["https://deus.netlify.com/pkg/SortVisual.wl"];
 ```
 
 
-
-## Magic
-
+## ShellSort
 ### 参数说明
 
-::: tip Magic[n,dim:2]
-- n 类型为 `Integer`, 表示幻方的阶
-- dim 类型为 `Integer`, 表示幻方的维度
+::: tip ShellSort[list]
+- list 类型为 `List`, 待排序的列表
 :::
-
-### 可选项
-
-待定, 支持其他种类幻方
 
 ### 返回值
 
-`MagicObject`
-
-::: danger Magic
-讲道理要不是 matlab 里这么叫的, Magic 这种说一半的做法是不可能作为函数名的.
-:::
+给出输入列表的希尔排序过程追踪
 
 
 ### 标准示例
 
-**测试代码:**
+#### 测试代码:
 ```haskell
 Import[]
 ```
 
-**测试输出:**
+#### 测试输出:
 
 
+## BubbleSort
+冒泡排序过程追踪
+
+## InsertionSort
+插入排序过程追踪
+
+## CocktailSort
+鸡尾酒排序过程追踪
+
+## BogoSort
+
+量子猴排过程追踪

@@ -27,17 +27,20 @@ script:
 before_deploy:
   # 清理工程文件
   - cd ${GITHUB_REPO}
+  - rm -f yarn.lock
+  - rm -f .package.json
   - rm -f .travis.yml
   - rm -f .gitignore
   - rm -f .gitattributes
   - rm -rf .git
+  - rm -rf docs
   - rm -rf Packages/__Dev
   - rm -rf Packages/Module
-  - rm -rf Resources
   - cd .. && tar -cJf ${GITHUB_REPO}.tar.xz ${GITHUB_REPO}
   # 最小化安装
   - cd ${GITHUB_REPO}
   - rm -rf Documentation
+  - rm -rf Resources
   - cd .. && tar -cJf ${GITHUB_REPO}.min.tar.xz ${GITHUB_REPO}
 deploy:
   provider: releases
@@ -47,3 +50,4 @@ deploy:
   name: AutoBuild-$nVer
   file:
     - ${GITHUB_REPO}.tar.xz
+    - ${GITHUB_REPO}.min.tar.xz

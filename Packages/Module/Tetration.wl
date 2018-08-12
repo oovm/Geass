@@ -149,4 +149,4 @@ SetAttributes[
 	{Tetrate, TetraLog, TetraRoot, TetraD, HalfExp},
 	{Protected, ReadProtected}
 ];
-EndPackage[];
+EndPackage[]
