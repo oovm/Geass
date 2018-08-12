@@ -10,7 +10,7 @@
 
 ## ![安装方式](https://raw.githubusercontent.com/Moe-Net/Geass/master/Resources/ico/02_Install.png) Install
 
-#### 发行版本
+#### 发行版本 [![](https://travis-ci.org/Moe-Net/Geass.svg?branch=master)](https://github.com/Moe-Net/Geass/releases/latest)
 
 ```Mathematica
 PacletInstall["Geass","Site"->"http://m.vers.site/"]
