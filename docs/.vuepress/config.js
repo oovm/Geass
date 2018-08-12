@@ -8,7 +8,7 @@ module.exports = {
 		}
 	},
 	head: [
-		['link', {rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css'}]
+		['link', {rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css'}]
 	],
 	themeConfig: {
 		repo: 'Moe-Net/Geass',
@@ -49,6 +49,12 @@ module.exports = {
 				title: 'SortVisual 模块',
 				children: [
 					'/SortVisual/'
+				]
+			},
+			{
+				title: 'Isomerism 模块',
+				children: [
+					'/Isomerism/'
 				]
 			}
 		]
