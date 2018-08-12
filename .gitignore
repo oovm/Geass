@@ -8,7 +8,7 @@ yarn-error.log*
 Thumbs.db
 .DS_Store
 docs/.build/
-docs/.vuepress/public/
+# docs/.vuepress/public/
 
 # idea 配置文件
 *.iml

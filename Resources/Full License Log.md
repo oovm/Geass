@@ -2,11 +2,11 @@
 
 ## README Pictures and Icons
 
-MainPage Source: 
+MainPage Source:
 
 Author: ** **
 
-Icons Source: 
+Icons Source:
 
 Author: ** **
 
@@ -20,7 +20,7 @@ Date: 2008-7-24
 
 Version: v2.3
 
-Source: 
+Source:
 
 - A. J. Kempner, "A Curious Convergent Series"
 
@@ -38,7 +38,7 @@ Date: August 16, 2008
 
 Version: v1.3
 
-Source: 
+Source:
 
 - F. Irwin, "A Curious Convergent Series"
 
@@ -48,13 +48,13 @@ Source:
 
 ## Tetration
 
-License: Not Found
+License: *Not Found*
 
 Author: **Andrew Robbins**
 
-Version: ???
+Version: *Null*
 
-Source: 
+Source:
 
 - http://allergrootste.com/big/Source/articles/TetrationSuperlog_Robbins.pdf
 
@@ -68,7 +68,7 @@ Date: June 2007
 
 Version: 2.0.42
 
-Source: 
+Source:
 
 -
 
@@ -76,17 +76,17 @@ Source:
 
 -
 
-## 
+##
 
 License: ** **
 
 Author: ** **
 
-Date: 
+Date:
 
-Version: 
+Version:
 
-Source: 
+Source:
 
 -
 
