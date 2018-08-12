@@ -47,7 +47,7 @@ ExampleFunction[2]="我就是个示例函数,什么功能都没有";
 
 (* ::Subsection::Closed:: *)
 (*附加设置*)
-End[] ;
+End[];
 SetAttributes[
 	{ },
 	{Protected,ReadProtected}

@@ -8,7 +8,7 @@ env:
  global:
    - GITHUB_NAME: Gal@Builder            # 瞎填都可以
    - GITHUB_MAIL: galseraph@gmail.com    # 瞎填都可以
-   - GITHUB_USER: GalAster               # 你的用户名
+   - GITHUB_USER: Moe-Net                # 你的用户名
    - GITHUB_REPO: Geass                  # 你的项目名
    # 还有一个 TRAVIS_KEY 填在 travis settings 里!
    # 教程 https://0x0.life/archives/47a3aed6.html

@@ -1,26 +1,26 @@
 # Code::Geass
 
 [![Mathematica](https://img.shields.io/badge/Mathematica-%3E%3D10.0-brightgreen.svg)](https://www.wolfram.com/mathematica/)
-[![Release Vision](https://img.shields.io/badge/release-v0.7.x-ff69b4.svg)](https://github.com/GalAster/Geis/releases)
-[![Repo Size](https://img.shields.io/github/repo-size/GalAster/Geis.svg)](https://github.com/GalAster/Geis.git)
+[![Release Vision](https://img.shields.io/badge/release-v0.7.x-ff69b4.svg)](https://github.com/Moe-Net/Geis/releases)
+[![Repo Size](https://img.shields.io/github/repo-size/Moe-Net/Geis.svg)](https://github.com/Moe-Net/Geis.git)
 
-![Background](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/MainPage.png)
+![Background](https://i.loli.net/2018/08/12/5b6fe5c08a9ae.png)
 
-## ![项目简介](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/01_Introduce.png) Introduce
+## ![项目简介](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/01_Introduce.png) Introduce
 
-## ![安装方式](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/02_Install.png) Install
+## ![安装方式](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/02_Install.png) Install
 
 #### 自动安装
 
-- 点击release下载最新的[安装包](https://github.com/GalAster/Geis/releases) [![Build Status](https://travis-ci.org/GalAster/Geass.svg?branch=master)](https://travis-ci.org/GalAster/Geass)
+- 点击release下载最新的[安装包](https://github.com/Moe-Net/Geis/releases) [![Build Status](https://travis-ci.org/GalAster/Geass.svg?branch=master)](https://travis-ci.org/GalAster/Geass)
 
 
-## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/03_ShowTime.png) Show Time!
+## ![意见建议](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/03_ShowTime.png) Show Time!
 
 ### 解五次方程
 
 <div align=center>
-<img src="https://raw.githubusercontent.com/GalAster/Geis/master/Resources/pic/HermiteSolve.png" alt="解五次方程"/>
+<img src="https://i.loli.net/2018/08/12/5b6fe5be92aca.png" alt="解五次方程"/>
 </div>
 
 
@@ -32,9 +32,9 @@ In[1]:= TschirnhausSolve[t^5-t+(11 2^(3/4))/(15 Sqrt[5])==0,Method->EllipticNome
 In[2]:=
 ```
 
-[更多演示](https://github.com/GalAster/Geis/blob/master/Resources/Full%20Examples%20Log.md)
+[更多演示](https://github.com/Moe-Net/Geis/blob/master/Resources/Full%20Examples%20Log.md)
 
-## ![计划项目](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/04_TodoList.png) Todo List
+## ![计划项目](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/04_TodoList.png) Todo List
 
 - [x] 五次方程
   - [x] 五次方程椭圆函数解
@@ -45,28 +45,25 @@ In[2]:=
   - [ ] 椭圆函数加法
   - [ ] 椭圆函数乘法
 
-[更多计划](https://github.com/GalAster/Geis/blob/master/Resources/Full%20Todo%20Log.md)
+[更多计划](https://github.com/Moe-Net/Geis/blob/master/Resources/Full%20Todo%20Log.md)
 
-## ![更新日志](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/05_ChangeLog.png) Change Log
+## ![更新日志](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/05_ChangeLog.png) Change Log
 
 | 版本号 |最近更新|
 |:-----:| --- 
 | 0.3.0 | ???????
-| Older | [查看完整记录](https://github.com/GalAster/Geis/blob/master/Resources/Full%20Change%20Log.md)
+| Older | [查看完整记录](https://github.com/Moe-Net/Geis/blob/master/Resources/Full%20Change%20Log.md)
 
-## ![意见建议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/06_Ideas.png) Ideas
+## ![意见建议](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/06_Ideas.png) Ideas
 
 ### 联系方式
 
-|知乎主页|QQ群聊| 
-|:-:|:-:|
-|[<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Logo_Zhihu.png" alt="知乎链接" width = "100" align=center />](https://www.zhihu.com/people/GalAster)|[<img src="https://raw.githubusercontent.com/GalAster/Deus/master/Resources/pic/Logo_QQ.png" alt="QQ链接" width = "100" align=center />](https://jq.qq.com/?_wv=1027&k=5BqFya1)|
+QQ群: 1014125
 
-
-## ![许可协议](https://raw.githubusercontent.com/GalAster/Geis/master/Resources/ico/07_License.png) License
+## ![许可协议](https://raw.githubusercontent.com/Moe-Net/Geis/master/Resources/ico/07_License.png) License
 
 The application is under **Mozilla Public License v2**.
 
 ©Copyright picture, icons and packages.
 
-For all the ©Copyright see: [License Log Full](https://github.com/GalAster/Geis/blob/master/Resources/Full%20License%20Log.md).
+For all the ©Copyright see: [License Log Full](https://github.com/Moe-Net/Geis/blob/master/Resources/Full%20License%20Log.md).
