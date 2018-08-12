@@ -20,8 +20,11 @@
 BeginPackage["ExCode`"];
 ExEncrypt::usage = "ExEncrypt[Str,Way]以方式Way给出输入代码Str的超编码";
 ExDecrypt::usage = "ExDecrypt[Str,Way]以方式Way给出输入代码Str的超解码";
-ListToPolish::usage =
-	"ListToPolish[list]转换一个逆波兰表达式列表,如果有多个表达式混在一个栈,返回会自动划分\r
+ExpressionToList::usage = "";
+Lispify::usage = "";
+AbsExpand::usage = "";
+EvaluatePolish::usage ="\
+	EvaluatePolish[list]转换一个逆波兰表达式列表,如果有多个表达式混在一个栈,返回会自动划分\r
     注意算子(Plus)和运算符(+)的区别.运算符要用字符串,算子无所谓,允许使用字母.例:\r
     ListToPolish[{4,2,3,\"*\"}]返回结果是{4,3*2}\r
     ListToPolish[{4,2,3,Times}]返回结果是{Times[3,2,4]}\r\r
@@ -90,7 +93,6 @@ ExEncrypt[expr_, set_ : "MarySue", OptionsPattern[]] := Block[
 		"MarySue", ExEncryptMarySue[expr],
 		___, Return[Missing[]]
 	]
-
 ];
 
 
@@ -98,13 +100,13 @@ ExEncrypt[expr_, set_ : "MarySue", OptionsPattern[]] := Block[
 CharSet["Chinese"] := StringPartition[FromCharacterCode[Range[13312, 40869]], 1];
 CharSet["ASCII"] := StringPartition[FromCharacterCode[Range[32, 126]], 1];
 CharSet["TheElder"] := StringPartition["苟利国家生死以岂因祸福避趋之", 1];
-CharSet["MarySue"] = StringPartition["\
+CharSet["MarySue"] = StringDelete[StringPartition["\
 	丝丹丽之乐云亚仪伊优伤佳依俏倩倾兮兰冰凌凝凡凤凪利千华卿可叶吉君咏哀嘉园城基塔墨夏多奥如妍妖妙妮妲姆姣姬娅娜娣娥娴婉婵婷媛嫩宁安宜\
 	寂寇寒岚巧希幻幽弥彩影御心思怡恋恩悠悦情慕慧拉文斯春昭晓晗晶曦曼月朵枝枫柒柔格桂梅梦樱欢欣殇残毓沫泪洁洛浅海涅淑清温渺滢澜澪灵烟然\
 	燕燢爱爽玉玖玛玥玫环玲珊珍珠琉琦琪琬琰琳琴琼瑗瑞瑟瑰瑶瑷璃璎璐璧白百盘眉真碎离秀秋筱米素紫红纨纯纱绯缈美羽翠翼育舒舞艳艺艾芊芝芬花\
 	芳芸苏苑英茉茗茜茹荔荷莉莎莲莳莹莺菁菲萌萍萝萦萨落蒂蓉蓓蓝蔷蕊蕴蕾薇薰蝶融血裳语贞迷邪铃银锦阳陌雁雅雨雪霄霜霞霭露青静音韵颖颜风飘\
 	香馥馨魂魅魑鸢黎黛", 1
-];
+], {"\t", "\n"}];
 ExEncryptMarySue[expr_] := Block[
 	{byte, ans, ins, set = CharSet["MarySue"]},
 	byte = Normal@BinarySerialize[{RandomReal[], expr}, PerformanceGoal -> "Size"];
@@ -197,12 +199,12 @@ RPNExpression[stack_, {op_, rest___}] := Which[
 	True,
 	RPNExpression[Append[stack, ToExpression[op]], {rest}]
 ];
-ListToPolish[list_] := First@RPNExpression[{}, ToString /@ list];
+EvaluatePolish[list_] := First@RPNExpression[{}, ToString /@ list];
 
 
 
 (* ::Subsubsection:: *)
-(*逆波兰表达式*)
+(*S 表达式*)
 SetAttributes[Lispify, HoldAll];
 Lispify[h_[args___]] := Prepend[Lispify /@ Unevaluated@{args}, Lispify[h]];
 Lispify[s_ /; AtomQ[s]] := s;
@@ -211,6 +213,9 @@ FooReverse[a_?ListQ] := Reverse[a];
 ExpressionToList[exp_] := Flatten[Reverse@Map[FooReverse, Lispify[Unevaluated[exp]], Infinity]];
 
 
+
+(* ::Subsubsection:: *)
+(* 绝对值展开 *)
 EqCheck = {LessEqual -> Less, GreaterEqual -> Greater};
 pBase[a_, b_, fx_] := (fx /. {x -> (a + b + Sqrt[(x - a)^2] - Sqrt[(x - b)^2]) / 2}) - (fx /. {x -> b});
 pBase[a_, ComplexInfinity, fx_] := fx /. {x -> (x + a + Sqrt[(x - a)^2]) / 2};
