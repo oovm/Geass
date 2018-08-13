@@ -3,11 +3,11 @@ module.exports = {
 	locales: {
 		'/': {
 			lang: 'zh-CN',
-			title: 'Geis',
-			description: 'Code ➤ GEASS'
+			title: 'Code ➤ GEASS'
 		}
 	},
 	head: [
+		['link', {rel: 'shortcut icon', type: "image/x-icon", href: `./favicon.png`}],
 		['link', {rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.6.0/katex.min.css'}]
 	],
 	themeConfig: {

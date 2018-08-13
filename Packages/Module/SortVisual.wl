@@ -51,13 +51,14 @@ ExNumber::usage = "程序包的说明,这里抄一遍";
 Begin["`Private`"];
 (* ::Subsection::Closed:: *)
 (*主体代码*)
-Example$Version = "V1.0";
+Example$Version = "V1.1";
 Example$LastUpdate = "2016-11-11";
 (* ::Subsubsection:: *)
 (*排序算法*)
-ShellSort[start_] := Block[
+ShellSort[start_List] := Bloc k[
 	{liShell, SSort},
-	liShell = {};liShell = Append[liShell, start];
+	liShell = {};
+	liShell = Append[liShell, start];
 	SSort[lst_] := Block[{list = lst, incr, temp, i, j},
 		incr = Round[Length[list] / 2];
 		While[incr > 0, For[i = incr + 1, i < Length[list] + 1, i++, temp = list[[i]];j = i;
@@ -65,62 +66,76 @@ ShellSort[start_] := Block[
 			list[[j]] = list[[j - incr]];j = j - incr;];
 		list[[j]] = temp;liShell = Append[liShell, list];];
 		If[incr == 2, incr = 1, incr = Round[incr / 2.2]]]];
-	SSort[start];
+	SSort[start]
 ];
-BubbleSort[start_] := Block[
-	{liBubble, BuSort},
+BubbleSort[start_List] := Block[
+	{liBubble, BuSort, temp},
 	liBubble = {};liBubble = Append[liBubble, start];
-	BuSort[array_] := Block[{arr = array, swapped = False, n = Length[array]},
+	BuSort[array_] := Block[
+		{arr = array, swapped = False, n = Length[array]},
 		Do[If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
 		arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped = True;
 		liBubble = Append[liBubble, arr];], {i, 1, n - 1}];
 		While[swapped == True, swapped = False;
 		Do[If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
 		arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped = True;
-		liBubble = Append[liBubble, arr];], {i, 1, n - 1}]]];
+		liBubble = Append[liBubble, arr];], {i, 1, n - 1}]]
+	];
 	BuSort[start];
 	liBubble
 ];
-InsertionSort[start_] := Block[
-	{liInsert, ISort},
-	liInsert = {};liInsert = Append[liInsert, start];
-	ISort[array_] := Block[{arr = array},
+InsertionSort[start_List] := Block[
+	{liInsert, ISort, i, j, value},
+	liInsert = {};
+	liInsert = Append[liInsert, start];
+	ISort[array_] := Block[
+		{arr = array},
 		For[i = 2, i <= Length[arr], i++, value = arr[[i]];j = i - 1;
 		While[j >= 1 && arr[[j]] > value, arr[[j + 1]] = arr[[j]];j--;];
 		arr[[j + 1]] = value;
-		liInsert = Append[liInsert, arr]]];
+		liInsert = Append[liInsert, arr]]
+	];
 	ISort[start];
 	liInsert
 ];
-CocktailSort[start_] := Block[
-	{liCocktail, CSort},
-	liCocktail = {};liCocktail = Append[liCocktail, start];
-	CSort[array2_] := Block[{arr = array2}, swapped = True;
-	While[swapped == True, swapped := False;
-	For[i = 1, i < Length[arr] - 1, i++,
-		If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
-		arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped = True;
-		liCocktail = Append[liCocktail, arr];]];
-	If[swapped == False, Break[]];
-	swapped := False;
-	For[i = Length[arr] - 1, i > 0, i--,
-		If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
-		arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped := True;
-		liCocktail = Append[liCocktail, arr];]];]];
+CocktailSort[start_List] := Block[
+	{liCocktail, CSort, swapped, i, temp},
+	liCocktail = {};
+	liCocktail = Append[liCocktail, start];
+	CSort[array2_] := Block[
+		{arr = array2},
+		swapped = True;
+		While[swapped == True, swapped := False;
+		For[i = 1, i < Length[arr] - 1, i++,
+			If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
+			arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped = True;
+			liCocktail = Append[liCocktail, arr];]
+		];
+		If[swapped == False, Break[]];
+		swapped := False;
+		For[i = Length[arr] - 1, i > 0, i--,
+			If[arr[[i]] > arr[[i + 1]], temp = arr[[i]];
+			arr[[i]] = arr[[i + 1]];arr[[i + 1]] = temp;swapped := True;
+			liCocktail = Append[liCocktail, arr];]
+		];
+		]
+	];
 	CSort[start];
 	liCocktail
 ];
-BogoSort[start_] := Block[
+BogoSort[start_List] := Block[
 	{l, time, ans, res},
 	l = Length@start;time = RandomVariate@PoissonDistribution[l l!];
-	res = DeleteCases[Table[RandomSample[start], {t, 0,
-		RandomVariate@PoissonDistribution[l^2]}], Sort@start] ~ Join ~ {Sort@start};
+	res = DeleteCases[Table[
+		RandomSample[start],
+		{t, 0, RandomVariate@PoissonDistribution[l^2]}
+	], Sort@start] ~ Join ~ {Sort@start};
 	ans = Sort@Union@RandomInteger[time, Ceiling@Sqrt@Length@res];
 	Print["我们观测了" <> ToString[time] <> "个平行宇宙后得到了最终的结果,接下来我们输出编号" <>
 		ToString[ans] <> "等" <> ToString[Length[res]] <> "个宇宙中的观测结果:"];
 	res
 ];
-QuickSort[s_] := Block[
+QuickSort[s_List] := Block[
 	{head, tail, qsort, t0},
 	head[{x_, xs___}] := Select[{xs}, # <= x&];
 	tail[{x_, xs___}] := Select[{xs}, # > x&];
@@ -135,24 +150,25 @@ QuickSort[s_] := Block[
 (* ::Subsubsection:: *)
 (*排序可视化*)
 Options[SortPlay] = {ChartStyle -> "DarkRainbow"};
-SortPlay[startlist_, OptionsPattern[]] := Animate[
-	BarChart[startlist[[n]],
+SortPlay[mat_?MatrixQ, OptionsPattern[]] := Animate[
+	BarChart[mat[[n]],
 		ChartStyle -> OptionValue[ChartStyle], ImageSize -> Large], {n, 1,
-		Length@startlist, 1}, AnimationRunning -> False,
+		Length@mat, 1}, AnimationRunning -> False,
 	DisplayAllSteps -> True
 ];
-Options[SortDraw] = {ColorFunction -> "TemperatureMap", AspectRatio -> Automatic};
-SortDraw[startlist_, OptionsPattern[]] := ArrayPlot[
-	startlist, ColorFunction -> OptionValue[ColorFunction],
-	AspectRatio -> OptionValue[AspectRatio]
+Options[SortDraw] = {ColorFunction -> "Rainbow", ImageSize -> 600};
+SortDraw[mat_?MatrixQ, OptionsPattern[]] := ArrayPlot[Transpose[mat],
+	FrameTicksStyle -> Opacity[1], FrameStyle -> Opacity[0], FrameTicks -> {{None, None}, {All, None}},
+	AspectRatio -> 1 / GoldenRatio^GoldenRatio, ImageSize -> OptionValue[ImageSize],
+	ColorFunction -> OptionValue[ColorFunction]
 ];
 Options[SortShow] = {AspectRatio -> Automatic};
-SortShow[startlist_, OptionsPattern[]] := Block[
-	{n = Length[startlist[[1]]]},
+SortShow[mat_?MatrixQ, OptionsPattern[]] := Block[
+	{n = Length[mat[[1]]]},
 	Graphics[
 		MapIndexed[{Thickness[0.1 / n], Hue[Last[#2] / n], Line[#1], Black,
 			If[n < 20, Function[s, Text[First[#2], s]] /@ #1, {}]}&,
-			Transpose[MapIndexed[{First[#2], #1}&, startlist, {2}]]],
+			Transpose[MapIndexed[{First[#2], #1}&, mat, {2}]]],
 		AspectRatio -> OptionValue[AspectRatio], ImageSize -> Full]
 ];
 Options[SortPlot] = {Joined -> False, ColorFunction -> "Rainbow"};

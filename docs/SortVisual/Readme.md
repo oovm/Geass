@@ -8,6 +8,16 @@ SortVisual 模块
 Import["https://deus.netlify.com/pkg/SortVisual.wl"];
 ```
 
+- 预加载以下函数
+
+```
+plotSort[mat_] := ArrayPlot[Transpose[mat],
+  FrameTicksStyle -> Opacity[1],
+  FrameTicks -> {{None, None}, {All, None}}, FrameStyle -> Opacity[0],
+  AspectRatio -> 1/GoldenRatio^GoldenRatio,
+  ColorFunction -> "Rainbow", ImageSize -> 600
+  ]
+```
 
 ## ShellSort
 ### 参数说明
